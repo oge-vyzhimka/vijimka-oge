@@ -7,6 +7,7 @@ const QuizEngine = {
   currentIndex: 0,
   score: 0,
   answered: false,
+  preparedQuestions: [],
 
   getQuestions(subjectId) {
     const sId = subjectId || this.currentSubjectId;
@@ -22,15 +23,36 @@ const QuizEngine = {
     this.currentIndex = 0;
     this.score = 0;
     this.answered = false;
+
+    // Загружаем исходные вопросы и рандомизируем порядок вариантов ответов
+    const raw = this.getQuestions(this.currentSubjectId);
+    this.preparedQuestions = raw.map(q => {
+      const correctAnswer = q.options[q.correctIndex];
+      const shuffledOptions = [...q.options];
+
+      // Тасование Фишера-Йетса для вариантов ответа
+      for (let i = shuffledOptions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledOptions[i], shuffledOptions[j]] = [shuffledOptions[j], shuffledOptions[i]];
+      }
+
+      return {
+        question: q.question,
+        options: shuffledOptions,
+        correctIndex: shuffledOptions.indexOf(correctAnswer),
+        explanation: q.explanation
+      };
+    });
+
     this.renderQuestion();
   },
 
   renderQuestion() {
     const container = document.getElementById("quiz-main-content");
     const subj = SUBJECTS_DATA[this.currentSubjectId];
-    const questions = this.getQuestions(this.currentSubjectId);
+    const questions = this.preparedQuestions;
 
-    if (!container || !subj || questions.length === 0) {
+    if (!container || !subj || !questions || questions.length === 0) {
       if (container) {
         container.innerHTML = `
           <div class="callout callout-tip">
@@ -108,8 +130,7 @@ const QuizEngine = {
     if (this.answered) return;
     this.answered = true;
 
-    const questions = this.getQuestions(this.currentSubjectId);
-    const q = questions[this.currentIndex];
+    const q = this.preparedQuestions[this.currentIndex];
     const optionButtons = document.querySelectorAll(".quiz-option-btn");
     const explanationArea = document.getElementById("quiz-explanation-area");
     const footerArea = document.getElementById("quiz-footer-area");
@@ -133,7 +154,7 @@ const QuizEngine = {
       explanationArea.innerHTML = `
         <div class="quiz-explanation-box">
           <div class="quiz-explanation-title" style="color: ${isCorrect ? 'var(--accent-green)' : 'var(--accent-red)'}">
-            ${isCorrect ? '✓ Верно!' : '✗ Ошибка!'} Правильный ответ: ${String.fromCharCode(65 + q.correctIndex)})
+            ${isCorrect ? '✓ Верно!' : '✗ Ошибка!'} Правильный ответ: ${String.fromCharCode(65 + q.correctIndex)}) ${q.options[q.correctIndex]}
           </div>
           <div class="quiz-explanation-body">
             ${q.explanation}
@@ -155,7 +176,7 @@ const QuizEngine = {
   renderResults() {
     const container = document.getElementById("quiz-main-content");
     const subj = SUBJECTS_DATA[this.currentSubjectId];
-    const questions = this.getQuestions(this.currentSubjectId);
+    const questions = this.preparedQuestions;
     const total = questions.length;
     const percentage = Math.round((this.score / total) * 100);
 
