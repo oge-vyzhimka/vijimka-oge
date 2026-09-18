@@ -3943,3 +3943,759 @@ button {
   }
 }
 
+/* ==========================================================================
+   Раздел: Все темы ОГЭ ФИПИ (Каталог всех тем, поиск и трекер по 11 предметам)
+   ========================================================================== */
+
+.topics-view-container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-bottom: 2.5rem;
+}
+
+/* Верхний баннер каталога тем */
+.tracker-hero {
+  background: linear-gradient(135deg, rgba(56, 139, 253, 0.12) 0%, rgba(163, 113, 247, 0.12) 50%, rgba(46, 160, 67, 0.08) 100%);
+  border: 1px solid rgba(56, 139, 253, 0.35);
+  border-radius: var(--radius-lg);
+  padding: 1.8rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.topics-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  background: rgba(56, 139, 253, 0.2);
+  color: var(--accent-blue);
+  border: 1px solid rgba(56, 139, 253, 0.35);
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.topics-hero-tag {
+  background: rgba(46, 160, 67, 0.25);
+  color: #3fb950;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(46, 160, 67, 0.4);
+}
+
+.topics-hero-title {
+  font-size: 1.7rem;
+  font-weight: 900;
+  line-height: 1.25;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.topics-hero-desc {
+  font-size: 0.94rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  max-width: 750px;
+  margin-bottom: 0.5rem;
+}
+
+.topics-doc-source {
+  margin-top: 0.65rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+/* Статистическая плашка прогресса */
+.tracker-stats-group {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 1.1rem 1.4rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
+}
+
+.tracker-circle-progress {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #3fb950;
+  line-height: 1;
+}
+
+.tracker-stats-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.tracker-stats-labels strong {
+  font-size: 1.15rem;
+  color: var(--text-primary);
+}
+
+.tracker-stats-sub {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+/* Быстрый скролл предметов в каталоге тем */
+.topics-subject-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.3rem 0.2rem 0.75rem;
+  margin-bottom: 1.25rem;
+  scrollbar-width: thin;
+}
+
+.topics-subject-selector::-webkit-scrollbar {
+  height: 4px;
+}
+.topics-subject-selector::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: var(--radius-full);
+}
+
+.topics-selector-label {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  margin-right: 0.25rem;
+}
+
+.topics-subj-btn,
+.topics-subject-pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.topics-subj-btn:hover,
+.topics-subject-pill:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border-color: rgba(56, 139, 253, 0.45);
+}
+
+.topics-subj-btn.active,
+.topics-subject-pill.active {
+  background: var(--accent-blue);
+  color: #ffffff;
+  border-color: var(--accent-blue);
+  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.35);
+}
+
+/* Тулбар поиска и фильтрации тем */
+.topics-toolbar {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.topics-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.topics-search-icon {
+  position: absolute;
+  left: 1rem;
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.topics-search-input {
+  width: 100%;
+  padding: 0.75rem 2.8rem 0.75rem 2.8rem;
+  font-size: 0.95rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  transition: all var(--transition-fast);
+  box-sizing: border-box;
+}
+
+.topics-search-input:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.25);
+}
+
+.topics-clear-search-btn {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 50%;
+  transition: color var(--transition-fast);
+}
+
+.topics-clear-search-btn:hover {
+  color: var(--text-primary);
+}
+
+.topics-filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.topics-filter-pills {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.topics-filter-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.topics-filter-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.topics-filter-btn.active {
+  background: rgba(56, 139, 253, 0.18);
+  color: var(--accent-blue);
+  border-color: rgba(56, 139, 253, 0.45);
+}
+
+.topics-actions-row {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.topics-tool-btn {
+  font-size: 0.78rem !important;
+  padding: 0.35rem 0.7rem !important;
+  border-radius: var(--radius-md) !important;
+}
+
+.topics-tool-btn.reset-btn {
+  color: var(--accent-orange) !important;
+}
+.topics-tool-btn.reset-btn:hover {
+  border-color: var(--accent-orange) !important;
+}
+
+.topics-search-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: var(--radius-sm);
+  background: rgba(56, 139, 253, 0.1);
+  border: 1px solid rgba(56, 139, 253, 0.25);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+}
+
+.topics-reset-inline {
+  background: none;
+  border: none;
+  color: var(--accent-blue);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  margin-left: auto;
+}
+
+/* Карточка раздела тем (Аккордеон) */
+.topic-section-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--transition-fast);
+}
+
+.topic-section-card:hover {
+  border-color: rgba(56, 139, 253, 0.35);
+}
+
+.topic-section-header {
+  padding: 1.1rem 1.3rem;
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background var(--transition-fast);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.topic-section-card.collapsed .topic-section-header {
+  border-bottom: none;
+}
+
+.topic-section-header:hover {
+  background: var(--bg-tertiary);
+}
+
+.topic-section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.topic-section-chevron {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  width: 14px;
+  display: inline-block;
+  transition: transform var(--transition-fast);
+}
+
+.topic-section-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.topic-section-fipicode {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-full);
+  background: rgba(56, 139, 253, 0.15);
+  color: var(--accent-blue);
+  border: 1px solid rgba(56, 139, 253, 0.3);
+  white-space: nowrap;
+}
+
+.topic-section-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.topic-section-count {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.topic-section-body {
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.topics-grid-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+/* Карточка отдельной темы */
+.topic-card-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.topic-card-item:hover {
+  border-color: rgba(56, 139, 253, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  transform: translateY(-1px);
+}
+
+.topic-card-item.completed {
+  border-color: rgba(46, 160, 67, 0.4);
+  background: linear-gradient(135deg, rgba(46, 160, 67, 0.05), var(--bg-card));
+}
+
+.topic-item-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.9rem;
+}
+
+/* Кастомный чекбокс */
+.topic-checkbox-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  margin-top: 0.2rem;
+}
+
+.topic-checkbox {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.topic-checkmark {
+  width: 20px;
+  height: 20px;
+  background-color: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  display: inline-block;
+  transition: all var(--transition-fast);
+  position: relative;
+}
+
+.topic-checkbox-wrap:hover .topic-checkmark {
+  border-color: var(--accent-blue);
+}
+
+.topic-checkbox:checked ~ .topic-checkmark {
+  background-color: #2ea043;
+  border-color: #2ea043;
+  box-shadow: 0 0 10px rgba(46, 160, 67, 0.4);
+}
+
+.topic-checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.topic-checkbox:checked ~ .topic-checkmark:after {
+  display: block;
+}
+
+.topic-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.topic-item-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.55rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.topic-fipi-tag {
+  font-size: 0.72rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--accent-blue);
+  background: rgba(56, 139, 253, 0.12);
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+}
+
+.topic-title-text {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.topic-card-item.completed .topic-title-text {
+  color: var(--text-secondary);
+}
+
+/* Бейджи темы */
+.topic-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.65rem;
+}
+
+.topic-task-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-full);
+  background: rgba(56, 139, 253, 0.15);
+  border: 1px solid rgba(56, 139, 253, 0.35);
+  color: var(--accent-blue);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.topic-task-badge:hover {
+  background: var(--accent-blue);
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(56, 139, 253, 0.3);
+}
+
+.task-badge-arrow {
+  font-size: 0.8rem;
+  transition: transform var(--transition-fast);
+}
+.topic-task-badge:hover .task-badge-arrow {
+  transform: translateX(2px) translateY(-1px);
+}
+
+.topic-part-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.topic-part-badge.part1 {
+  background: rgba(35, 134, 54, 0.12);
+  color: #3fb950;
+  border-color: rgba(46, 160, 67, 0.3);
+}
+
+.topic-part-badge.part2 {
+  background: rgba(163, 113, 247, 0.15);
+  color: #d2a8ff;
+  border-color: rgba(163, 113, 247, 0.35);
+}
+
+.topic-diff-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+}
+
+.topic-diff-badge.Базовый {
+  background: rgba(46, 160, 67, 0.15);
+  color: #3fb950;
+}
+
+.topic-diff-badge.Повышенный {
+  background: rgba(210, 153, 34, 0.15);
+  color: var(--accent-yellow);
+}
+
+.topic-diff-badge.Высокий {
+  background: rgba(248, 81, 73, 0.15);
+  color: var(--accent-red);
+}
+
+/* Формулы и термины */
+.topic-terms-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.terms-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.terms-pills {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.term-pill {
+  display: inline-block;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.78rem;
+  color: var(--text-primary);
+}
+
+.term-pill code {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: #58a6ff;
+}
+
+/* Совет от экспертов */
+.topic-tip-box {
+  margin-top: 0.65rem;
+  background: rgba(210, 153, 34, 0.08);
+  border: 1px solid rgba(210, 153, 34, 0.25);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.85rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.tip-bulb {
+  font-size: 1.1rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.topic-tip-box strong {
+  color: var(--accent-yellow);
+  display: block;
+  font-size: 0.78rem;
+  margin-bottom: 0.15rem;
+}
+
+.topic-tip-box p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* Подсветка поискового запроса */
+.topic-highlight {
+  background: rgba(234, 179, 8, 0.35);
+  color: #fff;
+  border-radius: 2px;
+  padding: 0 2px;
+  font-weight: 800;
+}
+
+/* Пустое состояние поиска */
+.topics-empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  background: var(--bg-secondary);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+}
+.topics-empty-state h3 {
+  font-size: 1.25rem;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+.topics-empty-state p {
+  font-size: 0.9rem;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .topics-hero-header {
+    padding: 1.2rem 1rem;
+  }
+  .topics-hero-title {
+    font-size: 1.3rem;
+  }
+  .topics-stats-bar {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  .topics-stat-card {
+    padding: 0.6rem 0.75rem;
+  }
+  .topics-stat-num {
+    font-size: 1.25rem;
+  }
+  .topics-toolbar {
+    padding: 0.85rem;
+  }
+  .topics-filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .topics-actions-row {
+    justify-content: flex-start;
+  }
+  .topic-section-header {
+    padding: 0.85rem 0.95rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
+  }
+  .topic-section-body {
+    padding: 0.75rem 0.75rem;
+  }
+  .topic-card-item {
+    padding: 0.85rem;
+  }
+  .topic-item-main {
+    gap: 0.65rem;
+  }
+}
+
+
