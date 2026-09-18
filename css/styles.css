@@ -689,20 +689,23 @@ button {
 }
 
 .subject-chip:hover {
-  border-color: var(--chip-accent, var(--accent-blue));
+  border-color: rgba(56, 189, 248, 0.4);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 }
 
 .subject-chip.active {
-  border-color: var(--chip-accent, #38bdf8);
-  background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), var(--bg-card));
-  box-shadow: 0 0 0 1px var(--chip-accent, #38bdf8), 0 4px 16px rgba(0, 0, 0, 0.3);
+  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(56, 189, 248, 0.12);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.15);
   font-weight: 600;
+  color: #38bdf8;
 }
 
 [data-theme="light"] .subject-chip.active {
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), #ffffff);
+  background: rgba(2, 132, 199, 0.08);
+  border-color: rgba(2, 132, 199, 0.4);
+  color: #0284c7;
 }
 
 .chip-icon {
@@ -1613,60 +1616,14 @@ button {
 }
 
 /* ==========================================================================
-   Mobile Bottom Navigation (Native App Tab Bar)
+   Mobile Bottom Navigation (Removed per design update)
    ========================================================================== */
 .mobile-bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: var(--bg-card);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid var(--border-color);
-  padding: 0.45rem 0.6rem calc(0.45rem + env(safe-area-inset-bottom, 0px));
-  display: none;
-  justify-content: space-around;
-  align-items: center;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.35);
+  display: none !important;
 }
 
 .mobile-nav-btn {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
-  padding: 0.4rem 0.2rem;
-  border-radius: var(--radius-md);
-  color: var(--text-muted);
-  transition: all var(--transition-fast);
-  background: none;
-  border: none;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.mobile-nav-icon {
-  font-size: 1.35rem;
-  line-height: 1;
-  transition: transform var(--transition-fast);
-}
-
-.mobile-nav-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-}
-
-.mobile-nav-btn.active {
-  color: var(--accent-blue);
-}
-
-.mobile-nav-btn.active .mobile-nav-icon {
-  transform: translateY(-2px) scale(1.1);
+  display: none !important;
 }
 
 /* ==========================================================================
@@ -1674,26 +1631,28 @@ button {
    ========================================================================== */
 @media (max-width: 768px) {
   body {
-    padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: 0 !important;
     overflow-x: hidden;
   }
 
   .site-header {
-    height: 52px;
-    padding: 0 0.85rem;
+    height: auto;
+    min-height: 52px;
+    padding: 0.5rem 0.85rem;
     position: sticky;
     top: 0;
     z-index: 100;
   }
 
   .nav-center-menu {
-    display: none !important; /* На смартфонах используется нижняя панель навигации */
+    display: none !important;
   }
 
   .header-container {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
     gap: 0.5rem;
     width: 100%;
   }
@@ -1878,37 +1837,33 @@ button {
     white-space: nowrap !important;
   }
 
-  /* НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ (TAB BAR) */
+  /* Скрываем мобильную нижнюю панель */
   .mobile-bottom-nav {
-    display: flex !important;
-    padding: 0.35rem 0.4rem calc(0.35rem + env(safe-area-inset-bottom, 0px)) !important;
-    gap: 0.2rem !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    background: var(--bg-card);
-    overflow-x: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    scrollbar-width: none !important;
-  }
-  .mobile-bottom-nav::-webkit-scrollbar {
     display: none !important;
   }
 
-  .mobile-nav-btn {
-    flex: 0 0 auto !important;
-    min-width: 52px !important;
-    padding: 0.25rem 0.3rem !important;
-    gap: 0.1rem !important;
+  /* На мобильных капсульная панель предметов переносится на вторую строку шапки */
+  .nav-capsule-bar {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    border-radius: 12px;
+    padding: 3px 6px;
+    justify-content: flex-start;
+    margin-top: 0.25rem;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
   }
-
-  .mobile-nav-icon {
-    font-size: 1.15rem !important;
+  .nav-capsule-bar::-webkit-scrollbar {
+    display: none;
   }
-
-  .mobile-nav-label {
-    font-size: 0.65rem !important;
-    white-space: nowrap !important;
-    letter-spacing: -0.01em !important;
+  .nav-capsule-btn {
+    flex-shrink: 0;
+    padding: 0.35rem 0.65rem;
+    font-size: 0.76rem;
+    gap: 0.3rem;
   }
 
   .subject-banner {
@@ -3016,16 +2971,17 @@ button {
 }
 
 .btn-umschool-action {
-  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%) !important;
-  border: none !important;
-  color: #ffffff !important;
-  font-weight: 700 !important;
-  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+  background: rgba(56, 189, 248, 0.08) !important;
+  border: 1px solid rgba(56, 189, 248, 0.3) !important;
+  color: #38bdf8 !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
 }
 .btn-umschool-action:hover {
-  background: linear-gradient(135deg, #6d28d9 0%, #4338ca 100%) !important;
+  background: rgba(56, 189, 248, 0.16) !important;
+  border-color: rgba(56, 189, 248, 0.5) !important;
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(124, 58, 237, 0.5);
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2) !important;
 }
 
 /* ==========================================================================
@@ -3178,16 +3134,16 @@ button {
    ========================================================================== */
 .umschool-modal-card {
   max-width: 850px;
-  border-top: 4px solid #7c3aed;
+  border-top: 3px solid #38bdf8;
 }
 
 .umschool-brand-badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(79, 70, 229, 0.2));
-  color: #a78bfa;
-  border: 1px solid rgba(124, 58, 237, 0.4);
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.25);
   font-size: 0.76rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -3206,8 +3162,8 @@ button {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: rgba(124, 58, 237, 0.2);
-  border: 1px solid rgba(124, 58, 237, 0.4);
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3221,13 +3177,13 @@ button {
 
 .umschool-teacher-role {
   font-size: 0.8rem;
-  color: #a78bfa;
+  color: #38bdf8;
 }
 
 .umschool-quote-box {
   padding: 0.75rem 1rem;
-  background: rgba(124, 58, 237, 0.08);
-  border-left: 3px solid #7c3aed;
+  background: rgba(56, 189, 248, 0.06);
+  border-left: 3px solid #38bdf8;
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   font-size: 0.88rem;
   font-style: italic;
@@ -3257,21 +3213,21 @@ button {
 
 .btn-umschool-reveal {
   font-size: 0.82rem !important;
-  background: rgba(124, 58, 237, 0.15) !important;
-  border-color: rgba(124, 58, 237, 0.4) !important;
-  color: #c4b5fd !important;
+  background: rgba(56, 189, 248, 0.1) !important;
+  border-color: rgba(56, 189, 248, 0.3) !important;
+  color: #38bdf8 !important;
   font-weight: 700 !important;
 }
 .btn-umschool-reveal:hover {
-  background: #7c3aed !important;
-  color: white !important;
+  background: #38bdf8 !important;
+  color: #0f172a !important;
 }
 
 .umschool-solution-box {
   margin-top: 0.85rem;
   padding: 1rem;
   background: var(--bg-card);
-  border: 1px solid rgba(124, 58, 237, 0.3);
+  border: 1px solid rgba(56, 189, 248, 0.25);
   border-radius: var(--radius-md);
   animation: fadeIn 0.25s ease;
 }
@@ -3721,21 +3677,16 @@ button {
 }
 
 .demos-badge-pill.official-pill {
-  background: rgba(37, 99, 235, 0.18);
-  color: #60a5fa;
-  border-color: rgba(37, 99, 235, 0.4);
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.25);
 }
 
-.demos-badge-pill.umschool-pill {
-  background: rgba(139, 92, 246, 0.18);
-  color: #c084fc;
-  border-color: rgba(139, 92, 246, 0.4);
-}
-
+.demos-badge-pill.umschool-pill,
 .demos-badge-pill.local-pill {
-  background: rgba(16, 185, 129, 0.18);
-  color: #34d399;
-  border-color: rgba(16, 185, 129, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .demos-hero-title {
@@ -3847,23 +3798,13 @@ button {
   background: var(--bg-tertiary);
 }
 
-.demos-subtab-btn.active {
-  background: var(--accent-blue);
-  color: #ffffff;
-  border-color: var(--accent-blue);
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
-}
-
-.demos-subtab-btn.subtab-umschool.active {
-  background: linear-gradient(135deg, #7c3aed, #9333ea);
-  border-color: #7c3aed;
-  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.4);
-}
-
+.demos-subtab-btn.active,
+.demos-subtab-btn.subtab-umschool.active,
 .demos-subtab-btn.subtab-prokudskoe.active {
-  background: linear-gradient(135deg, #059669, #10b981);
-  border-color: #059669;
-  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 0 14px rgba(56, 189, 248, 0.12);
 }
 
 /* Панель фильтрации заданий (Все, Часть 1, Часть 2) */
@@ -3926,7 +3867,7 @@ button {
 }
 
 .demo-task-card.part-2 {
-  border-left: 4px solid var(--accent-purple, #8b5cf6);
+  border-left: 3px solid rgba(56, 189, 248, 0.4);
 }
 
 .demo-task-top {
@@ -5740,11 +5681,6 @@ button {
   padding: 0.2rem 0.55rem;
   border-radius: 9999px;
 }
-  font-size: 0.75rem;
-  font-weight: 800;
-  padding: 0.25rem 0.6rem;
-  border-radius: 9999px;
-}
 
 .gate-school-tag {
   font-size: 0.75rem;
@@ -6462,15 +6398,17 @@ button {
 }
 
 .home-badge-pill.school-pill {
-  background: rgba(168, 85, 247, 0.1);
-  border-color: rgba(168, 85, 247, 0.28);
-  color: #c084fc;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
   cursor: pointer;
   transition: all var(--transition-fast, 0.18s ease);
 }
 
 .home-badge-pill.school-pill:hover {
-  background: rgba(168, 85, 247, 0.2);
+  background: rgba(56, 189, 248, 0.1);
+  border-color: rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
   transform: translateY(-1px);
 }
 
@@ -6613,26 +6551,25 @@ button {
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: var(--card-accent, #38bdf8);
-  opacity: 0.65;
-  transition: opacity 0.2s ease, height 0.2s ease;
+  height: 2px;
+  background: #38bdf8;
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
 .home-subject-card:hover {
   transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 22px rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.3);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(56, 189, 248, 0.08);
 }
 
 [data-theme="light"] .home-subject-card:hover {
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
-  border-color: rgba(15, 23, 42, 0.18);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  border-color: rgba(2, 132, 199, 0.3);
 }
 
 .home-subject-card:hover::before {
   opacity: 1;
-  height: 4px;
 }
 
 .home-subject-header {
@@ -6643,14 +6580,29 @@ button {
 }
 
 .home-subject-icon-box {
-  width: 48px;
-  height: 48px;
+  width: 46px;
+  height: 46px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+}
+
+[data-theme="light"] .home-subject-icon-box {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+
+.home-subject-card:hover .home-subject-icon-box {
+  background: rgba(56, 189, 248, 0.1);
+  border-color: rgba(56, 189, 248, 0.3);
+  transform: scale(1.04);
 }
 
 .home-subject-badges {
@@ -6663,17 +6615,17 @@ button {
 
 .home-cat-badge {
   font-size: 0.72rem;
-  font-weight: 600;
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
+  font-weight: 500;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.04);
-  color: var(--text-secondary);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .home-cat-badge.home-cat-mandatory {
   background: rgba(56, 189, 248, 0.08);
-  color: #7dd3fc;
+  color: #38bdf8;
   border-color: rgba(56, 189, 248, 0.22);
 }
 
@@ -6682,16 +6634,17 @@ button {
 .home-cat-badge.home-cat-science {
   background: rgba(255, 255, 255, 0.04);
   color: var(--text-secondary);
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 .home-score-badge {
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 500;
   padding: 0.2rem 0.55rem;
-  border-radius: 9999px;
-  background: rgba(148, 163, 184, 0.1);
-  color: var(--text-secondary);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .home-subject-body {
@@ -6751,7 +6704,7 @@ button {
 
 .home-open-link {
   font-weight: 600;
-  color: var(--card-accent, #38bdf8);
+  color: #38bdf8;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
