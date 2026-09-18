@@ -138,6 +138,18 @@ const QuizEngine = {
     const isCorrect = (selectedIndex === q.correctIndex);
     if (isCorrect) {
       this.score++;
+    } else {
+      // Сохраняем в персональный банк ошибок
+      if (typeof MistakesBank !== "undefined" && MistakesBank.recordMistake) {
+        MistakesBank.recordMistake({
+          subjectId: this.currentSubjectId,
+          question: q.question,
+          options: q.options,
+          userAnswer: q.options[selectedIndex],
+          correctAnswer: q.options[q.correctIndex],
+          explanation: q.explanation
+        });
+      }
     }
 
     optionButtons.forEach((btn, idx) => {
@@ -154,7 +166,7 @@ const QuizEngine = {
       explanationArea.innerHTML = `
         <div class="quiz-explanation-box">
           <div class="quiz-explanation-title" style="color: ${isCorrect ? 'var(--accent-green)' : 'var(--accent-red)'}">
-            ${isCorrect ? '✓ Верно!' : '✗ Ошибка!'} Правильный ответ: ${String.fromCharCode(65 + q.correctIndex)}) ${q.options[q.correctIndex]}
+            ${isCorrect ? '✓ Верно!' : '✗ Ошибка! Задание добавлено в «Мои ошибки»'} • Правильный ответ: ${String.fromCharCode(65 + q.correctIndex)}) ${q.options[q.correctIndex]}
           </div>
           <div class="quiz-explanation-body">
             ${q.explanation}
@@ -180,6 +192,16 @@ const QuizEngine = {
     const total = questions.length;
     const percentage = Math.round((this.score / total) * 100);
 
+    // Геймификация и ачивки
+    if (typeof Gamification !== "undefined") {
+      Gamification.recordActivity();
+      Gamification.unlockAchievement("first_test");
+      if (percentage === 100) {
+        Gamification.unlockAchievement("perfect_score");
+      }
+      Gamification.checkAchievements();
+    }
+
     let verdict = "Нужно ещё потренироваться и повторить теорию!";
     let gradeEstimate = "3";
     if (percentage >= 85) {
@@ -189,6 +211,8 @@ const QuizEngine = {
       verdict = "Хороший уровень знаний (уверенная «4»), но разберите ошибки!";
       gradeEstimate = "4";
     }
+
+    const unresolvedErrors = (typeof MistakesBank !== "undefined") ? MistakesBank.getUnresolvedCount() : 0;
 
     container.innerHTML = `
       <div class="quiz-container" style="text-align: center;">
@@ -206,14 +230,19 @@ const QuizEngine = {
           <button class="btn-action" onclick="QuizEngine.start('${this.currentSubjectId}')">
             Пройти тест заново 🔄
           </button>
-          <button class="btn-action" onclick="App.openKimModal('${this.currentSubjectId}')" style="background: var(--bg-tertiary);">
-            📚 Посмотреть сборники КИМ ФИПИ
+          ${unresolvedErrors > 0 ? `
+            <button class="btn-action" onclick="App.switchView('mistakes')" style="background: var(--accent-red); color: white;">
+              ❌ Разобрать ошибки (${unresolvedErrors})
+            </button>
+          ` : ''}
+          <button class="btn-action" onclick="App.switchView('cabinet')" style="background: var(--accent-blue); color: white;">
+            👤 Мой кабинет и ачивки
           </button>
-          <button class="btn-action" onclick="App.openUmschoolModal('${this.currentSubjectId}')" style="background: #7c3aed; color: white;">
-            🟣 Пробник Умскул с решениями
+          <button class="btn-action" onclick="App.openKimModal('${this.currentSubjectId}')" style="background: var(--bg-tertiary);">
+            📚 Сборники КИМ ФИПИ
           </button>
           <button class="btn-action" onclick="App.switchView('cheatsheet')">
-            Вернуться к шпаргалкам 📖
+            К шпаргалкам 📖
           </button>
         </div>
       </div>
