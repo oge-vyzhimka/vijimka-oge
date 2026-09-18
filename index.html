@@ -29,152 +29,58 @@
        ======================================================================== -->
   <div id="welcome-gate" class="welcome-gate-screen">
     <div class="welcome-gate-card">
-      <div class="gate-badge-row">
-        <span class="gate-badge">🎓 ОГЭ 2025/2026</span>
-        <span class="gate-school-tag">МКОУ Чикская СОШ №6 им. Д.К. Потапова</span>
-      </div>
-
       <div class="gate-header">
+        <div class="gate-badge-row">
+          <span class="gate-badge">🎓 ОГЭ 2025/2026</span>
+          <span class="gate-school-tag">МКОУ Чикская СОШ №6</span>
+        </div>
         <h1 class="gate-title">ОГЭ Выжимка<span>.Экспресс</span></h1>
         <p class="gate-subtitle">
-          Платформа экспресс-подготовки к экзаменам 9 класса. Вся теория ФИПИ, интерактивные тесты, банк ошибок и стрики ежедневных занятий.
+          Платформа экспресс-подготовки к экзаменам 9 класса. Вход в систему.
         </p>
       </div>
 
-      <!-- Переключатель роли на начальном экране (Ученик и Telegram) -->
-      <div class="gate-role-tabs">
-        <button type="button" class="gate-tab-btn active" id="gate-tab-student" onclick="Auth.switchGateTab('student')">
-          🎒 Быстрый старт
+      <!-- ФОРМА ВХОДА (ЛОГИН И ПАРОЛЬ) -->
+      <form id="gate-login-form" onsubmit="Auth.submitGateLogin(event)">
+        <div class="gate-form-group">
+          <label class="gate-label" for="gate-input-username">Логин или имя:</label>
+          <input type="text" id="gate-input-username" class="gate-input" required placeholder="Введите логин" autocomplete="username" value="Ученик">
+        </div>
+
+        <div class="gate-form-group">
+          <label class="gate-label" for="gate-input-password">Пароль:</label>
+          <input type="password" id="gate-input-password" class="gate-input" required placeholder="Введите пароль" autocomplete="current-password" value="123456">
+        </div>
+
+        <div id="gate-login-error" class="gate-error-msg" style="display: none;"></div>
+
+        <button type="submit" class="gate-submit-btn">
+          Войти в систему 🚀
         </button>
-        <button type="button" class="gate-tab-btn tg-gate-tab" id="gate-tab-telegram" onclick="Auth.switchGateTab('telegram')">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="#38bdf8" style="vertical-align: -2px; margin-right: 4px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
-          Войти через Telegram
+      </form>
+
+      <!-- РАЗДЕЛИТЕЛЬ И ВХОД ДЛЯ УЧИТЕЛЯ -->
+      <div class="gate-divider"><span>или доступ для преподавателей</span></div>
+
+      <div class="gate-teacher-section">
+        <button type="button" class="gate-teacher-toggle-btn" onclick="Auth.toggleTeacherPanel()" id="gate-teacher-toggle-btn">
+          👩‍🏫 Вход для учителя
         </button>
-      </div>
 
-      <!-- ФОРМА 1: Вход для ученика (ручной ввод) -->
-      <div id="gate-panel-student" class="gate-panel">
-        <!-- Кнопка быстрого перехода в Telegram -->
-        <div class="gate-fast-tg-banner" onclick="Auth.switchGateTab('telegram')" role="button" tabindex="0" title="Быстрый вход через Telegram">
-          <div class="fast-tg-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="#38bdf8"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
-          </div>
-          <div class="fast-tg-info">
-            <span class="fast-tg-title">⚡ Войти через Telegram</span>
-            <span class="fast-tg-sub">Вход по @username без паролей и почты</span>
-          </div>
-          <span class="fast-tg-badge">Войти →</span>
-        </div>
-
-        <form onsubmit="Auth.submitGateStudent(event)">
-          <div class="gate-form-group">
-            <label class="gate-label">Ваше имя или никнейм:</label>
-            <input type="text" id="gate-input-name" class="gate-input" required placeholder="Например, Алексей" value="Ученик">
-          </div>
-
-          <div class="gate-form-row">
-            <div class="gate-form-group">
-              <label class="gate-label">Класс:</label>
-              <select id="gate-input-grade" class="gate-input">
-                <option value="9 «А»" selected>9 «А» класс</option>
-                <option value="9 «Б»">9 «Б» класс</option>
-                <option value="9 «В»">9 «В» класс</option>
-                <option value="9 «Г»">9 «Г» класс</option>
-                <option value="9 класс">9 класс</option>
-              </select>
+        <div id="gate-teacher-panel" class="gate-teacher-panel" style="display: none;">
+          <form onsubmit="Auth.submitGateTeacher(event)">
+            <label class="gate-label" for="gate-teacher-code">Секретное кодовое слово учителя:</label>
+            <div class="gate-teacher-input-row">
+              <input type="password" id="gate-teacher-code" class="gate-input" placeholder="Введите кодовое слово" autocomplete="off">
+              <button type="submit" class="gate-teacher-submit-btn">Войти →</button>
             </div>
-            <div class="gate-form-group">
-              <label class="gate-label">Аватарка:</label>
-              <div class="gate-avatar-selector">
-                <button type="button" class="gate-avatar-pill active" onclick="Auth.selectGateAvatar('🦊', this)">🦊</button>
-                <button type="button" class="gate-avatar-pill" onclick="Auth.selectGateAvatar('🚀', this)">🚀</button>
-                <button type="button" class="gate-avatar-pill" onclick="Auth.selectGateAvatar('🦉', this)">🦉</button>
-                <button type="button" class="gate-avatar-pill" onclick="Auth.selectGateAvatar('⚡', this)">⚡</button>
-                <button type="button" class="gate-avatar-pill" onclick="Auth.selectGateAvatar('🏆', this)">🏆</button>
-                <button type="button" class="gate-avatar-pill" onclick="Auth.selectGateAvatar('🎓', this)">🎓</button>
-              </div>
-              <input type="hidden" id="gate-input-avatar" value="🦊">
-            </div>
-          </div>
-
-          <button type="submit" class="gate-submit-btn student-btn">
-            Войти и открыть материалы ОГЭ 🚀
-          </button>
-        </form>
-
-        <div class="gate-divider"><span>или быстрый вход через сервисы</span></div>
-
-        <div class="gate-cloud-row" style="grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem;">
-          <button type="button" class="gate-oauth-btn tg-btn" onclick="Auth.signInWithTelegram()" style="background: rgba(34, 158, 217, 0.15); border-color: rgba(34, 158, 217, 0.4); color: #38bdf8;" title="Войти через Telegram">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#38bdf8"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
-            Telegram
-          </button>
-          <button type="button" class="gate-oauth-btn" onclick="Auth.signInWithGoogle()" title="Войти через Google аккаунт">
-            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
-            Google
-          </button>
-          <button type="button" class="gate-oauth-btn email-btn" onclick="Auth.openProfileModal();" title="Вход по почте и паролю">
-            ✉️ Email
-          </button>
-        </div>
-      </div>
-
-      <!-- ФОРМА 2: Вход через Telegram (ВЫДЕЛЕННАЯ ВКЛАДКА) -->
-      <div id="gate-panel-telegram" class="gate-panel" style="display: none;">
-        <div class="tg-hero-card">
-          <div class="tg-hero-header">
-            <div class="tg-hero-circle">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
-            </div>
-            <div>
-              <div class="tg-hero-title">Вход через Telegram</div>
-              <div class="tg-hero-sub">Синхронизация прогресса по Telegram-нику без паролей</div>
-            </div>
-          </div>
-        </div>
-
-        <form onsubmit="Auth.submitGateTelegram(event)">
-          <div class="gate-form-group">
-            <label class="gate-label">Ваш никнейм в Telegram (@username):</label>
-            <div class="tg-input-wrapper">
-              <span class="tg-at-symbol">@</span>
-              <input type="text" id="gate-tg-username" class="gate-input tg-styled-input" required placeholder="ваш_никнейм" autocomplete="username">
-            </div>
-            <div class="gate-hint-text">Укажите ник из настроек Telegram (например: ivan_9a). Пароль не нужен.</div>
-          </div>
-
-          <div class="gate-form-row">
-            <div class="gate-form-group">
-              <label class="gate-label">Класс:</label>
-              <select id="gate-tg-grade" class="gate-input">
-                <option value="9 «А»" selected>9 «А» класс</option>
-                <option value="9 «Б»">9 «Б» класс</option>
-                <option value="9 «В»">9 «В» класс</option>
-                <option value="9 «Г»">9 «Г» класс</option>
-                <option value="9 класс">9 класс</option>
-              </select>
-            </div>
-            <div class="gate-form-group">
-              <label class="gate-label">Ваше имя (необязательно):</label>
-              <input type="text" id="gate-tg-displayname" class="gate-input" placeholder="Как вас называть">
-            </div>
-          </div>
-
-          <button type="submit" class="gate-submit-btn tg-full-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
-            Войти через Telegram ✈️
-          </button>
-        </form>
-
-        <div style="margin-top: 1rem; text-align: center;">
-          <button type="button" class="gate-link-btn" onclick="Auth.switchGateTab('student')">
-            ← Войти без Telegram (ручная анкета)
-          </button>
+            <div id="gate-teacher-error" class="gate-error-msg" style="display: none;"></div>
+          </form>
         </div>
       </div>
 
       <div class="gate-footer">
-        <span>Данные сохраняются автоматически. Настройки профиля можно изменить в любой момент.</span>
+        <span>Данные профиля сохраняются локально в вашем браузере.</span>
       </div>
     </div>
   </div>
@@ -247,17 +153,8 @@
           <input type="text" id="global-search-input" class="search-input" placeholder="Поиск формулы, правила..." autocomplete="off">
         </div>
 
-        <button class="nav-pill-btn profile-header-btn" id="header-profile-btn" onclick="Auth.openProfileModal()" title="Личный кабинет и профиль">
-          <span id="header-profile-avatar">🦊</span>
-          <span id="header-profile-name">Войти</span>
-        </button>
-
         <button class="btn-icon" id="theme-toggle-btn" title="Сменить тему оформления" onclick="App.toggleTheme()">
           <span id="theme-toggle-icon">☀️</span>
-        </button>
-
-        <button class="btn-icon print-btn-icon" onclick="window.print()" title="Распечатать шпаргалку текущего предмета">
-          <span>🖨️</span>
         </button>
 
         <button class="nav-pill-btn logout-header-btn" id="header-logout-btn" onclick="Auth.showGateScreen()" title="Выйти на начальный экран">
@@ -285,10 +182,6 @@
         </div>
       </div>
       <div class="status-right">
-        <div class="status-chip streak-chip" id="status-streak-chip" onclick="Auth.openProfileModal()" title="Ваша текущая серия занятий">
-          <span class="status-chip-icon">🔥</span>
-          <span id="header-streak-badge">1 день</span>
-        </div>
         <button class="status-chip school-chip" onclick="App.switchView('school')" title="Раздел для учеников Чикской СОШ № 6">
           <span>🏫</span>
           <span>Чикская СОШ №6</span>
@@ -753,6 +646,44 @@
     </div>
   </div>
 
+  <!-- ========================================================================
+       Модальное окно: Подробный разбор заданий ОГЭ (ФИПИ & Решу ОГЭ)
+       ======================================================================== -->
+  <div id="task-detail-modal" class="task-modal-overlay" style="display: none;" onclick="TaskDetails.onBackdropClick(event)">
+    <div class="task-modal-dialog">
+      <div class="task-modal-header">
+        <div class="task-modal-header-info">
+          <div class="task-modal-badges">
+            <span class="task-badge task-badge-fipi">📋 ФИПИ & Решу ОГЭ</span>
+            <span class="task-badge task-badge-subj" id="task-modal-subj-badge">Математика</span>
+            <span class="task-badge task-badge-score" id="task-modal-score-badge">1 балл</span>
+          </div>
+          <h2 class="task-modal-title" id="task-modal-title">Задание ОГЭ</h2>
+        </div>
+        <button class="task-modal-close-btn" onclick="TaskDetails.close()" title="Закрыть (Esc)">✕</button>
+      </div>
+
+      <div class="task-modal-nav-tabs">
+        <button class="task-nav-tab active" data-tab="theory" onclick="TaskDetails.switchTab('theory')">💡 Полная теория и формулы</button>
+        <button class="task-nav-tab" data-tab="algorithm" onclick="TaskDetails.switchTab('algorithm')">⚙️ Алгоритм решения</button>
+        <button class="task-nav-tab" data-tab="examples" onclick="TaskDetails.switchTab('examples')">📝 Примеры ФИПИ & Решу ОГЭ</button>
+        <button class="task-nav-tab" data-tab="traps" onclick="TaskDetails.switchTab('traps')">⚠️ Ловушки и ошибки</button>
+      </div>
+
+      <div class="task-modal-body" id="task-modal-content">
+        <!-- Генерируется из task_details.js -->
+      </div>
+
+      <div class="task-modal-footer">
+        <div class="task-modal-footer-left">
+          <button class="task-footer-btn" id="task-modal-prev-btn" onclick="TaskDetails.prevTask()">← Предыдущее</button>
+          <button class="task-footer-btn" id="task-modal-next-btn" onclick="TaskDetails.nextTask()">Следующее задание →</button>
+        </div>
+        <button class="task-footer-close-btn" onclick="TaskDetails.close()">Вернуться к конспекту</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Подключение Supabase JS Client v2 CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -766,6 +697,7 @@
   <script src="js/data/umschool.js?v=20260918-v5"></script>
   <script src="js/data/quizzes.js?v=20260918-v5"></script>
   <script src="js/data/oge_topics.js?v=20260918-v5"></script>
+  <script src="js/task_details.js?v=20260918-v6"></script>
   <script src="js/calculator.js?v=20260918-v5"></script>
   <script src="js/auth.js?v=20260918-v5"></script>
   <script src="js/mistakes.js?v=20260918-v5"></script>
