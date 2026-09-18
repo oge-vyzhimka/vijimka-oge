@@ -181,5 +181,10 @@ const Calculator = {
       const pct = Math.round((clampedScore / subj.examInfo.maxScore) * 100);
       progressFill.style.width = `${pct}%`;
     }
+
+    // Геймификация: разблокировка ачивки за расчет отличной оценки
+    if (finalGrade === 5 && typeof Gamification !== "undefined") {
+      Gamification.unlockAchievement("grade_5");
+    }
   }
 };
