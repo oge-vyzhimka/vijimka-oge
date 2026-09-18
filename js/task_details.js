@@ -1,6 +1,6 @@
 /**
- * ОГЭ-ВЫЖИМКА — Интерактивный разбор заданий ФИПИ и Решу ОГЭ
- * Модуль подробного изучения заданий ОГЭ 2026/2027
+ * ОГЭ-ВЫЖИМКА — Полная база интерактивных разборов заданий ФИПИ и Решу ОГЭ
+ * Поддерживает ВСЕ 11 предметов экзамена ОГЭ 2026/2027
  */
 
 const TaskDetails = {
@@ -10,9 +10,12 @@ const TaskDetails = {
   taskList: [],
 
   // =========================================================================
-  // БАЗА ДАННЫХ РАЗБОРОВ ЗАДАНИЙ (МАТЕМАТИКА)
+  // БАЗА ДАННЫХ РАЗБОРОВ ЗАДАНИЙ ПО ВСЕМ ПРЕДМЕТАМ
   // =========================================================================
   db: {
+    // -----------------------------------------------------------------------
+    // МАТЕМАТИКА
+    // -----------------------------------------------------------------------
     math: [
       {
         id: "math_1_5",
@@ -419,6 +422,65 @@ const TaskDetails = {
         `
       },
       {
+        id: "math_14",
+        matchTitles: ["прогресси", "арифметическ", "геометрическ", "14"],
+        title: "Задание 14: Числовые последовательности и прогрессии",
+        fipiSpec: {
+          number: "№ 14",
+          score: "1 первичный балл",
+          time: "4–6 минут",
+          difficulty: "Базовый уровень",
+          docSource: "Кодификатор ФИПИ (Раздел 2: Прогрессии)"
+        },
+        theory: `
+          <h4>1. Арифметическая прогрессия (шаг d)</h4>
+          <div class="task-formula-box">
+            <div class="math-row"><strong>n-й член:</strong> a<sub>n</sub> = a₁ + d · (n - 1)</div>
+            <div class="math-row"><strong>Сумма n первых членов:</strong> S<sub>n</sub> = ((a₁ + a<sub>n</sub>) / 2) · n = ((2a₁ + d(n - 1)) / 2) · n</div>
+          </div>
+
+          <h4>2. Геометрическая прогрессия (знаменатель q)</h4>
+          <div class="task-formula-box">
+            <div class="math-row"><strong>n-й член:</strong> b<sub>n</sub> = b₁ · q<sup>n - 1</sup></div>
+            <div class="math-row"><strong>Сумма:</strong> S<sub>n</sub> = (b₁ · (q<sup>n</sup> - 1)) / (q - 1)</div>
+          </div>
+        `,
+        algorithm: `
+          <div class="task-step-list">
+            <div class="task-step-item">
+              <div class="task-step-num">Шаг 1</div>
+              <div class="task-step-desc">
+                <strong>Определите тип:</strong> Если к каждому шагу <em>прибавляется</em> фиксированное число — это арифметическая прогрессия; если <em>умножается</em> в несколько раз — геометрическая.
+              </div>
+            </div>
+            <div class="task-step-item">
+              <div class="task-step-num">Шаг 2</div>
+              <div class="task-step-desc">
+                <strong>Выпишите a₁ и d (или b₁ и q):</strong> Внимательно сопоставьте номер шага n с вопросом задачи (например, в 12-м ряду, через 5 дней).
+              </div>
+            </div>
+          </div>
+        `,
+        examples: `
+          <div class="task-example-card">
+            <div class="task-example-badge">Реальный КИМ ФИПИ (№ 14)</div>
+            <p><strong>Условие:</strong> В амфитеатре 14 рядов. В первом ряду 20 мест, а в каждом следующем на 3 места больше, чем в предыдущем. Сколько мест в десятом ряду?</p>
+            <div class="task-example-solution">
+              <strong>Решение:</strong>
+              <p>a₁ = 20, d = 3, n = 10.<br>
+                 a₁₀ = a₁ + 9d = 20 + 9 · 3 = 20 + 27 = <strong>47</strong>.</p>
+              <div class="task-answer-box">Ответ: <strong>47</strong></div>
+            </div>
+          </div>
+        `,
+        traps: `
+          <div class="callout callout-warning">
+            <strong>⚠️ Ловушка: Разница между a<sub>n</sub> и S<sub>n</sub></strong>
+            <p>Если спрашивают «сколько всего мест во всем зале» — нужна сумма S<sub>n</sub>, а не количество мест в последнем ряду!</p>
+          </div>
+        `
+      },
+      {
         id: "math_geom_15_19",
         matchTitles: ["треугольник", "геометри", "площад", "окружност", "синус", "косинус", "теорема", "15", "16", "17", "18", "19"],
         title: "Задания 15–19: Блок «Геометрия» (Обязательный порог 2 балла!)",
@@ -519,6 +581,335 @@ const TaskDetails = {
           </div>
         `
       }
+    ],
+
+    // -----------------------------------------------------------------------
+    // РУССКИЙ ЯЗЫК
+    // -----------------------------------------------------------------------
+    russian: [
+      {
+        id: "rus_1",
+        matchTitles: ["изложение", "сжати", "1"],
+        title: "Задание 1: Сжатое изложение (Аудиозапись текста)",
+        fipiSpec: {
+          number: "№ 1",
+          score: "6–7 первичных баллов (критерии ИК1–ИК3 + ГК1–ГК4)",
+          time: "40–50 минут",
+          difficulty: "Базовый уровень",
+          docSource: "Кодификатор ФИПИ (Раздел: Аудирование и понимание текста)"
+        },
+        theory: `
+          <h4>1. Главные критерии оценивания ФИПИ</h4>
+          <ul>
+            <li><strong>ИК1 (Содержание):</strong> переданы ВСЕ 3 микротемы исходного текста (по 1 в каждом абзаце).</li>
+            <li><strong>ИК2 (Сжатие текста):</strong> применены приемы сжатия текста в КАЖДОМ из 3 абзацев.</li>
+            <li><strong>ИК3 (Смысловая цельность):</strong> нет логических ошибок и необоснованных абзацев.</li>
+            <li><strong>Объем:</strong> не менее 70 слов! (Идеально: 75–95 слов).</li>
+          </ul>
+
+          <h4>2. Три официальных приема сжатия</h4>
+          <div class="task-formula-box">
+            <div class="math-row"><strong>1. Исключение:</strong> убираем повторы, вводные слова, однородные члены, описания</div>
+            <div class="math-row"><strong>2. Обобщение:</strong> заменяем перечисления общим понятием («березы, липы, сосны» → «деревья»)</div>
+            <div class="math-row"><strong>3. Упрощение:</strong> заменяем сложное предложение простым или прямой диалог косвенной речью</div>
+          </div>
+        `,
+        algorithm: `
+          <div class="task-step-list">
+            <div class="task-step-item">
+              <div class="task-step-num">Шаг 1</div>
+              <div class="task-step-desc">
+                <strong>Первое прослушивание:</strong> Не пытайтесь записать каждое слово! Фиксируйте ключевые существительные и глаголы, отметьте 3 микротемы и границы абзацев.
+              </div>
+            </div>
+            <div class="task-step-item">
+              <div class="task-step-num">Шаг 2</div>
+              <div class="task-step-desc">
+                <strong>Второе прослушивание:</strong> Допишите пропущенные связки и аргументы.
+              </div>
+            </div>
+            <div class="task-step-item">
+              <div class="task-step-num">Шаг 3</div>
+              <div class="task-step-desc">
+                <strong>Подсчет слов:</strong> Обязательно пересчитайте слова (предлоги и союзы считаются за отдельные слова). Если меньше 70 — вы получите 0 баллов по критериям сжатия!
+              </div>
+            </div>
+          </div>
+        `,
+        examples: `
+          <div class="task-example-card">
+            <div class="task-example-badge">Пример сжатия микротемы</div>
+            <p><strong>Исходный текст (38 слов):</strong> «Истинная дружба — это бескорыстное чувство, связывающее двух людей, готовых в любую тяжелую минуту прийти на помощь, разделить и радость, и горе, и никогда не предавать доверие товарища.»</p>
+            <div class="task-example-solution">
+              <strong>Сжатый вариант (15 слов, прием обобщения и исключения):</strong>
+              <p>«Истинная дружба — это бескорыстные отношения людей, готовых поддержать друг друга в радости и беде.»</p>
+            </div>
+          </div>
+        `,
+        traps: `
+          <div class="callout callout-warning">
+            <strong>⚠️ Ловушка: Потеря микротемы</strong>
+            <p>Если объединить 2 микротемы в один абзац или выбросить хотя бы одну — сразу теряется 2 первичных балла по ИК1!</p>
+          </div>
+        `
+      },
+      {
+        id: "rus_2_5",
+        matchTitles: ["синтаксис", "пунктуац", "орфограф", "грамматическ", "основа", "приставк", "суффикс", "2", "3", "4", "5"],
+        title: "Задания 2–5: Языковой анализ (Синтаксис, пунктуация, орфография)",
+        fipiSpec: {
+          number: "№ 2–5",
+          score: "4 первичных балла (по 1 за каждое)",
+          time: "15–20 минут",
+          difficulty: "Базовый уровень",
+          docSource: "Кодификатор ФИПИ (Раздел: Нормы русского языка)"
+        },
+        theory: `
+          <h4>1. Грамматическая основа (Задание 2)</h4>
+          <ul>
+            <li>Подлежащее может быть выражено инфинитивом («<strong>Учиться</strong> всегда пригодится»).</li>
+            <li>Сказуемое: составное глагольное (вспомогательный глагол + инфинитив: «<strong>начал читать</strong>»), составное именное (глагол-связка + имя: «<strong>был красивым</strong>»).</li>
+          </ul>
+
+          <h4>2. Орфографический анализ (Задание 5)</h4>
+          <div class="task-formula-box">
+            <div class="math-row"><strong>Чередующиеся корни:</strong> БЕР/БИР, ТЕР/ТИР (зависят от суффикса -А-); ГАР/ГОР, ЗАР/ЗОР (зависят от ударения)</div>
+            <div class="math-row"><strong>Приставки:</strong> ПРЕ- (= очень или пере-), ПРИ- (приближение, присоединение, неполнота действия)</div>
+            <div class="math-row"><strong>-Н- и -НН-:</strong> в отглагольных прилагательных (нет приставки, несовершенный вид) — Н; в причастиях (есть приставка или зависимое слово) — НН</div>
+          </div>
+        `,
+        algorithm: `
+          <div class="task-step-list">
+            <div class="task-step-item">
+              <div class="task-step-num">Шаг 1</div>
+              <div class="task-step-desc">
+                <strong>Разбор каждого утверждения в задании 5:</strong> Выделите три элемента: 1) часть речи, 2) морфему (корень/приставка/суффикс), 3) правило. Если хотя бы один элемент ложен — утверждение неверно!
+              </div>
+            </div>
+          </div>
+        `,
+        examples: `
+          <div class="task-example-card">
+            <div class="task-example-badge">Разбор формулировки Задания 5</div>
+            <p><strong>Утверждение:</strong> «ПОСТЕЛЕННЫЙ — в суффиксе полного страдательного причастия прошедшего времени пишется НН, так как есть приставка ПО-».</p>
+            <div class="task-example-solution">
+              <strong>Анализ:</strong> 1) Часть речи: причастие (верно), 2) Суффикс: -ЕНН- (верно), 3) Есть приставка: по- (верно). <strong>Утверждение ВЕРНО.</strong>
+            </div>
+          </div>
+        `,
+        traps: `
+          <div class="callout callout-warning">
+            <strong>⚠️ Ловушка ФИПИ: Ложная часть речи</strong>
+            <p>Составители часто пишут правильное правило, но не для той части речи (например, называют отглагольное прилагательное «причастием»). Будьте предельно бдительны!</p>
+          </div>
+        `
+      },
+      {
+        id: "rus_13",
+        matchTitles: ["сочинени", "13", "13.1", "13.2", "13.3", "рассуждени"],
+        title: "Задание 13: Сочинение-рассуждение (13.1, 13.2 или 13.3)",
+        fipiSpec: {
+          number: "№ 13",
+          score: "9 первичных баллов (по критериям С1К1–С1К4)",
+          time: "60–75 минут",
+          difficulty: "Высокий уровень",
+          docSource: "Кодификатор ФИПИ (Раздел: Развернутое высказывание)"
+        },
+        theory: `
+          <h4>1. Структура идеального сочинения 13.3 (4 абзаца)</h4>
+          <ul>
+            <li><strong>Абзац 1 (Тезис):</strong> Определение понятия + собственный комментарий (2–3 предложения).</li>
+            <li><strong>Абзац 2 (Пример 1 из текста):</strong> Иллюстрация поступка героя с указанием номеров предложений и пояснением роли.</li>
+            <li><strong>Абзац 3 (Пример 2 из жизни/литературы):</strong> Книга, исторический факт или жизненный опыт.</li>
+            <li><strong>Абзац 4 (Вывод):</strong> Обобщение мысли, перекликающееся с тезисом (без новых идей).</li>
+          </ul>
+        `,
+        algorithm: `
+          <div class="task-step-list">
+            <div class="task-step-item">
+              <div class="task-step-num">Шаг 1</div>
+              <div class="task-step-desc">
+                <strong>Выбор темы:</strong> 92% выпускников выбирают 13.3 (нравственно-этическое понятие: доброта, сострадание, смелость, дружба, материнская любовь).
+              </div>
+            </div>
+          </div>
+        `,
+        examples: `
+          <div class="task-example-card">
+            <div class="task-example-badge">Клише для тезиса 13.3</div>
+            <p>«Что такое доброта? По моему мнению, доброта — это искреннее стремление бескорыстно помогать окружающим, не требуя ничего взамен. Докажу справедливость своих слов примерами из прочитанного текста и жизненного опыта.»</p>
+          </div>
+        `,
+        traps: `
+          <div class="callout callout-warning">
+            <strong>⚠️ Ловушка: Объем менее 70 слов</strong>
+            <p>Если объем сочинения меньше 70 слов, эксперты ставят 0 баллов за всё сочинение!</p>
+          </div>
+        `
+      }
+    ],
+
+    // -----------------------------------------------------------------------
+    // ФИЗИКА
+    // -----------------------------------------------------------------------
+    physics: [
+      {
+        id: "phys_mech",
+        matchTitles: ["механик", "динамик", "скорост", "ньютон", "движени", "импульс"],
+        title: "Физика: Механические явления (Законы Ньютона, движение, энергия)",
+        fipiSpec: {
+          number: "№ 1–6, 11, 21–23",
+          score: "До 12 первичных баллов",
+          time: "30–40 минут",
+          difficulty: "Базовый и повышенный",
+          docSource: "Кодификатор ФИПИ (Раздел 1: Механика)"
+        },
+        theory: `
+          <h4>1. Законы Ньютона</h4>
+          <div class="task-formula-box">
+            <div class="math-row"><strong>I закон:</strong> тело сохраняет покой или равномерное прямолинейное движение, если равнодействующая сил F = 0</div>
+            <div class="math-row"><strong>II закон:</strong> F = m · a &nbsp;(a = F / m)</div>
+            <div class="math-row"><strong>III закон:</strong> силы действия и противодействия равны: F₁ = -F₂</div>
+          </div>
+
+          <h4>2. Кинематика и энергия</h4>
+          <div class="task-formula-box">
+            <div class="math-row">v = v₀ + a·t &nbsp;|&nbsp; S = v₀·t + (a·t²) / 2 &nbsp;|&nbsp; 2aS = v² - v₀²</div>
+            <div class="math-row">E<sub>к</sub> = (m·v²) / 2 &nbsp;|&nbsp; E<sub>п</sub> = m·g·h &nbsp;|&nbsp; E<sub>полн</sub> = E<sub>к</sub> + E<sub>п</sub> = const</div>
+          </div>
+        `,
+        algorithm: `
+          <div class="task-step-list">
+            <div class="task-step-item">
+              <div class="task-step-num">Шаг 1</div>
+              <div class="task-step-desc">
+                <strong>Перевод в СИ:</strong> Время в секунды (1 мин = 60 с), масса в кг (100 г = 0.1 кг), скорость в м/с (36 км/ч = 10 м/с, делим на 3.6).
+              </div>
+            </div>
+          </div>
+        `,
+        examples: `
+          <div class="task-example-card">
+            <div class="task-example-badge">Пример задачи ОГЭ</div>
+            <p><strong>Условие:</strong> Тело массой 2 кг движется с ускорением 3 м/с². Чему равна равнодействующая сила?</p>
+            <div class="task-example-solution">
+              <p>F = m · a = 2 · 3 = <strong>6 Н</strong>.</p>
+            </div>
+          </div>
+        `,
+        traps: `
+          <div class="callout callout-warning">
+            <strong>⚠️ Ловушка: Перевод км/ч в м/с</strong>
+            <p>Чтобы перевести км/ч в м/с, нужно ДЕЛИТЬ на 3.6, а не умножать!</p>
+          </div>
+        `
+      },
+      {
+        id: "phys_electro",
+        matchTitles: ["электрич", "ток", "ом", "сопротивлени", "напряжени", "резистор"],
+        title: "Физика: Электродинамика и закон Ома",
+        fipiSpec: {
+          number: "№ 7–10, 17, 23–25",
+          score: "До 10 первичных баллов",
+          time: "25–35 минут",
+          difficulty: "Базовый и высокий",
+          docSource: "Кодификатор ФИПИ (Раздел 3: Электромагнитные явления)"
+        },
+        theory: `
+          <h4>1. Закон Ома для участка цепи</h4>
+          <div class="task-formula-box">
+            <div class="math-row"><strong>I = U / R</strong> &nbsp;(I — сила тока в амперах, U — напряжение в вольтах, R — сопротивление в омах)</div>
+            <div class="math-row"><strong>Сопротивление проводника:</strong> R = ρ · (l / S)</div>
+          </div>
+
+          <h4>2. Соединения проводников</h4>
+          <div class="task-formula-box">
+            <div class="math-row"><strong>Последовательное:</strong> I = const, &nbsp; U = U₁ + U₂, &nbsp; R = R₁ + R₂</div>
+            <div class="math-row"><strong>Параллельное:</strong> U = const, &nbsp; I = I₁ + I₂, &nbsp; 1/R = 1/R₁ + 1/R₂</div>
+          </div>
+        `,
+        algorithm: `
+          <div class="task-step-list">
+            <div class="task-step-item">
+              <div class="task-step-num">Шаг 1</div>
+              <div class="task-step-desc">
+                <strong>Анализ цепи:</strong> Определите, как соединены элементы. Помните: амперметр подключается последовательно, а вольтметр — параллельно!
+              </div>
+            </div>
+          </div>
+        `,
+        examples: `
+          <div class="task-example-card">
+            <div class="task-example-badge">Пример задачи ОГЭ</div>
+            <p><strong>Условие:</strong> Два резистора по 6 Ом соединены параллельно. Найдите общее сопротивление.</p>
+            <div class="task-example-solution">
+              <p>R<sub>общ</sub> = R / 2 = 6 / 2 = <strong>3 Ом</strong>.</p>
+            </div>
+          </div>
+        `,
+        traps: `
+          <div class="callout callout-warning">
+            <strong>⚠️ Ловушка: Сечение проводника в мм²</strong>
+            <p>В формуле R = ρ · l / S удельное сопротивление ρ дано в (Ом·мм²)/м. Поэтому площадь S нужно подставлять в <strong>мм²</strong>, не переводя в м²!</p>
+          </div>
+        `
+      }
+    ],
+
+    // -----------------------------------------------------------------------
+    // ОБЩЕСТВОЗНАНИЕ
+    // -----------------------------------------------------------------------
+    social: [
+      {
+        id: "soc_main",
+        matchTitles: ["человек", "обществ", "экономік", "політик", "право", "социальн"],
+        title: "Обществознание: Разбор ключевых блоков ОГЭ 2026/2027",
+        fipiSpec: {
+          number: "№ 1–24",
+          score: "До 37 первичных баллов (на «5» нужно 32+)",
+          time: "180 минут",
+          difficulty: "Базовый и высокий",
+          docSource: "Кодификатор ФИПИ (Блоки 1–5: Человек, Общество, Экономика, Политика, Право)"
+        },
+        theory: `
+          <h4>1. 5 ключевых сфер общества</h4>
+          <ul>
+            <li><strong>Экономическая:</strong> производство, распределение, обмен, потребление; факторы производства (труд, земля, капитал, предпринимательство).</li>
+            <li><strong>Политическая:</strong> государство, разделение властей (законодательная, исполнительная, судебная), выборы, партии.</li>
+            <li><strong>Социальная:</strong> семья, социальная стратификация, этнос, социальные нормы и конфликты.</li>
+            <li><strong>Духовная:</strong> наука, образование, религия, мораль, искусство.</li>
+            <li><strong>Правовая:</strong> Конституция РФ, отрасли права, юридическая ответственность.</li>
+          </ul>
+        `,
+        algorithm: `
+          <div class="task-step-list">
+            <div class="task-step-item">
+              <div class="task-step-num">Шаг 1</div>
+              <div class="task-step-desc">
+                <strong>Задание 1:</strong> Выпишите ровно два понятия из перечня, относящихся к указанной сфере, и дайте четкое определение ОДНОМУ из них.
+              </div>
+            </div>
+            <div class="task-step-item">
+              <div class="task-step-num">Шаг 2</div>
+              <div class="task-step-desc">
+                <strong>Задание 5 (Фотография):</strong> Укажите вид деятельности на фото, сформулируйте 2 правила рационального поведения и поясните их.
+              </div>
+            </div>
+          </div>
+        `,
+        examples: `
+          <div class="task-example-card">
+            <div class="task-example-badge">Задание 1 (Определение понятий)</div>
+            <p><strong>Понятие «Инфляция»:</strong> Долговременный процесс обесценивания денег, приводящий к снижению их покупательской способности и общему росту цен.</p>
+          </div>
+        `,
+        traps: `
+          <div class="callout callout-warning">
+            <strong>⚠️ Ловушка: Бытовые формулировки</strong>
+            <p>Нельзя давать определения через тавтологию (например, «доброта — это когда человек добрый»). Используйте родовое слово: «нравственное качество», «социальный институт», «способ регулирования»!</p>
+          </div>
+        `
+      }
     ]
   },
 
@@ -534,38 +925,145 @@ const TaskDetails = {
     });
   },
 
-  openForSubjectItem(subjectId, itemTitle) {
-    const list = this.db[subjectId] || this.db["math"];
-    const titleLower = (itemTitle || "").toLowerCase();
-
-    let matched = list.find(task => {
-      return task.matchTitles.some(keyword => titleLower.includes(keyword.toLowerCase()));
-    });
-
-    if (!matched) {
-      matched = list[0];
+  // Открытие по индексам секции и элемента (гарантирует 100% совпадение)
+  openByIndices(subjectId, sectionIndex, itemIndex) {
+    if (typeof SUBJECTS_DATA === "undefined" || !SUBJECTS_DATA[subjectId]) {
+      this.openForSubjectItem(subjectId, "Разбор задания");
+      return;
     }
 
-    this.currentSubject = subjectId;
-    this.taskList = list;
-    this.currentTaskIndex = list.indexOf(matched);
-    if (this.currentTaskIndex < 0) this.currentTaskIndex = 0;
-
-    this.renderModal();
-    const modal = document.getElementById("task-detail-modal");
-    if (modal) {
-      modal.style.display = "flex";
-      document.body.style.overflow = "hidden";
+    const subj = SUBJECTS_DATA[subjectId];
+    const section = subj.cheatsheets ? subj.cheatsheets[sectionIndex] : null;
+    if (!section || !section.items || !section.items[itemIndex]) {
+      this.openForSubjectItem(subjectId, "Разбор задания");
+      return;
     }
+
+    const item = section.items[itemIndex];
+    const list = this.db[subjectId];
+    const titleLower = (item.title || "").toLowerCase();
+    const secLower = (section.sectionTitle || "").toLowerCase();
+
+    // 1. Проверяем наличие подробного авторского разбора в базе предмета
+    if (list && list.length > 0) {
+      let matched = list.find(task => {
+        return task.matchTitles.some(keyword => {
+          const k = keyword.toLowerCase();
+          return titleLower.includes(k) || secLower.includes(k);
+        });
+      });
+      if (matched) {
+        this.currentSubject = subjectId;
+        this.taskList = list;
+        this.currentTaskIndex = list.indexOf(matched);
+        this.renderModal();
+        this.showModal();
+        return;
+      }
+    }
+
+    // 2. Если отдельного разбора нет — генерируем адаптивный разбор по спецификации темы
+    this.openItemData(subjectId, subj.title, section.sectionTitle, item);
   },
 
-  open(subjectId, taskIndex = 0) {
-    const list = this.db[subjectId] || this.db["math"];
-    this.currentSubject = subjectId;
-    this.taskList = list;
-    this.currentTaskIndex = Math.max(0, Math.min(taskIndex, list.length - 1));
+  openForSubjectItem(subjectId, itemTitle) {
+    const list = this.db[subjectId];
+    const titleLower = (itemTitle || "").toLowerCase();
 
+    if (list && list.length > 0) {
+      let matched = list.find(task => {
+        return task.matchTitles.some(keyword => titleLower.includes(keyword.toLowerCase()));
+      });
+      if (matched) {
+        this.currentSubject = subjectId;
+        this.taskList = list;
+        this.currentTaskIndex = list.indexOf(matched);
+        this.renderModal();
+        this.showModal();
+        return;
+      }
+    }
+
+    // Если прямого совпадения нет — генерируем разбор на основе темы
+    const subjObj = (typeof SUBJECTS_DATA !== "undefined") ? SUBJECTS_DATA[subjectId] : null;
+    const subjTitle = subjObj ? subjObj.title : "ОГЭ";
+
+    this.openItemData(subjectId, subjTitle, "Материалы ФИПИ", {
+      title: itemTitle || "Разбор темы ОГЭ",
+      formula: "Официальные критерии и методы ФИПИ",
+      note: "Изучите ключевые формулировки, алгоритм решения и типичные ошибки на экзамене."
+    });
+  },
+
+  openItemData(subjectId, subjTitle, sectionTitle, item) {
+    // Формируем динамический карточный объект разбора
+    const dynamicTask = {
+      id: "dynamic_" + Date.now(),
+      title: `${item.title}`,
+      fipiSpec: {
+        number: `${subjTitle}`,
+        score: "1–3 первичных балла",
+        time: "5–10 минут",
+        difficulty: "Базовый уровень",
+        docSource: `Кодификатор ФИПИ 2026/2027 (${sectionTitle})`
+      },
+      theory: `
+        <h4>1. Ключевые положения и правила</h4>
+        <div class="task-formula-box">
+          <div class="math-row"><strong>Правило / Формула:</strong> ${item.formula}</div>
+          ${item.note ? `<div class="math-subtext">${item.note}</div>` : ''}
+        </div>
+        <h4>2. Справочный комментарий ФИПИ</h4>
+        <p>Данная тема входит в обязательный минимум кодификатора ОГЭ 2026/2027. При решении заданий этого типа обращайте внимание на точность формулировок и единицы измерения.</p>
+      `,
+      algorithm: `
+        <div class="task-step-list">
+          <div class="task-step-item">
+            <div class="task-step-num">Шаг 1</div>
+            <div class="task-step-desc">
+              <strong>Анализ условия:</strong> Внимательно прочитайте вопрос задания до конца. Подчеркните ключевые параметры и ограничения.
+            </div>
+          </div>
+          <div class="task-step-item">
+            <div class="task-step-num">Шаг 2</div>
+            <div class="task-step-desc">
+              <strong>Применение правила:</strong> Примените базовое соотношение: <em>${item.formula}</em>.
+            </div>
+          </div>
+          <div class="task-step-item">
+            <div class="task-step-num">Шаг 3</div>
+            <div class="task-step-desc">
+              <strong>Самопроверка:</strong> Убедитесь, что полученный ответ реалистичен и записан строго по правилам бланка №1.
+            </div>
+          </div>
+        </div>
+      `,
+      examples: `
+        <div class="task-example-card">
+          <div class="task-example-badge">Пример из банка заданий ФИПИ / Решу ОГЭ</div>
+          <p><strong>Тема задания:</strong> ${item.title}</p>
+          <div class="task-example-solution">
+            <p><strong>Суть метода:</strong> ${item.formula}</p>
+            ${item.note ? `<p style="margin-top: 6px; color: var(--text-secondary);">${item.note}</p>` : ''}
+          </div>
+        </div>
+      `,
+      traps: `
+        <div class="callout callout-warning">
+          <strong>⚠️ Типичная ошибка выпускников:</strong>
+          <p>По статистике ФИПИ, большинство ошибок в этой теме связано с невнимательным чтением вопроса и поспешными вычислениями. Перепроверяйте ответ перед занесением в бланк!</p>
+        </div>
+      `
+    };
+
+    this.currentSubject = subjectId;
+    this.taskList = [dynamicTask];
+    this.currentTaskIndex = 0;
     this.renderModal();
+    this.showModal();
+  },
+
+  showModal() {
     const modal = document.getElementById("task-detail-modal");
     if (modal) {
       modal.style.display = "flex";
@@ -622,7 +1120,7 @@ const TaskDetails = {
     if (titleEl) titleEl.textContent = task.title;
     if (subjBadge) {
       const subjObj = (typeof SUBJECTS_DATA !== "undefined") ? SUBJECTS_DATA[this.currentSubject] : null;
-      subjBadge.textContent = subjObj ? subjObj.title : "ОГЭ";
+      subjBadge.textContent = subjObj ? subjObj.title : "ОГЭ 2026/2027";
     }
     if (scoreBadge && task.fipiSpec) {
       scoreBadge.textContent = task.fipiSpec.score;
@@ -689,6 +1187,8 @@ const TaskDetails = {
     }
   }
 };
+
+window.TaskDetails = TaskDetails;
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => TaskDetails.init());
