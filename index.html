@@ -377,10 +377,10 @@
 
         <!-- Сетка карточек библиотек (по умолчанию Прокудское, при геолокации подгружает библиотеки города пользователя) -->
         <div class="libraries-grid" id="libraries-cards-grid">
-          <!-- Карточка 1: Школьная библиотека СОШ 6 -->
-          <div class="library-card">
+          <!-- Карточка 1: Школьная библиотека СОШ 6 (своё фото) -->
+          <div class="library-card has-image">
             <div class="library-image-wrap">
-              <img src="images/school6.jpg" alt="МКОУ Чикская СОШ №6 имени Д.К. Потапова" class="library-img">
+              <img src="images/school6.jpg" alt="МКОУ Чикская СОШ №6 имени Д.К. Потапова" class="library-img" onerror="this.closest('.library-image-wrap').style.display='none'; this.closest('.library-card').classList.add('no-image');">
               <span class="library-status-tag">Школа № 6</span>
             </div>
             <div class="library-info">
@@ -409,10 +409,10 @@
             </div>
           </div>
 
-          <!-- Карточка 2: Библиотека в КДЦ Гармония -->
-          <div class="library-card">
+          <!-- Карточка 2: Библиотека в КДЦ Гармония (своё фото) -->
+          <div class="library-card has-image">
             <div class="library-image-wrap">
-              <img src="images/kdc_library.jpg" alt="Библиотека в КДЦ Гармония с. Прокудское" class="library-img">
+              <img src="images/kdc_library.jpg" alt="Библиотека в КДЦ Гармония с. Прокудское" class="library-img" onerror="this.closest('.library-image-wrap').style.display='none'; this.closest('.library-card').classList.add('no-image');">
               <span class="library-status-tag tag-kdc">КДЦ «Гармония»</span>
             </div>
             <div class="library-info">
@@ -435,6 +435,73 @@
               </div>
               <div class="library-actions">
                 <a href="https://yandex.ru/maps/?text=село+Прокудское+Совхозная+29+КДЦ+Гармония" target="_blank" rel="noopener noreferrer" class="btn-action map-btn">
+                  🗺️ Открыть на Яндекс.Картах
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Карточка 3: Коченёвская центральная библиотека (без авы) -->
+          <div class="library-card no-image">
+            <div class="library-card-header-bar">
+              <div class="library-card-icon-tag">
+                <span class="lib-header-icon">🏛️</span>
+                <span class="library-status-tag-static">Районный центр</span>
+              </div>
+              <span class="library-read-hall-tag">📖 Читальный зал</span>
+            </div>
+            <div class="library-info">
+              <h3 class="library-title">Коченёвская центральная библиотека имени П.Н. Дорофеева</h3>
+              <div class="library-address-line">
+                <span class="lib-icon">📍</span>
+                <div>
+                  <strong>632640, Новосибирская область, р.п. Коченёво, ул. Октябрьская, д. 52</strong>
+                  <div class="lib-subtext">Главный библиотечно-методический центр района</div>
+                  <div class="lib-subtext" style="color: #38bdf8; margin-top: 3px;">🕒 Пн–Пт: 09:00 – 18:00, Вс: 10:00 – 17:00</div>
+                </div>
+              </div>
+              <p class="library-desc">
+                Крупнейший книжный фонд района. Доступ к Национальной электронной библиотеке (НЭБ), справочным правовым системам, редким краеведческим изданиям и словарям.
+              </p>
+              <div class="library-features">
+                <span class="lib-feat">🏛️ Районный фонд</span>
+                <span class="lib-feat">💻 Доступ к НЭБ</span>
+                <span class="lib-feat">📑 Консультации библиографа</span>
+              </div>
+              <div class="library-actions">
+                <a href="https://yandex.ru/maps/?text=Коченево+Октябрьская+52+библиотека" target="_blank" rel="noopener noreferrer" class="btn-action map-btn">
+                  🗺️ Открыть на Яндекс.Картах
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Карточка 4: ГПНТБ СО РАН (своё фото: nsk_gpntb.jpg) -->
+          <div class="library-card has-image">
+            <div class="library-image-wrap">
+              <img src="images/nsk_gpntb.jpg" alt="ГПНТБ СО РАН Новосибирск" class="library-img" onerror="this.closest('.library-image-wrap').style.display='none'; this.closest('.library-card').classList.add('no-image');">
+              <span class="library-status-tag">Федеральный уровень</span>
+            </div>
+            <div class="library-info">
+              <h3 class="library-title">ГПНТБ СО РАН (Государственная публичная научно-техническая библиотека)</h3>
+              <div class="library-address-line">
+                <span class="lib-icon">📍</span>
+                <div>
+                  <strong>630200, г. Новосибирск, ул. Восход, 15 (метро «Речной вокзал»)</strong>
+                  <div class="lib-subtext">Крупнейшая библиотека за Уралом и в азиатской части России</div>
+                  <div class="lib-subtext" style="color: #38bdf8; margin-top: 3px;">🕒 Пн–Пт: 09:00 – 19:00, Сб–Вс: 10:00 – 18:00</div>
+                </div>
+              </div>
+              <p class="library-desc">
+                Флагман сибирской науки. Фонд свыше 10 миллионов изданий, современные мультимедийные читальные залы, бесплатный Wi-Fi и специализированные залы для научной подготовки.
+              </p>
+              <div class="library-features">
+                <span class="lib-feat">🌟 10+ млн книг</span>
+                <span class="lib-feat">☕ Коворкинг и Wi-Fi</span>
+                <span class="lib-feat">🔬 Научные базы данных</span>
+              </div>
+              <div class="library-actions">
+                <a href="https://yandex.ru/maps/?text=Новосибирск+Восход+15+ГПНТБ" target="_blank" rel="noopener noreferrer" class="btn-action map-btn">
                   🗺️ Открыть на Яндекс.Картах
                 </a>
               </div>
