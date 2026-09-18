@@ -647,73 +647,93 @@ const Auth = {
     this.renderModalContent("auth_telegram");
   },
 
-  switchGateTab(tab) {
-    const btnStudent = document.getElementById("gate-tab-student");
-    const btnTelegram = document.getElementById("gate-tab-telegram");
-    const panelStudent = document.getElementById("gate-panel-student");
-    const panelTelegram = document.getElementById("gate-panel-telegram");
-
-    if (btnStudent) btnStudent.classList.toggle("active", tab === "student");
-    if (btnTelegram) btnTelegram.classList.toggle("active", tab === "telegram");
-
-    if (panelStudent) panelStudent.style.display = (tab === "student") ? "block" : "none";
-    if (panelTelegram) panelTelegram.style.display = (tab === "telegram") ? "block" : "none";
-
-    if (tab === "telegram") {
-      setTimeout(() => {
-        const inp = document.getElementById("gate-tg-username");
-        if (inp) inp.focus();
-      }, 100);
-    }
-  },
-
-  submitGateTelegram(e) {
+  submitGateLogin(e) {
     if (e) e.preventDefault();
-    const rawUname = document.getElementById("gate-tg-username")?.value.trim() || "";
-    if (!rawUname) {
-      alert("Укажите ваш никнейм в Telegram!");
+    const usernameInput = document.getElementById("gate-input-username");
+    const passwordInput = document.getElementById("gate-input-password");
+    const errorEl = document.getElementById("gate-login-error");
+
+    const username = usernameInput ? usernameInput.value.trim() : "";
+    const password = passwordInput ? passwordInput.value.trim() : "";
+
+    if (!username) {
+      if (errorEl) {
+        errorEl.textContent = "Пожалуйста, введите логин или имя";
+        errorEl.style.display = "block";
+      }
       return;
     }
-    const cleanUname = rawUname.startsWith("@") ? rawUname : "@" + rawUname;
-    const grade = document.getElementById("gate-tg-grade")?.value || "9 «А»";
-    const dispName = document.getElementById("gate-tg-displayname")?.value.trim() || cleanUname;
+
+    if (!password) {
+      if (errorEl) {
+        errorEl.textContent = "Пожалуйста, введите пароль";
+        errorEl.style.display = "block";
+      }
+      return;
+    }
+
+    if (errorEl) errorEl.style.display = "none";
 
     this.saveProfile({
-      name: dispName,
+      name: username,
       role: "student",
-      grade: grade,
-      school: "МБОУ СОШ №6 им. Д.К. Потапова",
-      avatar: "✈️",
-      telegram: cleanUname,
-      authProvider: "telegram",
-      isGuest: false
+      grade: "9 класс",
+      school: "МКОУ Чикская СОШ №6",
+      avatar: "🦊",
+      isGuest: false,
+      authProvider: "credentials"
     });
 
     this.completeGate();
   },
 
-  selectGateAvatar(emoji, btn) {
-    document.querySelectorAll(".gate-avatar-pill").forEach(b => b.classList.remove("active"));
-    if (btn) btn.classList.add("active");
-    const inp = document.getElementById("gate-input-avatar");
-    if (inp) inp.value = emoji;
+  toggleTeacherPanel() {
+    const panel = document.getElementById("gate-teacher-panel");
+    const btn = document.getElementById("gate-teacher-toggle-btn");
+    const errorEl = document.getElementById("gate-teacher-error");
+    if (!panel) return;
+
+    const isHidden = (panel.style.display === "none" || !panel.style.display);
+    panel.style.display = isHidden ? "block" : "none";
+    if (btn) btn.classList.toggle("active", isHidden);
+    if (errorEl) errorEl.style.display = "none";
+
+    if (isHidden) {
+      const codeInput = document.getElementById("gate-teacher-code");
+      if (codeInput) {
+        setTimeout(() => codeInput.focus(), 100);
+      }
+    }
+  },
+
+  submitGateTeacher(e) {
+    if (e) e.preventDefault();
+    const codeInput = document.getElementById("gate-teacher-code");
+    const errorEl = document.getElementById("gate-teacher-error");
+    const code = codeInput ? codeInput.value.trim() : "";
+
+    if (code.toLowerCase() === "учитель2026") {
+      if (errorEl) errorEl.style.display = "none";
+      this.saveProfile({
+        name: "Преподаватель ОГЭ",
+        role: "teacher",
+        grade: "Учитель / Куратор",
+        school: "МКОУ Чикская СОШ №6",
+        avatar: "👩‍🏫",
+        isGuest: false,
+        authProvider: "teacher"
+      });
+      this.completeGate();
+    } else {
+      if (errorEl) {
+        errorEl.textContent = "Неверное кодовое слово учителя! Введите «учитель2026»";
+        errorEl.style.display = "block";
+      }
+    }
   },
 
   submitGateStudent(e) {
-    e.preventDefault();
-    const name = document.getElementById("gate-input-name").value.trim() || "Ученик";
-    const grade = document.getElementById("gate-input-grade").value;
-    const avatar = document.getElementById("gate-input-avatar").value || "🦊";
-
-    this.saveProfile({
-      name: name,
-      role: "student",
-      grade: grade,
-      school: "МБОУ СОШ №6 им. Д.К. Потапова",
-      avatar: avatar
-    });
-
-    this.completeGate();
+    this.submitGateLogin(e);
   },
 
   completeGate() {
@@ -724,7 +744,7 @@ const Auth = {
       setTimeout(() => {
         gate.style.display = "none";
         document.body.style.overflow = "";
-      }, 350);
+      }, 300);
     }
     if (typeof Gamification !== "undefined" && Gamification.recordActivity) {
       Gamification.recordActivity();
@@ -739,6 +759,10 @@ const Auth = {
       gate.style.display = "flex";
       document.body.style.overflow = "hidden";
     }
+    const err1 = document.getElementById("gate-login-error");
+    const err2 = document.getElementById("gate-teacher-error");
+    if (err1) err1.style.display = "none";
+    if (err2) err2.style.display = "none";
     this.closeProfileModal();
   }
 };
