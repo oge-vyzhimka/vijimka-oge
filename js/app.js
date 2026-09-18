@@ -22,12 +22,18 @@ const App = {
     this.initTheme();
     this.initTimer();
     this.renderSubjectCards();
+
+    // Инициализация модулей аккаунтов, банка ошибок и геймификации
+    if (typeof Auth !== "undefined" && Auth.init) Auth.init();
+    if (typeof MistakesBank !== "undefined" && MistakesBank.init) MistakesBank.init();
+    if (typeof Gamification !== "undefined" && Gamification.init) Gamification.init();
+
     const hash = (window.location.hash || "").replace("#", "");
     if (hash.startsWith("demos")) {
       const parts = hash.split("-");
       if (parts[1]) this.currentDemosSubtab = parts[1];
       this.switchView("demos", false);
-    } else if (hash && ["cheatsheet", "guide", "quiz", "calculator", "tracker", "store", "school"].includes(hash)) {
+    } else if (hash && ["cheatsheet", "guide", "quiz", "calculator", "tracker", "store", "school", "mistakes", "cabinet"].includes(hash)) {
       this.switchView(hash, false);
     } else {
       this.renderCurrentView();
@@ -291,11 +297,20 @@ const App = {
     if (storeView) storeView.style.display = (viewName === "store") ? "block" : "none";
     const schoolView = document.getElementById("view-school");
     if (schoolView) schoolView.style.display = (viewName === "school") ? "block" : "none";
+    const mistakesView = document.getElementById("view-mistakes");
+    if (mistakesView) mistakesView.style.display = (viewName === "mistakes") ? "block" : "none";
+    const cabinetView = document.getElementById("view-cabinet");
+    if (cabinetView) cabinetView.style.display = (viewName === "cabinet") ? "block" : "none";
 
-    // Управляем видимостью промо-баннера: в разделах школы, гида, магазина и пробников скрываем его, но панель 11 предметов всегда оставляем!
+    // Управляем видимостью промо-баннера: в разделах школы, гида, магазина, ошибок, кабинета и пробников скрываем его
     const heroSection = document.querySelector(".hero-section");
     if (heroSection) {
-      heroSection.style.display = (viewName === "school" || viewName === "guide" || viewName === "store" || viewName === "demos") ? "none" : "block";
+      heroSection.style.display = (viewName === "school" || viewName === "guide" || viewName === "store" || viewName === "demos" || viewName === "mistakes" || viewName === "cabinet") ? "none" : "block";
+    }
+
+    // Достижение при посещении раздела школы №6
+    if (viewName === "school" && typeof Gamification !== "undefined") {
+      Gamification.unlockAchievement("potapov_school");
     }
 
     this.renderCurrentView();
@@ -322,6 +337,10 @@ const App = {
       this.renderTracker();
     } else if (this.currentView === "store") {
       this.renderStoreView();
+    } else if (this.currentView === "mistakes") {
+      if (typeof MistakesBank !== "undefined" && MistakesBank.render) MistakesBank.render();
+    } else if (this.currentView === "cabinet") {
+      if (typeof CabinetView !== "undefined" && CabinetView.render) CabinetView.render();
     }
   },
 
@@ -857,6 +876,20 @@ const App = {
 
     savedProgress[this.currentSubject] = subjectList;
     localStorage.setItem("oge_topics_tracker", JSON.stringify(savedProgress));
+
+    // Геймификация и стрики
+    if (typeof Gamification !== "undefined") {
+      Gamification.recordActivity();
+      let totalChecked = 0;
+      Object.values(savedProgress).forEach(arr => { if (Array.isArray(arr)) totalChecked += arr.length; });
+      const topicAch = Gamification.achievements.find(a => a.id === "topic_scholar");
+      if (topicAch) {
+        topicAch.progress = Math.min(totalChecked, 10);
+        if (totalChecked >= 10) Gamification.unlockAchievement("topic_scholar");
+        Gamification.saveAchievements();
+      }
+    }
+
     this.renderTracker();
   },
 
