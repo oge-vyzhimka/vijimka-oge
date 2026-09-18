@@ -11,6 +11,10 @@ const App = {
   allDemoSolutionsExpanded: false,
   theme: "dark",
   lastUpdateDate: "18.09",
+  topicsSearchQuery: "",
+  topicsPartFilter: "all", // all | part1 | part2
+  topicsStatusFilter: "all", // all | pending | completed
+  collapsedTopicSections: {},
 
   init() {
     this.updateLastChangeBadge();
@@ -410,82 +414,470 @@ const App = {
   },
 
   /* --------------------------------------------------------------------------
-     Отображение Трекера / Чек-листа прогресса
+     Отображение Полного Каталога Тем ОГЭ (ФИПИ и Решу ОГЭ)
      -------------------------------------------------------------------------- */
   renderTracker() {
     const container = document.getElementById("tracker-content");
     const subj = SUBJECTS_DATA[this.currentSubject];
     if (!container || !subj) return;
 
-    const savedProgress = JSON.parse(localStorage.getItem("oge_tracker") || "{}");
+    // Проверяем наличие базы данных тем
+    const hasTopicsData = (typeof OGE_TOPICS_DATA !== "undefined" && OGE_TOPICS_DATA[this.currentSubject]);
+    const topicsData = hasTopicsData ? OGE_TOPICS_DATA[this.currentSubject] : null;
+
+    // Считываем сохраненный прогресс
+    const savedProgress = JSON.parse(localStorage.getItem("oge_topics_tracker") || "{}");
     const subjectProgress = savedProgress[this.currentSubject] || [];
 
-    const totalCount = subj.checklist.length;
-    const completedCount = subjectProgress.length;
+    // Подсчет статистики
+    let allTopicsList = [];
+    if (topicsData) {
+      topicsData.sections.forEach(sec => {
+        allTopicsList = allTopicsList.concat(sec.topics);
+      });
+    } else {
+      allTopicsList = subj.checklist || [];
+    }
+
+    const totalCount = allTopicsList.length;
+    const completedCount = allTopicsList.filter(t => subjectProgress.includes(t.id)).length;
+    const pendingCount = totalCount - completedCount;
     const pct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+
+    const part1Count = allTopicsList.filter(t => t.part === "part1").length;
+    const part2Count = allTopicsList.filter(t => t.part === "part2").length;
+
+    // Фильтрация тем
+    const q = (this.topicsSearchQuery || "").trim().toLowerCase();
+
+    const filterTopic = (t) => {
+      const isCompleted = subjectProgress.includes(t.id);
+
+      // Фильтр по статусу
+      if (this.topicsStatusFilter === "completed" && !isCompleted) return false;
+      if (this.topicsStatusFilter === "pending" && isCompleted) return false;
+
+      // Фильтр по части
+      if (this.topicsPartFilter === "part1" && t.part !== "part1") return false;
+      if (this.topicsPartFilter === "part2" && t.part !== "part2") return false;
+
+      // Фильтр по поисковому запросу
+      if (q) {
+        const titleMatch = (t.title || "").toLowerCase().includes(q);
+        const tasksMatch = (t.tasks || "").toLowerCase().includes(q);
+        const codeMatch = (t.fipiCode || "").toLowerCase().includes(q);
+        const tipMatch = (t.tip || "").toLowerCase().includes(q);
+        const termsMatch = (t.keyTerms || []).some(k => k.toLowerCase().includes(q));
+
+        // Поиск по номеру задания (например "задание 6", "№6", "6")
+        const taskNumQuery = q.replace(/[^0-9]/g, "");
+        const taskNumMatch = taskNumQuery && t.taskNums && t.taskNums.includes(parseInt(taskNumQuery, 10));
+
+        if (!titleMatch && !tasksMatch && !codeMatch && !tipMatch && !termsMatch && !taskNumMatch) {
+          return false;
+        }
+      }
+
+      return true;
+    };
+
+    // Подсчет отфильтрованных тем
+    const filteredTotal = allTopicsList.filter(filterTopic).length;
 
     container.innerHTML = `
       <div class="tracker-container">
+        <!-- Главная карточка темы -->
         <div class="tracker-hero">
-          <div>
-            <h2 style="font-size: 1.5rem; margin-bottom: 0.4rem;">Чек-лист подготовки: ${subj.icon} ${subj.title}</h2>
-            <p style="color: var(--text-secondary); font-size: 0.9rem;">
-              Отмечайте темы, которые вы уже разобрали. Прогресс сохраняется автоматически.
+          <div style="flex: 1; min-width: 280px;">
+            <div class="topics-hero-badge">
+              <span>📚 Официальный кодификатор ФИПИ и Решу ОГЭ</span>
+              <span class="topics-hero-tag">Только программа 9 класса</span>
+            </div>
+            <h2 class="topics-hero-title">Каталог всех тем ОГЭ: ${subj.icon} ${subj.title}</h2>
+            <p class="topics-hero-desc">
+              Все контролируемые элементы содержания (КЭС), спецификации ФИПИ и тематический классификатор «Решу ОГЭ». 
+              Отмечайте изученные темы галочками — прогресс сохраняется в памяти браузера.
             </p>
+            <div class="topics-doc-source">
+              <span>📄 Документ: ${topicsData ? topicsData.fipiDoc : 'Кодификатор ФИПИ'}</span>
+              <span style="margin-left: 0.5rem; color: var(--accent-cyan);">• КИМ: ${subj.examInfo.questionsCount} (макс. ${subj.examInfo.maxScore} б.)</span>
+            </div>
           </div>
+
           <div class="tracker-stats-group">
             <div class="tracker-circle-progress">${pct}%</div>
-            <div style="font-size: 0.85rem; color: var(--text-secondary);">
-              Изучено:<br><strong style="font-size: 1.1rem; color: var(--text-primary);">${completedCount} из ${totalCount}</strong> тем
+            <div class="tracker-stats-labels">
+              <div>Изучено тем:</div>
+              <strong>${completedCount} из ${totalCount}</strong>
+              <div class="tracker-stats-sub">
+                Часть 1: ${allTopicsList.filter(t => t.part === 'part1' && subjectProgress.includes(t.id)).length}/${part1Count} • Часть 2: ${allTopicsList.filter(t => t.part === 'part2' && subjectProgress.includes(t.id)).length}/${part2Count}
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="tracker-section">
-          <div class="tracker-section-title">
-            <span>Основные разделы и навыки</span>
-            <button class="btn-action" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="App.resetTracker('${this.currentSubject}')">
-              Сбросить
+        <!-- Быстрый выбор предмета прямо в каталоге тем -->
+        <div class="topics-subject-selector">
+          <span class="topics-selector-label">Предмет:</span>
+          ${Object.values(SUBJECTS_DATA).map(s => `
+            <button class="topics-subj-btn ${s.id === this.currentSubject ? 'active' : ''}" onclick="App.selectSubject('${s.id}')">
+              <span>${s.icon}</span>
+              <span>${s.title}</span>
             </button>
+          `).join("")}
+        </div>
+
+        <!-- Поисковая панель и фильтры тем -->
+        <div class="topics-toolbar">
+          <div class="topics-search-box">
+            <span class="topics-search-icon">🔍</span>
+            <input 
+              type="text" 
+              id="topics-search-input" 
+              class="topics-search-input" 
+              placeholder="Поиск темы по названию, коду ФИПИ, ключевым словам или номеру задания (например: 21, дроби, ОВР, Ньютон)..." 
+              value="${this.topicsSearchQuery.replace(/"/g, '&quot;')}" 
+              oninput="App.onTopicsSearch(this.value)"
+            >
+            ${this.topicsSearchQuery ? `
+              <button class="topics-search-clear" onclick="App.clearTopicsSearch()" title="Очистить поиск">✕</button>
+            ` : ''}
           </div>
-          <div>
-            ${subj.checklist.map(item => {
-              const isChecked = subjectProgress.includes(item.id);
-              return `
-                <div class="tracker-item ${isChecked ? 'completed' : ''}" onclick="App.toggleTrackerItem('${item.id}')">
-                  <input type="checkbox" class="tracker-checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); App.toggleTrackerItem('${item.id}')">
-                  <span class="tracker-label">${item.text}</span>
-                </div>
-              `;
-            }).join("")}
+
+          <div class="topics-filter-row">
+            <div class="topics-filter-pills">
+              <button class="topics-filter-btn ${this.topicsPartFilter === 'all' && this.topicsStatusFilter === 'all' ? 'active' : ''}" onclick="App.resetAllTopicsFilters()">
+                Все темы (${totalCount})
+              </button>
+              <button class="topics-filter-btn ${this.topicsPartFilter === 'part1' ? 'active' : ''}" onclick="App.setTopicsPartFilter('part1')">
+                Часть 1 (${part1Count})
+              </button>
+              <button class="topics-filter-btn ${this.topicsPartFilter === 'part2' ? 'active' : ''}" onclick="App.setTopicsPartFilter('part2')">
+                Часть 2 (${part2Count})
+              </button>
+              <button class="topics-filter-btn ${this.topicsStatusFilter === 'pending' ? 'active' : ''}" onclick="App.setTopicsStatusFilter('pending')">
+                Не изучено (${pendingCount})
+              </button>
+              <button class="topics-filter-btn ${this.topicsStatusFilter === 'completed' ? 'active' : ''}" onclick="App.setTopicsStatusFilter('completed')">
+                Изучено (${completedCount})
+              </button>
+            </div>
+
+            <div class="topics-actions-row">
+              <button class="btn-action topics-tool-btn" onclick="App.expandAllTopicSections()" title="Развернуть все разделы">
+                ▼ Развернуть все
+              </button>
+              <button class="btn-action topics-tool-btn" onclick="App.collapseAllTopicSections()" title="Свернуть все разделы">
+                ▲ Свернуть все
+              </button>
+              <button class="btn-action topics-tool-btn reset-btn" onclick="App.resetTopicsProgress('${this.currentSubject}')" title="Сбросить отметки">
+                ↺ Сбросить
+              </button>
+            </div>
           </div>
+
+          <!-- Индикатор поиска -->
+          ${q || this.topicsPartFilter !== 'all' || this.topicsStatusFilter !== 'all' ? `
+            <div class="topics-search-info">
+              <span>Найдено: <strong>${filteredTotal}</strong> из ${totalCount} тем</span>
+              ${q ? `<span>по запросу «<em>${this.escapeHtml(q)}</em>»</span>` : ''}
+              <button class="topics-reset-inline" onclick="App.resetAllTopicsFilters()">Сбросить фильтры</button>
+            </div>
+          ` : ''}
+        </div>
+
+        <!-- Контейнер со списком разделов и тем -->
+        <div id="topics-sections-container">
+          ${hasTopicsData ? this.renderTopicSections(topicsData, subjectProgress, filterTopic, q) : this.renderFallbackChecklist(subj, subjectProgress)}
         </div>
       </div>
     `;
   },
 
-  toggleTrackerItem(itemId) {
-    const savedProgress = JSON.parse(localStorage.getItem("oge_tracker") || "{}");
-    const subjectList = savedProgress[this.currentSubject] || [];
+  renderTopicSections(topicsData, subjectProgress, filterTopic, query) {
+    let html = "";
+    let visibleSectionsCount = 0;
 
-    const index = subjectList.indexOf(itemId);
-    if (index > -1) {
-      subjectList.splice(index, 1);
-    } else {
-      subjectList.push(itemId);
+    topicsData.sections.forEach(section => {
+      const visibleTopics = section.topics.filter(filterTopic);
+      if (visibleTopics.length === 0) return; // Скрываем пустые разделы при активном поиске
+
+      visibleSectionsCount++;
+      const isCollapsed = !query && this.collapsedTopicSections[section.id];
+      const sectionTotal = section.topics.length;
+      const sectionCompleted = section.topics.filter(t => subjectProgress.includes(t.id)).length;
+      const sectionPct = sectionTotal > 0 ? Math.round((sectionCompleted / sectionTotal) * 100) : 0;
+
+      html += `
+        <div class="topic-section-card ${isCollapsed ? 'collapsed' : ''}" id="section-card-${section.id}">
+          <div class="topic-section-header" onclick="App.toggleTopicSection('${section.id}')">
+            <div class="topic-section-title-wrap">
+              <span class="topic-section-chevron">${isCollapsed ? '▶' : '▼'}</span>
+              <span class="topic-section-name">${this.highlightMatch(section.name, query)}</span>
+              <span class="topic-section-fipicode">КЭС ${section.fipiCode}</span>
+            </div>
+            <div class="topic-section-meta">
+              <span class="topic-section-count">${sectionCompleted}/${sectionTotal} изучено (${sectionPct}%)</span>
+            </div>
+          </div>
+
+          <div class="topic-section-body" style="${isCollapsed ? 'display: none;' : 'display: block;'}">
+            <div class="topics-grid-list">
+              ${visibleTopics.map(topic => {
+                const isChecked = subjectProgress.includes(topic.id);
+                const firstTask = (topic.taskNums && topic.taskNums.length > 0) ? topic.taskNums[0] : 1;
+                return `
+                  <div class="topic-card-item ${isChecked ? 'completed' : ''}" id="topic-item-${topic.id}">
+                    <div class="topic-item-main">
+                      <label class="topic-checkbox-wrap" onclick="event.stopPropagation();">
+                        <input 
+                          type="checkbox" 
+                          class="topic-checkbox" 
+                          ${isChecked ? 'checked' : ''} 
+                          onchange="App.toggleTopicProgress('${topic.id}')"
+                        >
+                        <span class="topic-checkmark"></span>
+                      </label>
+
+                      <div class="topic-item-content">
+                        <div class="topic-item-header">
+                          <span class="topic-fipi-tag">КЭС ${topic.fipiCode}</span>
+                          <span class="topic-title-text">${this.highlightMatch(topic.title, query)}</span>
+                        </div>
+
+                        <!-- Бейджи задания и сложности -->
+                        <div class="topic-badges-row">
+                          <button class="topic-task-badge" onclick="App.jumpToDemoTask(${firstTask})" title="Перейти к тренировке в демоверсии">
+                            <span>🎯</span>
+                            <strong>${topic.tasks}</strong>
+                            <span class="task-badge-arrow">↗</span>
+                          </button>
+                          <span class="topic-part-badge ${topic.part}">
+                            ${topic.part === 'part1' ? 'Часть 1 (краткий ответ)' : 'Часть 2 (развернутый ответ)'}
+                          </span>
+                          <span class="topic-diff-badge ${topic.difficulty}">
+                            ${topic.difficulty}
+                          </span>
+                        </div>
+
+                        <!-- Ключевые термины и формулы -->
+                        ${topic.keyTerms && topic.keyTerms.length > 0 ? `
+                          <div class="topic-terms-row">
+                            <span class="terms-label">Ключевые формулы и правила:</span>
+                            <div class="terms-pills">
+                              ${topic.keyTerms.map(term => `
+                                <span class="term-pill"><code>${this.highlightMatch(term, query)}</code></span>
+                              `).join("")}
+                            </div>
+                          </div>
+                        ` : ''}
+
+                        <!-- Совет от эксперта ФИПИ и Решу ОГЭ -->
+                        ${topic.tip ? `
+                          <div class="topic-tip-box">
+                            <span class="tip-bulb">💡</span>
+                            <div>
+                              <strong>Совет от экспертов ФИПИ / Решу ОГЭ:</strong>
+                              <p>${this.highlightMatch(topic.tip, query)}</p>
+                            </div>
+                          </div>
+                        ` : ''}
+                      </div>
+                    </div>
+                  </div>
+                `;
+              }).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    if (visibleSectionsCount === 0) {
+      html = `
+        <div class="topics-empty-state">
+          <div style="font-size: 2.5rem; margin-bottom: 0.6rem;">🔍</div>
+          <h3>Темы не найдены</h3>
+          <p>По запросу «${this.escapeHtml(query)}» ничего не найдено. Попробуйте изменить формулировку или сбросить фильтры.</p>
+          <button class="btn-action" style="margin-top: 1rem;" onclick="App.resetAllTopicsFilters()">Сбросить поиск</button>
+        </div>
+      `;
     }
 
-    savedProgress[this.currentSubject] = subjectList;
-    localStorage.setItem("oge_tracker", JSON.stringify(savedProgress));
+    return html;
+  },
+
+  renderFallbackChecklist(subj, subjectProgress) {
+    return `
+      <div class="tracker-section">
+        <div class="tracker-section-title">
+          <span>Чек-лист основных навыков</span>
+          <button class="btn-action" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="App.resetTopicsProgress('${this.currentSubject}')">
+            Сбросить
+          </button>
+        </div>
+        <div>
+          ${(subj.checklist || []).map(item => {
+            const isChecked = subjectProgress.includes(item.id);
+            return `
+              <div class="tracker-item ${isChecked ? 'completed' : ''}" onclick="App.toggleTopicProgress('${item.id}')">
+                <input type="checkbox" class="tracker-checkbox" ${isChecked ? 'checked' : ''} onclick="event.stopPropagation(); App.toggleTopicProgress('${item.id}')">
+                <span class="tracker-label">${item.text}</span>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      </div>
+    `;
+  },
+
+  onTopicsSearch(val) {
+    this.topicsSearchQuery = val;
+    // Обновляем только список тем и блок поиска, чтобы не сбивать фокус ввода
+    const listContainer = document.getElementById("topics-sections-container");
+    const toolbar = document.querySelector(".topics-toolbar");
+    if (listContainer) {
+      const topicsData = (typeof OGE_TOPICS_DATA !== "undefined" && OGE_TOPICS_DATA[this.currentSubject]);
+      const savedProgress = JSON.parse(localStorage.getItem("oge_topics_tracker") || "{}");
+      const subjectProgress = savedProgress[this.currentSubject] || [];
+      const q = val.trim().toLowerCase();
+
+      const filterTopic = (t) => {
+        const isCompleted = subjectProgress.includes(t.id);
+        if (this.topicsStatusFilter === "completed" && !isCompleted) return false;
+        if (this.topicsStatusFilter === "pending" && isCompleted) return false;
+        if (this.topicsPartFilter === "part1" && t.part !== "part1") return false;
+        if (this.topicsPartFilter === "part2" && t.part !== "part2") return false;
+        if (q) {
+          const titleMatch = (t.title || "").toLowerCase().includes(q);
+          const tasksMatch = (t.tasks || "").toLowerCase().includes(q);
+          const codeMatch = (t.fipiCode || "").toLowerCase().includes(q);
+          const tipMatch = (t.tip || "").toLowerCase().includes(q);
+          const termsMatch = (t.keyTerms || []).some(k => k.toLowerCase().includes(q));
+          const taskNumQuery = q.replace(/[^0-9]/g, "");
+          const taskNumMatch = taskNumQuery && t.taskNums && t.taskNums.includes(parseInt(taskNumQuery, 10));
+          if (!titleMatch && !tasksMatch && !codeMatch && !tipMatch && !termsMatch && !taskNumMatch) return false;
+        }
+        return true;
+      };
+
+      listContainer.innerHTML = topicsData ? this.renderTopicSections(topicsData, subjectProgress, filterTopic, q) : "";
+    }
+  },
+
+  clearTopicsSearch() {
+    this.topicsSearchQuery = "";
     this.renderTracker();
   },
 
-  resetTracker(subjectId) {
-    if (!confirm("Сбросить прогресс по этому предмету?")) return;
-    const savedProgress = JSON.parse(localStorage.getItem("oge_tracker") || "{}");
-    savedProgress[subjectId] = [];
-    localStorage.setItem("oge_tracker", JSON.stringify(savedProgress));
+  setTopicsPartFilter(part) {
+    this.topicsPartFilter = (this.topicsPartFilter === part) ? "all" : part;
     this.renderTracker();
+  },
+
+  setTopicsStatusFilter(status) {
+    this.topicsStatusFilter = (this.topicsStatusFilter === status) ? "all" : status;
+    this.renderTracker();
+  },
+
+  resetAllTopicsFilters() {
+    this.topicsSearchQuery = "";
+    this.topicsPartFilter = "all";
+    this.topicsStatusFilter = "all";
+    this.renderTracker();
+  },
+
+  toggleTopicProgress(topicId) {
+    const savedProgress = JSON.parse(localStorage.getItem("oge_topics_tracker") || "{}");
+    const subjectList = savedProgress[this.currentSubject] || [];
+
+    const index = subjectList.indexOf(topicId);
+    if (index > -1) {
+      subjectList.splice(index, 1);
+    } else {
+      subjectList.push(topicId);
+    }
+
+    savedProgress[this.currentSubject] = subjectList;
+    localStorage.setItem("oge_topics_tracker", JSON.stringify(savedProgress));
+    this.renderTracker();
+  },
+
+  toggleTopicSection(secId) {
+    this.collapsedTopicSections[secId] = !this.collapsedTopicSections[secId];
+    const card = document.getElementById(`section-card-${secId}`);
+    if (card) {
+      const isCollapsed = this.collapsedTopicSections[secId];
+      card.classList.toggle("collapsed", isCollapsed);
+      const chevron = card.querySelector(".topic-section-chevron");
+      const body = card.querySelector(".topic-section-body");
+      if (chevron) chevron.textContent = isCollapsed ? '▶' : '▼';
+      if (body) body.style.display = isCollapsed ? 'none' : 'block';
+    }
+  },
+
+  expandAllTopicSections() {
+    this.collapsedTopicSections = {};
+    document.querySelectorAll(".topic-section-card").forEach(card => {
+      card.classList.remove("collapsed");
+      const chevron = card.querySelector(".topic-section-chevron");
+      const body = card.querySelector(".topic-section-body");
+      if (chevron) chevron.textContent = '▼';
+      if (body) body.style.display = 'block';
+    });
+  },
+
+  collapseAllTopicSections() {
+    if (typeof OGE_TOPICS_DATA !== "undefined" && OGE_TOPICS_DATA[this.currentSubject]) {
+      OGE_TOPICS_DATA[this.currentSubject].sections.forEach(sec => {
+        this.collapsedTopicSections[sec.id] = true;
+      });
+    }
+    document.querySelectorAll(".topic-section-card").forEach(card => {
+      card.classList.add("collapsed");
+      const chevron = card.querySelector(".topic-section-chevron");
+      const body = card.querySelector(".topic-section-body");
+      if (chevron) chevron.textContent = '▶';
+      if (body) body.style.display = 'none';
+    });
+  },
+
+  resetTopicsProgress(subjectId) {
+    if (!confirm(`Сбросить весь прогресс по предмету ${SUBJECTS_DATA[subjectId].title}?`)) return;
+    const savedProgress = JSON.parse(localStorage.getItem("oge_topics_tracker") || "{}");
+    savedProgress[subjectId] = [];
+    localStorage.setItem("oge_topics_tracker", JSON.stringify(savedProgress));
+    this.renderTracker();
+  },
+
+  jumpToDemoTask(taskNum) {
+    this.currentDemosSubtab = "fipi";
+    this.currentDemoPartFilter = "all";
+    this.switchView("demos");
+    setTimeout(() => {
+      const el = document.getElementById(`demo-task-${taskNum}`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        el.classList.add("highlight-flash");
+        setTimeout(() => el.classList.remove("highlight-flash"), 2500);
+      }
+    }, 120);
+  },
+
+  highlightMatch(text, query) {
+    if (!query || !text) return text;
+    try {
+      const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escaped})`, 'gi');
+      return text.replace(regex, '<mark class="topic-highlight">$1</mark>');
+    } catch (e) {
+      return text;
+    }
+  },
+
+  escapeHtml(str) {
+    if (!str) return "";
+    return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   },
 
   /* --------------------------------------------------------------------------
@@ -574,6 +966,32 @@ const App = {
         });
       }
 
+      // Поиск по официальным темам ФИПИ из кодификатора
+      if (typeof OGE_TOPICS_DATA !== "undefined") {
+        Object.entries(OGE_TOPICS_DATA).forEach(([subId, subjData]) => {
+          if (!subjData || !subjData.sections) return;
+          subjData.sections.forEach(sec => {
+            sec.topics.forEach(t => {
+              const inTitle = (t.title || "").toLowerCase().includes(q);
+              const inTasks = (t.tasks || "").toLowerCase().includes(q);
+              const inCode = (t.fipiCode || "").toLowerCase().includes(q);
+              const inTip = (t.tip || "").toLowerCase().includes(q);
+              const inTerms = (t.keyTerms || []).some(k => k.toLowerCase().includes(q));
+              if (inTitle || inTasks || inCode || inTip || inTerms) {
+                results.push({
+                  subjectId: subId,
+                  subjectTitle: subjData.title,
+                  subjectIcon: subjData.icon,
+                  targetView: "tracker",
+                  title: `📚 Тема КЭС ${t.fipiCode}: ${t.title}`,
+                  snippet: `${t.tasks} (${t.difficulty}) | ${t.tip || t.keyTerms.join(', ')}`
+                });
+              }
+            });
+          });
+        });
+      }
+
       overlay.classList.add("open");
       if (results.length === 0) {
         resultsContainer.innerHTML = `
@@ -609,6 +1027,8 @@ const App = {
     if (targetView === "demos") {
       if (targetSubtab) this.currentDemosSubtab = targetSubtab;
       this.switchView("demos");
+    } else if (targetView === "tracker") {
+      this.switchView("tracker");
     } else {
       this.switchView("cheatsheet");
     }
