@@ -185,28 +185,31 @@
   <header class="site-header">
     <div class="header-container">
       <!-- Логотип и бренд -->
-      <a href="#" class="nav-brand" onclick="App.switchView('cheatsheet'); return false;" title="ОГЭ Выжимка — Главная">
+      <a href="#" class="nav-brand" onclick="App.goToHome(); return false;" title="ОГЭ Выжимка — Главная">
         <span class="brand-spark">⚡</span>
         <span class="brand-name">ОГЭ<strong>Выжимка</strong></span>
       </a>
 
-      <!-- Основная навигация приложения (десктоп) -->
-      <nav class="nav-center-menu">
-        <button class="nav-item-link view-tab-btn active" data-view="cheatsheet" onclick="App.switchView('cheatsheet')">
-          <span class="nav-item-icon">📖</span> Материалы
+      <!-- Капсульная панель навигации (по референсам Фото 1 и Фото 2) -->
+      <nav class="nav-capsule-bar" id="main-nav-capsule">
+        <button class="nav-capsule-btn view-tab-btn active" data-view="home" onclick="App.goToHome()" title="Главный экран — выбор предметов">
+          <span class="nav-btn-icon">🏠</span> <span>Главная</span>
         </button>
-        <button class="nav-item-link view-tab-btn" data-view="quiz" onclick="App.switchView('quiz')">
-          <span class="nav-item-icon">🎯</span> Тренажёр
+        <button class="nav-capsule-btn view-tab-btn" data-view="cheatsheet" onclick="App.switchView('cheatsheet')" title="Шпаргалки и конспекты">
+          <span class="nav-btn-icon">📖</span> <span>Материалы</span>
         </button>
-        <button class="nav-item-link view-tab-btn tab-mistakes-btn" data-view="mistakes" onclick="App.switchView('mistakes')">
-          <span class="nav-item-icon">❌</span> Ошибки <span class="tab-badge-count" id="mistakes-tab-badge" style="display:none;">0</span>
+        <button class="nav-capsule-btn view-tab-btn" data-view="quiz" onclick="App.switchView('quiz')" title="Интерактивный тренажёр">
+          <span class="nav-btn-icon">🎯</span> <span>Тренажёр</span>
         </button>
-        <button class="nav-item-link view-tab-btn" data-view="calculator" onclick="App.switchView('calculator')">
-          <span class="nav-item-icon">🧮</span> Калькулятор
+        <button class="nav-capsule-btn view-tab-btn tab-mistakes-btn" data-view="mistakes" onclick="App.switchView('mistakes')" title="Банк ошибок">
+          <span class="nav-btn-icon">❌</span> <span>Ошибки</span> <span class="tab-badge-count" id="mistakes-tab-badge" style="display:none;">0</span>
+        </button>
+        <button class="nav-capsule-btn view-tab-btn" data-view="calculator" onclick="App.switchView('calculator')" title="Калькулятор баллов ОГЭ">
+          <span class="nav-btn-icon">🧮</span> <span>Калькулятор</span>
         </button>
 
         <div class="nav-dropdown-wrapper">
-          <button class="nav-item-link nav-more-trigger" onclick="App.toggleMoreMenu(event)" title="Дополнительные разделы">
+          <button class="nav-capsule-btn nav-more-trigger" onclick="App.toggleMoreMenu(event)" title="Дополнительные разделы">
             <span>Ещё</span>
             <span class="dropdown-chevron">▾</span>
           </button>
@@ -295,32 +298,41 @@
   </div>
 
   <!-- ========================================================================
-       Компактная лента выбора предметов (Horizontal Scroll Ribbon)
-       ======================================================================== -->
-  <section class="subjects-nav-section">
-    <div class="subjects-nav-header">
-      <div class="filter-pills">
-        <button class="filter-pill active" data-category="all" onclick="App.filterCategory('all')">Все предметы (11)</button>
-        <button class="filter-pill" data-category="mandatory" onclick="App.filterCategory('mandatory')">Обязательные (2)</button>
-        <button class="filter-pill" data-category="technical" onclick="App.filterCategory('technical')">Технические (2)</button>
-        <button class="filter-pill" data-category="humanities" onclick="App.filterCategory('humanities')">Гуманитарные (4)</button>
-        <button class="filter-pill" data-category="science" onclick="App.filterCategory('science')">Естественные (3)</button>
-      </div>
-      <div class="subjects-quick-note">
-        <span>⚡ 100% ФИПИ 2025/26</span>
-      </div>
-    </div>
-
-    <!-- Горизонтальная лента чипов предметов -->
-    <div class="subjects-scroll-ribbon" id="subjects-grid">
-      <!-- Генерируется из subjects.js -->
-    </div>
-  </section>
-
-  <!-- ========================================================================
        Основная рабочая область
        ======================================================================== -->
   <main class="main-wrapper">
+
+    <!-- ====================================================================
+         ВКЛАДКА: ГЛАВНЫЙ ЭКРАН (Центральная витрина всех 11 предметов)
+         ==================================================================== -->
+    <section id="view-home">
+      <div class="home-hero-section">
+        <div class="home-hero-badge-row">
+          <span class="home-badge-pill">🎓 ОГЭ 2025/2026</span>
+          <span class="home-badge-pill school-pill" onclick="App.switchView('school')" title="Перейти в раздел школы">🏫 МКОУ Чикская СОШ №6</span>
+        </div>
+        <h1 class="home-hero-title">Выберите предмет для подготовки к ОГЭ</h1>
+        <p class="home-hero-subtitle">
+          Только официальные кодификаторы ФИПИ, выжимки формул, разборы каверзных ловушек и интерактивные тренажёры
+        </p>
+
+        <!-- Капсульный переключатель категорий предметов (стиль Фото 2) -->
+        <div class="home-category-capsule-wrap">
+          <div class="home-category-capsule">
+            <button class="category-pill active" data-category="all" onclick="App.filterCategory('all')">Все предметы (11)</button>
+            <button class="category-pill" data-category="mandatory" onclick="App.filterCategory('mandatory')">Обязательные (2)</button>
+            <button class="category-pill" data-category="technical" onclick="App.filterCategory('technical')">Технические (2)</button>
+            <button class="category-pill" data-category="humanities" onclick="App.filterCategory('humanities')">Гуманитарные (4)</button>
+            <button class="category-pill" data-category="science" onclick="App.filterCategory('science')">Естественные (3)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Центральная сетка карточек предметов -->
+      <div class="home-subjects-grid" id="home-subjects-grid">
+        <!-- Генерируется из subjects.js через App.renderHomeSubjects() -->
+      </div>
+    </section>
 
     <!-- Вкладка: Пробники и демо-версии (Полные демоверсии 4ЕГЭ, Умскул, Задачи села Прокудское) -->
     <section id="view-demos" style="display: none;">
@@ -332,8 +344,20 @@
       <div id="guide-main-content"></div>
     </section>
 
-    <!-- Вкладка 1: Выжимка теории -->
-    <section id="view-cheatsheet">
+    <!-- Вкладка 1: Выжимка теории и материалов конкретного предмета -->
+    <section id="view-cheatsheet" style="display: none;">
+      <!-- Панель возврата к выбору предметов -->
+      <div class="subject-view-top-bar">
+        <button class="back-to-home-btn" onclick="App.goToHome()" title="Вернуться к выбору предметов">
+          <span class="back-arrow">←</span> Все предметы
+        </button>
+        <div class="subject-view-breadcrumb" id="subject-view-breadcrumb">
+          <span class="crumb-home" onclick="App.goToHome()">Главная</span>
+          <span class="crumb-sep">/</span>
+          <span class="crumb-active" id="subject-crumb-title">Математика</span>
+        </div>
+      </div>
+
       <div id="cheatsheet-banner-container"></div>
       <div id="cheatsheet-fipi-container"></div>
       <div id="cheatsheet-traps-container"></div>
@@ -603,7 +627,11 @@
        Мобильная нижняя панель навигации (Native Mobile App Tab Bar)
        ======================================================================== -->
   <nav class="mobile-bottom-nav">
-    <button class="mobile-nav-btn active" data-view="cheatsheet" onclick="App.switchView('cheatsheet')">
+    <button class="mobile-nav-btn active" data-view="home" onclick="App.goToHome()">
+      <span class="mobile-nav-icon">🏠</span>
+      <span class="mobile-nav-label">Главная</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="cheatsheet" onclick="App.switchView('cheatsheet')">
       <span class="mobile-nav-icon">📖</span>
       <span class="mobile-nav-label">Выжимка</span>
     </button>
