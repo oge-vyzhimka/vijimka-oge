@@ -5,7 +5,7 @@
 const App = {
   currentSubject: "math",
   currentCategory: "all",
-  currentView: "cheatsheet", // cheatsheet | demos | quiz | calculator | tracker | school | guide | store
+  currentView: "home", // home | cheatsheet | demos | quiz | calculator | tracker | school | guide | store
   currentDemosSubtab: "fipi", // fipi | umschool | prokudskoe
   currentDemoPartFilter: "all", // all | part1 | part2
   allDemoSolutionsExpanded: false,
@@ -21,6 +21,7 @@ const App = {
     this.updateCategoryCounts();
     this.initTheme();
     this.initTimer();
+    this.renderHomeSubjects();
     this.renderSubjectCards();
 
     // Инициализация модулей аккаунтов, банка ошибок и геймификации
@@ -33,10 +34,10 @@ const App = {
       const parts = hash.split("-");
       if (parts[1]) this.currentDemosSubtab = parts[1];
       this.switchView("demos", false);
-    } else if (hash && ["cheatsheet", "guide", "quiz", "calculator", "tracker", "store", "school", "mistakes", "cabinet"].includes(hash)) {
+    } else if (hash && ["home", "cheatsheet", "guide", "quiz", "calculator", "tracker", "store", "school", "mistakes", "cabinet"].includes(hash)) {
       this.switchView(hash, false);
     } else {
-      this.renderCurrentView();
+      this.switchView("home", false);
     }
     this.bindGlobalEvents();
     this.initSearch();
@@ -54,14 +55,14 @@ const App = {
       science: subjects.filter(s => s.category === "science").length
     };
 
-    document.querySelectorAll(".filter-pill").forEach(pill => {
+    document.querySelectorAll(".category-pill, .filter-pill").forEach(pill => {
       const cat = pill.dataset.category;
       if (!cat) return;
       if (cat === "all") pill.textContent = `Все предметы (${counts.all})`;
       else if (cat === "mandatory") pill.textContent = `Обязательные (${counts.mandatory})`;
       else if (cat === "technical") pill.textContent = `Технические (${counts.technical})`;
       else if (cat === "humanities") pill.textContent = `Гуманитарные (${counts.humanities})`;
-      else if (cat === "science") pill.textContent = `Естественнонаучные (${counts.science})`;
+      else if (cat === "science") pill.textContent = `Естественные (${counts.science})`;
     });
   },
 
@@ -144,9 +145,64 @@ const App = {
   /* --------------------------------------------------------------------------
      Навигация по предметам и фильтры категорий
      -------------------------------------------------------------------------- */
+  renderHomeSubjects() {
+    const container = document.getElementById("home-subjects-grid");
+    if (!container) return;
+
+    if (typeof SUBJECTS_DATA === "undefined") return;
+
+    const subjects = Object.values(SUBJECTS_DATA).filter(subj => {
+      if (this.currentCategory === "all") return true;
+      return subj.category === this.currentCategory;
+    });
+
+    const categoryNames = {
+      mandatory: "Обязательный",
+      technical: "Технический",
+      humanities: "Гуманитарный",
+      science: "Естественный"
+    };
+
+    container.innerHTML = subjects.map(subj => {
+      const catName = categoryNames[subj.category] || "Предмет ОГЭ";
+      const duration = subj.examInfo ? subj.examInfo.duration.split("(")[0].trim() : "Экзамен";
+      const qCount = subj.examInfo ? subj.examInfo.questionsCount.split("(")[0].trim() : "";
+      const maxScore = subj.examInfo ? subj.examInfo.maxScore : 0;
+      const passThreshold = subj.examInfo ? subj.examInfo.passThreshold.split("(")[0].trim() : "";
+
+      return `
+        <div class="home-subject-card" style="--card-accent: ${subj.accentColor};" onclick="App.openSubject('${subj.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')App.openSubject('${subj.id}')">
+          <div class="home-subject-header">
+            <div class="home-subject-icon-box" style="background: ${subj.accentColor}18; color: ${subj.accentColor}; border: 1px solid ${subj.accentColor}33;">
+              <span class="home-subject-icon">${subj.icon}</span>
+            </div>
+            <div class="home-subject-badges">
+              <span class="home-cat-badge home-cat-${subj.category}">${catName}</span>
+              <span class="home-score-badge">макс. ${maxScore} б.</span>
+            </div>
+          </div>
+          <div class="home-subject-body">
+            <h3 class="home-subject-title">${subj.title}</h3>
+            <p class="home-subject-desc">${subj.tagline || 'Теория, формулы, ловушки и тренировочные задания ФИПИ'}</p>
+            <div class="home-subject-meta">
+              <span class="meta-item" title="Длительность экзамена"><span class="meta-icon">⏱</span> ${duration}</span>
+              <span class="meta-item" title="Количество заданий в КИМ"><span class="meta-icon">📝</span> ${qCount}</span>
+            </div>
+          </div>
+          <div class="home-subject-footer">
+            <span class="home-open-link">Перейти к материалам <span class="arrow">→</span></span>
+            <span class="home-pass-threshold" title="${subj.examInfo ? subj.examInfo.passThreshold : ''}">Порог: ${passThreshold}</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+  },
+
   renderSubjectCards() {
     const container = document.getElementById("subjects-grid");
     if (!container) return;
+
+    if (typeof SUBJECTS_DATA === "undefined") return;
 
     const subjects = Object.values(SUBJECTS_DATA).filter(subj => {
       if (this.currentCategory === "all") return true;
@@ -161,7 +217,7 @@ const App = {
         <button type="button" 
              class="subject-chip subject-card ${isActive ? 'active' : ''}" 
              style="--chip-accent: ${subj.accentColor};"
-             onclick="App.selectSubject('${subj.id}')"
+             onclick="App.openSubject('${subj.id}')"
              title="${subj.title} — ${subj.examInfo ? subj.examInfo.questionsCount : ''}, макс. ${maxScore} б.">
           <span class="chip-icon">${subj.icon}</span>
           <span class="chip-title">${subj.title}</span>
@@ -183,39 +239,45 @@ const App = {
 
   filterCategory(category) {
     this.currentCategory = category;
-    document.querySelectorAll(".filter-pill").forEach(pill => {
+    document.querySelectorAll(".category-pill, .filter-pill").forEach(pill => {
       pill.classList.toggle("active", pill.dataset.category === category);
     });
+    this.renderHomeSubjects();
     this.renderSubjectCards();
   },
 
-  selectSubject(subjectId) {
-    this.currentSubject = subjectId;
-    // Если пользователь был на странице школы, гида или магазина, переключаем на 'cheatsheet'
-    if (this.currentView === "school" || this.currentView === "guide" || this.currentView === "store") {
-      this.switchView("cheatsheet");
-    } else {
-      this.renderSubjectCards();
-      this.renderCurrentView();
-    }
+  openSubject(subjectId) {
+    if (typeof SUBJECTS_DATA !== "undefined" && SUBJECTS_DATA[subjectId]) {
+      this.currentSubject = subjectId;
+      const subj = SUBJECTS_DATA[subjectId];
+      const crumb = document.getElementById("subject-crumb-title");
+      if (crumb) crumb.textContent = subj.title;
 
-    // Синхронизируем калькулятор
-    Calculator.currentSubjectId = subjectId;
-    const calcSelect = document.getElementById("calc-subject-select");
-    if (calcSelect) {
-      calcSelect.value = subjectId;
-      Calculator.updateSubjectUI();
-      Calculator.calculate();
-    }
-
-    // Мягкая плавная прокрутка, только если пользователь уже проскроллил далеко вниз
-    if (window.scrollY > 220) {
-      const banner = document.getElementById("cheatsheet-banner-container") || document.querySelector(".main-wrapper");
-      if (banner) {
-        const topPos = Math.max(0, banner.getBoundingClientRect().top + window.pageYOffset - 75);
-        window.scrollTo({ top: topPos, behavior: "smooth" });
+      // Синхронизируем калькулятор
+      if (typeof Calculator !== "undefined") {
+        Calculator.currentSubjectId = subjectId;
+        const calcSelect = document.getElementById("calc-subject-select");
+        if (calcSelect) {
+          calcSelect.value = subjectId;
+          Calculator.updateSubjectUI();
+          Calculator.calculate();
+        }
       }
     }
+    this.switchView("cheatsheet", false);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  },
+
+  goToHome(scroll = true) {
+    this.switchView("home", false);
+    this.renderHomeSubjects();
+    if (scroll) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  },
+
+  selectSubject(subjectId) {
+    this.openSubject(subjectId);
   },
 
   /* --------------------------------------------------------------------------
@@ -280,7 +342,7 @@ const App = {
     this.currentView = viewName;
 
     // Синхронизация всех кнопок навигации и вкладок
-    document.querySelectorAll(".view-tab-btn, .nav-item-link, .nav-dropdown-item").forEach(btn => {
+    document.querySelectorAll(".view-tab-btn, .nav-item-link, .nav-dropdown-item, .nav-capsule-btn").forEach(btn => {
       if (btn.dataset && btn.dataset.view) {
         btn.classList.toggle("active", btn.dataset.view === viewName);
       }
@@ -302,16 +364,22 @@ const App = {
     });
 
     // Переключение секций
-    const viewSections = ["cheatsheet", "demos", "guide", "quiz", "calculator", "tracker", "store", "school", "mistakes", "cabinet"];
+    const viewSections = ["home", "cheatsheet", "demos", "guide", "quiz", "calculator", "tracker", "store", "school", "mistakes", "cabinet"];
     viewSections.forEach(v => {
       const el = document.getElementById(`view-${v}`);
       if (el) el.style.display = (v === viewName) ? "block" : "none";
     });
 
-    // Управляем видимостью блока предметов: скрываем в школе, гиде, магазине, ошибках, кабинете
+    // Управляем видимостью блока предметов: скрываем в школе, гиде, магазине, ошибках, кабинете, главной
     const subjectsNav = document.querySelector(".subjects-nav-section");
     if (subjectsNav) {
-      subjectsNav.style.display = (viewName === "school" || viewName === "guide" || viewName === "store" || viewName === "mistakes" || viewName === "cabinet") ? "none" : "block";
+      subjectsNav.style.display = (viewName === "home" || viewName === "school" || viewName === "guide" || viewName === "store" || viewName === "mistakes" || viewName === "cabinet") ? "none" : "block";
+    }
+
+    // Обновляем хлебные крошки при переходе в cheatsheet
+    if (viewName === "cheatsheet" && typeof SUBJECTS_DATA !== "undefined" && SUBJECTS_DATA[this.currentSubject]) {
+      const crumb = document.getElementById("subject-crumb-title");
+      if (crumb) crumb.textContent = SUBJECTS_DATA[this.currentSubject].title;
     }
 
     // Достижение при посещении раздела школы №6
@@ -346,7 +414,9 @@ const App = {
   },
 
   renderCurrentView() {
-    if (this.currentView === "cheatsheet") {
+    if (this.currentView === "home") {
+      this.renderHomeSubjects();
+    } else if (this.currentView === "cheatsheet") {
       this.renderCheatsheet();
     } else if (this.currentView === "demos") {
       this.renderDemosView();
