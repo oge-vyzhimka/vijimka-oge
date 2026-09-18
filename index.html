@@ -180,166 +180,147 @@
   </div>
 
   <!-- ========================================================================
-       Шапка сайта
+       Шапка сайта (Linear / Vercel Modern IT Header 56px)
        ======================================================================== -->
   <header class="site-header">
-    <!-- Индикатор последнего изменения (всегда в левом верхнем углу) -->
-    <div class="header-top-ribbon">
-      <div class="header-top-ribbon-inner">
-        <div class="last-update-indicator" id="last-update-badge" title="Последнее обновление материалов и базы заданий">
-          <span class="update-pulse-dot"></span>
-          <span class="update-label">18.09 последнее изменение</span>
-        </div>
-      </div>
-    </div>
-
     <div class="header-container">
-      <a href="#" class="logo-block" onclick="App.switchView('cheatsheet'); return false;">
-        <span class="logo-badge">ОГЭ</span>
-        <span class="logo-title">Выжимка<span>.Экспресс</span></span>
+      <!-- Логотип и бренд -->
+      <a href="#" class="nav-brand" onclick="App.switchView('cheatsheet'); return false;" title="ОГЭ Выжимка — Главная">
+        <span class="brand-spark">⚡</span>
+        <span class="brand-name">ОГЭ<strong>Выжимка</strong></span>
       </a>
 
-      <!-- Поле глобального поиска -->
-      <div class="header-search-wrap">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="global-search-input" class="search-input" placeholder="Поиск формулы, правила, ловушки или темы...">
-      </div>
+      <!-- Основная навигация приложения (десктоп) -->
+      <nav class="nav-center-menu">
+        <button class="nav-item-link view-tab-btn active" data-view="cheatsheet" onclick="App.switchView('cheatsheet')">
+          <span class="nav-item-icon">📖</span> Материалы
+        </button>
+        <button class="nav-item-link view-tab-btn" data-view="quiz" onclick="App.switchView('quiz')">
+          <span class="nav-item-icon">🎯</span> Тренажёр
+        </button>
+        <button class="nav-item-link view-tab-btn tab-mistakes-btn" data-view="mistakes" onclick="App.switchView('mistakes')">
+          <span class="nav-item-icon">❌</span> Ошибки <span class="tab-badge-count" id="mistakes-tab-badge" style="display:none;">0</span>
+        </button>
+        <button class="nav-item-link view-tab-btn" data-view="calculator" onclick="App.switchView('calculator')">
+          <span class="nav-item-icon">🧮</span> Калькулятор
+        </button>
 
-      <!-- Переключатели темы и действия -->
-      <div class="header-actions">
-        <!-- Кнопка Личного кабинета и стрика -->
+        <div class="nav-dropdown-wrapper">
+          <button class="nav-item-link nav-more-trigger" onclick="App.toggleMoreMenu(event)" title="Дополнительные разделы">
+            <span>Ещё</span>
+            <span class="dropdown-chevron">▾</span>
+          </button>
+          <div class="nav-dropdown-menu" id="nav-more-dropdown">
+            <button class="nav-dropdown-item view-tab-btn tab-demos-btn" data-view="demos" onclick="App.switchView('demos'); App.closeMoreMenu();">
+              <span class="dd-icon">📋</span> Пробники ФИПИ & варианты
+            </button>
+            <button class="nav-dropdown-item view-tab-btn tab-tracker-btn" data-view="tracker" onclick="App.switchView('tracker'); App.closeMoreMenu();">
+              <span class="dd-icon">📚</span> Каталог всех тем ФИПИ
+            </button>
+            <button class="nav-dropdown-item view-tab-btn tab-guide-btn" data-view="guide" onclick="App.switchView('guide'); App.closeMoreMenu();">
+              <span class="dd-icon">🚀</span> Стратегия и гид ОГЭ
+            </button>
+            <button class="nav-dropdown-item view-tab-btn tab-school-btn" data-view="school" onclick="App.switchView('school'); App.closeMoreMenu();">
+              <span class="dd-icon">🏫</span> Чикская СОШ №6
+            </button>
+            <button class="nav-dropdown-item view-tab-btn tab-store-btn" data-view="store" onclick="App.switchView('store'); App.closeMoreMenu();">
+              <span class="dd-icon">🛒</span> Где купить сборники
+            </button>
+            <div class="nav-dropdown-divider"></div>
+            <button class="nav-dropdown-item" onclick="App.openEgeModal(); App.closeMoreMenu();">
+              <span class="dd-icon">🎓</span> Подготовка к ЕГЭ <span class="ege-mini-badge">В разработке</span>
+            </button>
+            <button class="nav-dropdown-item view-tab-btn tab-cabinet-btn" data-view="cabinet" onclick="App.switchView('cabinet'); App.closeMoreMenu();">
+              <span class="dd-icon">👤</span> Профиль и достижения
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <!-- Поиск и действия справа -->
+      <div class="header-right-actions">
+        <div class="header-search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="global-search-input" class="search-input" placeholder="Поиск формулы, правила..." autocomplete="off">
+        </div>
+
         <button class="nav-pill-btn profile-header-btn" id="header-profile-btn" onclick="Auth.openProfileModal()" title="Личный кабинет и профиль">
           <span id="header-profile-avatar">🦊</span>
           <span id="header-profile-name">Войти</span>
-          <span class="streak-badge-pill" id="header-streak-badge" style="display:none;">🔥 1 день</span>
         </button>
-        <!-- Кнопка Выход на начальный экран -->
-        <button class="nav-pill-btn logout-header-btn" id="header-logout-btn" onclick="Auth.showGateScreen()" title="Выйти на начальный экран">
-          <span>🚪</span>
-          <span class="logout-btn-text">Выход</span>
-        </button>
-        <!-- Специальная кнопка школы №6 им. Потапова -->
-        <button class="nav-pill-btn school-highlight-btn" onclick="App.switchView('school')" title="Раздел для учеников 6 школы имени Д.К. Потапова">
-          <span>🏫</span>
-          <span class="school-btn-text-desktop">Школа №6</span>
-          <span class="school-btn-text-mobile">№6</span>
-        </button>
-        <button class="nav-pill-btn ege-header-btn" onclick="App.openEgeModal()" title="Подготовка к ЕГЭ (В разработке)">
-          <span>🎓</span>
-          <span>ЕГЭ</span>
-        </button>
+
         <button class="btn-icon" id="theme-toggle-btn" title="Сменить тему оформления" onclick="App.toggleTheme()">
           <span id="theme-toggle-icon">☀️</span>
         </button>
-        <button class="nav-pill-btn print-header-btn" onclick="window.print()" title="Распечатать шпаргалку текущего предмета">
+
+        <button class="btn-icon print-btn-icon" onclick="window.print()" title="Распечатать шпаргалку текущего предмета">
           <span>🖨️</span>
-          <span>Печать</span>
+        </button>
+
+        <button class="nav-pill-btn logout-header-btn" id="header-logout-btn" onclick="Auth.showGateScreen()" title="Выйти на начальный экран">
+          <span>🚪</span>
+          <span class="logout-btn-text">Выход</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- ========================================================================
-       Главный баннер с таймером и статистикой
+       Информационная статусная строка (40px Subheader)
        ======================================================================== -->
-  <section class="hero-section">
-    <div class="hero-content">
-      <div>
-        <div class="hero-tag">
-          <span>🎓</span> Индивидуальный проект 9 класс
+  <div class="app-status-bar">
+    <div class="app-status-inner">
+      <div class="status-left">
+        <div class="last-update-indicator" id="last-update-badge" title="Последнее обновление материалов и базы заданий">
+          <span class="update-pulse-dot"></span>
+          <span class="update-label">18.09 последнее изменение</span>
         </div>
-        <h1 class="hero-title">
-          Вся выжимка ОГЭ <br>по всем 11 предметам
-        </h1>
-        <p class="hero-desc">
-          Только ключевая теория, официальные формулы ФИПИ, алгоритмы решений и разбор частых ловушек. Никаких многостраничных занудных учебников — только то, что реально встретится в КИМ.
-        </p>
+        <span class="status-sep">•</span>
+        <div class="status-countdown" title="Обратный отсчет до начала экзаменов ОГЭ">
+          <span class="status-clock-icon">⏳</span>
+          <span>До ОГЭ: <strong id="oge-countdown-timer">Загрузка...</strong></span>
+        </div>
       </div>
-
-      <div class="hero-stats-panel">
-        <div class="timer-box">
-          <div class="timer-label">⏳ До основных дней ОГЭ:</div>
-          <div class="timer-digits" id="oge-countdown-timer">Загрузка...</div>
+      <div class="status-right">
+        <div class="status-chip streak-chip" id="status-streak-chip" onclick="Auth.openProfileModal()" title="Ваша текущая серия занятий">
+          <span class="status-chip-icon">🔥</span>
+          <span id="header-streak-badge">1 день</span>
         </div>
-        <div class="quick-meta-row">
-          <div class="quick-meta-item">
-            <div class="quick-meta-val">11</div>
-            <div class="quick-meta-lbl">Предметов</div>
-          </div>
-          <div class="quick-meta-item">
-            <div class="quick-meta-val">100%</div>
-            <div class="quick-meta-lbl">ФИПИ 2025/26</div>
-          </div>
-          <div class="quick-meta-item">
-            <div class="quick-meta-val">0%</div>
-            <div class="quick-meta-lbl">Лишней воды</div>
-          </div>
-        </div>
+        <button class="status-chip school-chip" onclick="App.switchView('school')" title="Раздел для учеников Чикской СОШ № 6">
+          <span>🏫</span>
+          <span>Чикская СОШ №6</span>
+        </button>
       </div>
     </div>
-  </section>
+  </div>
 
   <!-- ========================================================================
-       Панель навигации по предметам
+       Компактная лента выбора предметов (Horizontal Scroll Ribbon)
        ======================================================================== -->
   <section class="subjects-nav-section">
-    <div class="filter-bar">
+    <div class="subjects-nav-header">
       <div class="filter-pills">
         <button class="filter-pill active" data-category="all" onclick="App.filterCategory('all')">Все предметы (11)</button>
         <button class="filter-pill" data-category="mandatory" onclick="App.filterCategory('mandatory')">Обязательные (2)</button>
         <button class="filter-pill" data-category="technical" onclick="App.filterCategory('technical')">Технические (2)</button>
         <button class="filter-pill" data-category="humanities" onclick="App.filterCategory('humanities')">Гуманитарные (4)</button>
-        <button class="filter-pill" data-category="science" onclick="App.filterCategory('science')">Естественнонаучные (3)</button>
+        <button class="filter-pill" data-category="science" onclick="App.filterCategory('science')">Естественные (3)</button>
       </div>
-      <button class="ege-badge-btn" onclick="App.openEgeModal()" title="Раздел подготовки к ЕГЭ">
-        <span class="ege-icon">🎓</span>
-        <span class="ege-btn-text">Подготовка к ЕГЭ</span>
-        <span class="ege-tag-soon">В разработке</span>
-      </button>
+      <div class="subjects-quick-note">
+        <span>⚡ 100% ФИПИ 2025/26</span>
+      </div>
     </div>
 
-    <!-- Сетка карточек предметов -->
-    <div class="subjects-grid" id="subjects-grid">
+    <!-- Горизонтальная лента чипов предметов -->
+    <div class="subjects-scroll-ribbon" id="subjects-grid">
       <!-- Генерируется из subjects.js -->
     </div>
   </section>
 
   <!-- ========================================================================
-       Основная рабочая область (Табы представлений)
+       Основная рабочая область
        ======================================================================== -->
   <main class="main-wrapper">
-    <div class="view-tabs">
-      <button class="view-tab-btn active" data-view="cheatsheet" onclick="App.switchView('cheatsheet')">
-        📖 Шпаргалки
-      </button>
-      <button class="view-tab-btn tab-demos-btn" data-view="demos" onclick="App.switchView('demos')">
-        📋 Пробники ФИПИ
-      </button>
-      <button class="view-tab-btn tab-guide-btn" data-view="guide" onclick="App.switchView('guide')">
-        🚀 Гид ОГЭ
-      </button>
-      <button class="view-tab-btn" data-view="quiz" onclick="App.switchView('quiz')">
-        🎯 Тренажёр
-      </button>
-      <button class="view-tab-btn" data-view="calculator" onclick="App.switchView('calculator')">
-        🧮 Калькулятор
-      </button>
-      <button class="view-tab-btn tab-tracker-btn" data-view="tracker" onclick="App.switchView('tracker')">
-        📚 Темы
-      </button>
-      <button class="view-tab-btn tab-store-btn" data-view="store" onclick="App.switchView('store')">
-        🛒 Где купить
-      </button>
-      <button class="view-tab-btn tab-school-btn" data-view="school" onclick="App.switchView('school')">
-        🏫 Школа №6
-      </button>
-      <button class="view-tab-btn tab-mistakes-btn" data-view="mistakes" onclick="App.switchView('mistakes')">
-        ❌ Ошибки <span class="tab-badge-count" id="mistakes-tab-badge" style="display:none;">0</span>
-      </button>
-      <button class="view-tab-btn tab-cabinet-btn" data-view="cabinet" onclick="App.switchView('cabinet')">
-        👤 Кабинет
-      </button>
-    </div>
 
     <!-- Вкладка: Пробники и демо-версии (Полные демоверсии 4ЕГЭ, Умскул, Задачи села Прокудское) -->
     <section id="view-demos" style="display: none;">
@@ -655,6 +636,21 @@
       <span class="mobile-nav-label">Школа №6</span>
     </button>
   </nav>
+
+  <!-- ========================================================================
+       Модальное окно: Глобальный поиск формул и определений
+       ======================================================================== -->
+  <div id="search-results-overlay" class="custom-modal-overlay search-overlay" onclick="if(event.target===this) this.classList.remove('open');" style="display: none;">
+    <div class="custom-modal-card search-modal-card">
+      <div class="search-modal-header">
+        <div class="search-modal-title"><span>🔍</span> Результаты поиска</div>
+        <button class="modal-close-btn" onclick="document.getElementById('search-results-overlay').classList.remove('open');">&times;</button>
+      </div>
+      <div id="search-results-list" class="search-results-list">
+        <!-- Генерируется из initSearch в app.js -->
+      </div>
+    </div>
+  </div>
 
   <!-- ========================================================================
        Модальное окно: Подготовка к ЕГЭ (В разработке)
