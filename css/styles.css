@@ -4698,4 +4698,19 @@ button {
   }
 }
 
+/* Отступ при прокрутке к разделам под плавающую шапку сайта */
+.view-tabs,
+.main-wrapper,
+#view-cheatsheet,
+#view-demos,
+#view-guide,
+#view-quiz,
+#view-calculator,
+#view-tracker,
+#view-store,
+#view-school {
+  scroll-margin-top: 85px;
+}
+
+
 
