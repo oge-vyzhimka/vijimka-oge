@@ -13,6 +13,9 @@ const Auth = {
   profile: null,
 
   init() {
+    // 0. Автоопределение пользователя Telegram WebApp
+    this.detectTelegramWebApp();
+
     // 1. Инициализация Supabase клиента (если библиотека загружена)
     try {
       if (window.supabase && typeof window.supabase.createClient === "function") {
@@ -46,14 +49,46 @@ const Auth = {
     this.checkGateState();
   },
 
+  detectTelegramWebApp() {
+    try {
+      if (window.Telegram && window.Telegram.WebApp) {
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+        const tgUser = window.Telegram.WebApp.initDataUnsafe?.user;
+        if (tgUser) {
+          const fullName = [tgUser.first_name, tgUser.last_name].filter(Boolean).join(" ");
+          const uname = tgUser.username ? "@" + tgUser.username : "";
+          const saved = localStorage.getItem("oge_user_profile");
+          if (!saved) {
+            this.saveProfile({
+              name: fullName || uname || "Telegram Пользователь",
+              role: "student",
+              grade: "9 «А»",
+              school: "МБОУ СОШ №6 им. Д.К. Потапова",
+              avatar: "✈️",
+              telegram: uname,
+              authProvider: "telegram",
+              isGuest: false
+            });
+            localStorage.setItem("oge_auth_gate_passed", "true");
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Telegram WebApp detection error:", e);
+    }
+  },
+
   getDefaultProfile() {
     return {
       id: "guest_" + Math.random().toString(36).substring(2, 9),
       name: "Гость ОГЭ",
       role: "student", // 'student' | 'teacher'
-      school: "СОШ №6 им. Д.К. Потапова",
-      grade: "9А",
+      school: "МБОУ СОШ №6 им. Д.К. Потапова",
+      grade: "9 «А»",
       avatar: "🦊",
+      telegram: "",
+      authProvider: "local",
       targetGrade: "5",
       isGuest: true,
       email: ""
@@ -212,6 +247,49 @@ const Auth = {
       return;
     }
 
+    if (viewType === "auth_telegram") {
+      bodyEl.innerHTML = `
+        <div class="auth-modal-pane">
+          <div class="auth-modal-title" style="color: #38bdf8; display: flex; align-items: center; gap: 0.5rem;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#38bdf8"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+            Вход через Telegram
+          </div>
+          <p class="auth-modal-sub">Привяжите свой Telegram никнейм для быстрой синхронизации тестов и банка ошибок без пароля.</p>
+
+          <form onsubmit="Auth.handleModalTelegramSubmit(event)" style="display: flex; flex-direction: column; gap: 0.9rem; margin-top: 1rem;">
+            <div>
+              <label class="auth-field-lbl">Ваш никнейм в Telegram (@username):</label>
+              <div style="position: relative; display: flex; align-items: center;">
+                <span style="position: absolute; left: 1rem; color: #38bdf8; font-weight: 800; font-size: 1.1rem; pointer-events: none;">@</span>
+                <input type="text" id="modal-tg-username" class="auth-text-input" required placeholder="ваш_никнейм" value="${(p.telegram || '').replace(/^@/, '')}" style="padding-left: 2.1rem; border-color: rgba(34, 158, 217, 0.45);">
+              </div>
+              <div style="font-size: 0.74rem; color: var(--text-secondary); margin-top: 0.25rem;">Имя пользователя из настроек Telegram. Пароль не требуется.</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+              <div>
+                <label class="auth-field-lbl">Класс:</label>
+                <input type="text" id="modal-tg-grade" class="auth-text-input" value="${p.grade || '9 «А»'}">
+              </div>
+              <div>
+                <label class="auth-field-lbl">Отображаемое имя:</label>
+                <input type="text" id="modal-tg-name" class="auth-text-input" value="${p.name !== 'Гость ОГЭ' ? p.name : ''}" placeholder="Имя">
+              </div>
+            </div>
+
+            <button type="submit" class="btn-action" style="background: linear-gradient(135deg, #2AABEE, #229ED9); color: white; padding: 0.85rem; font-weight: 800; border-radius: 10px; margin-top: 0.4rem; border: none; cursor: pointer; box-shadow: 0 4px 15px rgba(34, 158, 217, 0.4); display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+              Войти и сохранить профиль ✈️
+            </button>
+            <button type="button" class="btn-action btn-secondary" onclick="Auth.renderModalContent('overview')">
+              Назад
+            </button>
+          </form>
+        </div>
+      `;
+      return;
+    }
+
     if (viewType === "auth_login") {
       bodyEl.innerHTML = `
         <div class="auth-modal-pane">
@@ -238,6 +316,10 @@ const Auth = {
           <div class="auth-divider-line"><span>Или</span></div>
 
           <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+            <button class="oauth-login-btn telegram-login-btn" onclick="Auth.signInWithTelegram()" style="background: rgba(34, 158, 217, 0.15); border-color: rgba(34, 158, 217, 0.4); color: #38bdf8;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#38bdf8"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+              Войти через Telegram
+            </button>
             <button class="oauth-login-btn google-btn" onclick="Auth.signInWithGoogle()">
               <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
               Войти через Google
@@ -333,6 +415,10 @@ const Auth = {
             <span>✏️ Настроить профиль (имя, класс, роль)</span>
             <span>→</span>
           </button>
+          <button class="profile-action-btn" onclick="Auth.renderModalContent('auth_telegram')" style="background: rgba(34, 158, 217, 0.08); border-color: rgba(34, 158, 217, 0.35);">
+            <span style="color: #38bdf8; font-weight: 700;">✈️ ${p.telegram ? `Telegram: ${p.telegram}` : 'Войти через Telegram'}</span>
+            <span style="color: #38bdf8; font-weight: 700;">${p.telegram ? 'Изменить →' : 'Вход →'}</span>
+          </button>
           <button class="profile-action-btn" onclick="App.switchView('mistakes'); Auth.closeProfileModal();">
             <span>❌ Перейти в «Мои ошибки» (${mistakeCount})</span>
             <span>→</span>
@@ -359,6 +445,30 @@ const Auth = {
         </div>
       </div>
     `;
+  },
+
+  handleModalTelegramSubmit(e) {
+    if (e) e.preventDefault();
+    const rawUname = document.getElementById("modal-tg-username")?.value.trim() || "";
+    if (!rawUname) {
+      alert("Укажите никнейм в Telegram!");
+      return;
+    }
+    const cleanUname = rawUname.startsWith("@") ? rawUname : "@" + rawUname;
+    const name = document.getElementById("modal-tg-name")?.value.trim() || cleanUname;
+    const grade = document.getElementById("modal-tg-grade")?.value.trim() || "9 «А»";
+
+    this.saveProfile({
+      name: name,
+      telegram: cleanUname,
+      grade: grade,
+      avatar: "✈️",
+      authProvider: "telegram",
+      isGuest: false
+    });
+
+    alert(`🎉 Профиль успешно привязан к Telegram (${cleanUname})!`);
+    this.renderModalContent("overview");
   },
 
   selectEmojiAvatar(emoji) {
@@ -524,17 +634,94 @@ const Auth = {
     }
   },
 
+  signInWithTelegram(prefillUsername) {
+    // 1. Проверяем Telegram WebApp контекст (если сайт открыт внутри Telegram)
+    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
+      const u = window.Telegram.WebApp.initDataUnsafe.user;
+      const fullName = [u.first_name, u.last_name].filter(Boolean).join(" ");
+      const uname = u.username ? "@" + u.username : (fullName || "Telegram Пользователь");
+      this.saveProfile({
+        name: fullName || uname,
+        role: "student",
+        grade: "9 «А»",
+        school: "МБОУ СОШ №6 им. Д.К. Потапова",
+        avatar: u.photo_url ? `<img src="${u.photo_url}" style="width:22px;height:22px;border-radius:50%;">` : "✈️",
+        telegram: u.username ? "@" + u.username : "",
+        isGuest: false,
+        authProvider: "telegram"
+      });
+      this.completeGate();
+      alert(`🎉 Добро пожаловать, ${this.profile.name}! Вы успешно вошли через Telegram.`);
+      return;
+    }
+
+    // 2. Если открыт начальный экран (Welcome Gate) — открываем вкладку Telegram
+    const gate = document.getElementById("welcome-gate");
+    if (gate && gate.style.display !== "none") {
+      this.switchGateTab("telegram");
+      if (prefillUsername) {
+        const inp = document.getElementById("gate-tg-username");
+        if (inp) inp.value = prefillUsername.replace(/^@/, '');
+      }
+      setTimeout(() => {
+        const inp = document.getElementById("gate-tg-username");
+        if (inp) inp.focus();
+      }, 150);
+      return;
+    }
+
+    // 3. Если уже внутри сайта — открываем модальное окно Telegram
+    this.openProfileModal();
+    this.renderModalContent("auth_telegram");
+  },
+
   switchGateTab(tab) {
     const btnStudent = document.getElementById("gate-tab-student");
+    const btnTelegram = document.getElementById("gate-tab-telegram");
     const btnTeacher = document.getElementById("gate-tab-teacher");
     const panelStudent = document.getElementById("gate-panel-student");
+    const panelTelegram = document.getElementById("gate-panel-telegram");
     const panelTeacher = document.getElementById("gate-panel-teacher");
 
     if (btnStudent) btnStudent.classList.toggle("active", tab === "student");
+    if (btnTelegram) btnTelegram.classList.toggle("active", tab === "telegram");
     if (btnTeacher) btnTeacher.classList.toggle("active", tab === "teacher");
 
     if (panelStudent) panelStudent.style.display = (tab === "student") ? "block" : "none";
+    if (panelTelegram) panelTelegram.style.display = (tab === "telegram") ? "block" : "none";
     if (panelTeacher) panelTeacher.style.display = (tab === "teacher") ? "block" : "none";
+
+    if (tab === "telegram") {
+      setTimeout(() => {
+        const inp = document.getElementById("gate-tg-username");
+        if (inp) inp.focus();
+      }, 100);
+    }
+  },
+
+  submitGateTelegram(e) {
+    if (e) e.preventDefault();
+    const rawUname = document.getElementById("gate-tg-username")?.value.trim() || "";
+    if (!rawUname) {
+      alert("Укажите ваш никнейм в Telegram!");
+      return;
+    }
+    const cleanUname = rawUname.startsWith("@") ? rawUname : "@" + rawUname;
+    const grade = document.getElementById("gate-tg-grade")?.value || "9 «А»";
+    const dispName = document.getElementById("gate-tg-displayname")?.value.trim() || cleanUname;
+
+    this.saveProfile({
+      name: dispName,
+      role: "student",
+      grade: grade,
+      school: "МБОУ СОШ №6 им. Д.К. Потапова",
+      avatar: "✈️",
+      telegram: cleanUname,
+      authProvider: "telegram",
+      isGuest: false
+    });
+
+    this.completeGate();
   },
 
   selectGateAvatar(emoji, btn) {
