@@ -212,6 +212,61 @@ const App = {
   },
 
   /* --------------------------------------------------------------------------
+     Плавная прокрутка экрана с физической анимацией (requestAnimationFrame)
+     Гарантированно работает во всех браузерах и на смартфонах плавно и без рывков
+     -------------------------------------------------------------------------- */
+  smoothScrollTo(targetY, duration = 650) {
+    const startY = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+    const diff = targetY - startY;
+
+    if (Math.abs(diff) < 5) return; // Уже на нужной высоте
+
+    let startTime = null;
+
+    // Плавная кубическая кривая ускорения и замедления (ease-in-out-cubic)
+    const easeInOutCubic = (t) => {
+      return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    };
+
+    const step = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const ease = easeInOutCubic(progress);
+
+      const currentPos = Math.round(startY + diff * ease);
+      window.scrollTo(0, currentPos);
+
+      if (progress < 1) {
+        requestAnimationFrame(step);
+      }
+    };
+
+    requestAnimationFrame(step);
+  },
+
+  scrollToViewContent(viewName) {
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        const viewTabs = document.querySelector(".view-tabs");
+        const activeSection = document.getElementById(`view-${viewName}`);
+        const header = document.querySelector(".site-header");
+        const headerHeight = header ? header.offsetHeight : 65;
+
+        // Точка назначения: панель вкладок и начало контента прямо под шапкой
+        const target = viewTabs || activeSection;
+        if (!target) return;
+
+        const rect = target.getBoundingClientRect();
+        const currentY = window.pageYOffset || document.documentElement.scrollTop || 0;
+        const targetY = Math.max(0, Math.round(currentY + rect.top - headerHeight - 12));
+
+        this.smoothScrollTo(targetY, 650);
+      });
+    }, 60);
+  },
+
+  /* --------------------------------------------------------------------------
      Переключение представлений (Выжимка, Тест, Калькулятор, Чек-лист, Школа, Магазин)
      -------------------------------------------------------------------------- */
   switchView(viewName, autoScroll = true) {
@@ -247,17 +302,7 @@ const App = {
 
     // Автоматическая плавная прокрутка экрана вниз к выбранному разделу
     if (autoScroll) {
-      setTimeout(() => {
-        const viewTabs = document.querySelector(".view-tabs");
-        const activeSection = document.getElementById(`view-${viewName}`);
-        const target = viewTabs || activeSection;
-        if (target) {
-          const header = document.querySelector(".site-header");
-          const headerHeight = header ? header.offsetHeight : 65;
-          const targetTop = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 12;
-          window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
-        }
-      }, 50);
+      this.scrollToViewContent(viewName);
     }
   },
 
