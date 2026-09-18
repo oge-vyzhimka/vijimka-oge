@@ -303,9 +303,7 @@ const CabinetView = {
             <div class="cabinet-user-info">
               <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
                 <h2 class="cabinet-user-name">${profile.name}</h2>
-                <span class="role-pill-badge ${isTeacher ? 'teacher' : 'student'}">
-                  ${isTeacher ? '👨‍🏫 Преподаватель' : '🎒 Ученик 9 класса'}
-                </span>
+                <span class="role-pill-badge student">🎒 Ученик 9 класса</span>
                 <span class="profile-status-badge ${profile.isGuest ? 'guest-badge' : 'cloud-badge'}">
                   ${profile.isGuest ? 'Локальный режим' : '☁️ Синхронизировано'}
                 </span>
@@ -326,22 +324,7 @@ const CabinetView = {
           </div>
         </div>
 
-        <!-- Переключатель режима Ученик / Учитель -->
-        <div class="cabinet-role-switch-banner">
-          <div>
-            <strong>Текущий режим: ${isTeacher ? '👨‍🏫 Кабинет Преподавателя / Репетитора' : '🎒 Личный кабинет ученика'}</strong>
-            <p style="font-size: 0.88rem; color: var(--text-secondary); margin: 0.2rem 0 0;">
-              ${isTeacher 
-                ? 'Вам доступны сводные ведомости класса, списки типичных ошибок учеников и экспорт отчетов.' 
-                : 'Отслеживайте стрик, пройденные темы, банк ошибок и получайте достижения.'}
-            </p>
-          </div>
-          <button class="btn-action btn-secondary" onclick="CabinetView.toggleRole()">
-            Сменить на «${isTeacher ? 'Ученика' : 'Преподавателя'}»
-          </button>
-        </div>
-
-        ${!isTeacher ? this.renderStudentDashboard(streak, checkedTopics.length, unresolvedMistakes, resolvedMistakes) : this.renderTeacherDashboard()}
+        ${this.renderStudentDashboard(streak, checkedTopics.length, unresolvedMistakes, resolvedMistakes)}
 
         <!-- Секция достижений и наград -->
         <div class="cabinet-section-card">
@@ -430,118 +413,6 @@ const CabinetView = {
 
       <div id="student-report-output" style="display: none; margin-top: 1rem;"></div>
     `;
-  },
-
-  renderTeacherDashboard() {
-    return `
-      <div class="cabinet-section-card teacher-panel">
-        <div class="sec-card-header">
-          <div>
-            <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
-              <h3 class="sec-card-title">👨‍🏫 Панель преподавателя (Школа №6 им. Д.К. Потапова)</h3>
-              <span style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: var(--accent-green); padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 700;">
-                🔑 Кодовое слово подтверждено
-              </span>
-            </div>
-            <p class="sec-card-sub">Сводная ведомость готовности класса к основному государственному экзамену</p>
-          </div>
-          <div style="display: flex; gap: 0.5rem;">
-            <button class="btn-action-sm" onclick="CabinetView.printTeacherClassReport()">🖨️ Печать ведомости</button>
-            <button class="btn-action-sm btn-secondary" onclick="CabinetView.copyClassSummary()">📋 Копировать сводку</button>
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1rem;">
-          <div class="teacher-metric-box">
-            <div class="t-met-title">Класс под кураторством:</div>
-            <div class="t-met-val">9 «А» класс</div>
-            <div class="t-met-sub">МБОУ СОШ №6 им. Д.К. Потапова</div>
-          </div>
-
-          <div class="teacher-metric-box">
-            <div class="t-met-title">Средняя готовность по темам:</div>
-            <div class="t-met-val" style="color: var(--accent-green);">74%</div>
-            <div class="t-met-sub">Обязательные предметы (Русский, Математика)</div>
-          </div>
-
-          <div class="teacher-metric-box">
-            <div class="t-met-title">Топ частых ловушек у ребят:</div>
-            <div class="t-met-val" style="color: var(--accent-red); font-size: 1.1rem; line-height: 1.4;">
-              ОДЗ корней, знаки в неравенствах, -Н-/-НН-
-            </div>
-          </div>
-        </div>
-
-        <!-- Таблица учеников класса -->
-        <h4 style="margin: 1.5rem 0 0.8rem; font-size: 1.05rem;">📋 Журнал успеваемости группы:</h4>
-        <div style="overflow-x: auto;">
-          <table class="teacher-grade-table">
-            <thead>
-              <tr>
-                <th>Ученик</th>
-                <th>Стрик</th>
-                <th>Изучено тем</th>
-                <th>Ошибок в банке</th>
-                <th>Прогноз оценки</th>
-                <th>Статус</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Алексей Н. (Вы)</strong></td>
-                <td>🔥 ${Gamification.streakData.currentStreak || 1} дн.</td>
-                <td>12 тем</td>
-                <td>${(typeof MistakesBank !== "undefined") ? MistakesBank.getUnresolvedCount() : 0} неразобр.</td>
-                <td><span class="grade-badge g5">«5» Отлично</span></td>
-                <td><span style="color: var(--accent-green);">● Активен сегодня</span></td>
-              </tr>
-              <tr>
-                <td>Дмитрий К.</td>
-                <td>🔥 4 дн.</td>
-                <td>18 тем</td>
-                <td>1 неразобр.</td>
-                <td><span class="grade-badge g5">«5» Отлично</span></td>
-                <td><span style="color: var(--accent-green);">● Активен</span></td>
-              </tr>
-              <tr>
-                <td>София М.</td>
-                <td>🔥 2 дн.</td>
-                <td>9 тем</td>
-                <td>4 неразобр.</td>
-                <td><span class="grade-badge g4">«4» Хорошо</span></td>
-                <td><span style="color: var(--text-secondary);">○ 1 день назад</span></td>
-              </tr>
-              <tr>
-                <td>Артём В.</td>
-                <td>🔥 1 дн.</td>
-                <td>5 тем</td>
-                <td>6 неразобр.</td>
-                <td><span class="grade-badge g3">«3» Удовл.</span></td>
-                <td><span style="color: var(--accent-red);">● Требуется разбор</span></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    `;
-  },
-
-  toggleRole() {
-    const current = (Auth.profile && Auth.profile.role) || "student";
-    const next = current === "teacher" ? "student" : "teacher";
-
-    // Запрос кодового слова при переключении на роль преподавателя
-    if (next === "teacher") {
-      const code = prompt("🔑 Введите секретное кодовое слово преподавателя для доступа к журналу класса:");
-      if (!code || code.trim().toLowerCase() !== "учитель2026") {
-        alert("⛔ Неверное кодовое слово! Доступ к панели преподавателя закрыт.");
-        return;
-      }
-      alert("✅ Доступ подтверждён! Вы переключились в режим Преподавателя.");
-    }
-
-    Auth.saveProfile({ role: next });
-    this.render();
   },
 
   generateStudentReport() {
