@@ -43,6 +43,7 @@ const Auth = {
     }
 
     this.updateUI();
+    this.checkGateState();
   },
 
   getDefaultProfile() {
@@ -351,6 +352,10 @@ const Auth = {
               <span>✕</span>
             </button>
           `}
+          <button class="profile-action-btn" onclick="Auth.showGateScreen()">
+            <span>🚪 Сменить пользователя / Выйти на начальный экран</span>
+            <span>→</span>
+          </button>
         </div>
       </div>
     `;
@@ -497,5 +502,120 @@ const Auth = {
     }
     this.handleSignOutLocal();
     this.renderModalContent("overview");
+  },
+
+  /* --------------------------------------------------------------------------
+     МЕТОДЫ НАЧАЛЬНОГО ЭКРАНА (WELCOME GATE)
+     -------------------------------------------------------------------------- */
+  checkGateState() {
+    const gate = document.getElementById("welcome-gate");
+    if (!gate) return;
+    const passed = localStorage.getItem("oge_auth_gate_passed");
+    if (passed === "true") {
+      gate.style.display = "none";
+      document.body.style.overflow = "";
+    } else {
+      gate.style.display = "flex";
+      document.body.style.overflow = "hidden";
+      if (this.profile && this.profile.name && this.profile.name !== "Гость ОГЭ") {
+        const inp = document.getElementById("gate-input-name");
+        if (inp) inp.value = this.profile.name;
+      }
+    }
+  },
+
+  switchGateTab(tab) {
+    const btnStudent = document.getElementById("gate-tab-student");
+    const btnTeacher = document.getElementById("gate-tab-teacher");
+    const panelStudent = document.getElementById("gate-panel-student");
+    const panelTeacher = document.getElementById("gate-panel-teacher");
+
+    if (btnStudent) btnStudent.classList.toggle("active", tab === "student");
+    if (btnTeacher) btnTeacher.classList.toggle("active", tab === "teacher");
+
+    if (panelStudent) panelStudent.style.display = (tab === "student") ? "block" : "none";
+    if (panelTeacher) panelTeacher.style.display = (tab === "teacher") ? "block" : "none";
+  },
+
+  selectGateAvatar(emoji, btn) {
+    document.querySelectorAll(".gate-avatar-pill").forEach(b => b.classList.remove("active"));
+    if (btn) btn.classList.add("active");
+    const inp = document.getElementById("gate-input-avatar");
+    if (inp) inp.value = emoji;
+  },
+
+  submitGateStudent(e) {
+    e.preventDefault();
+    const name = document.getElementById("gate-input-name").value.trim() || "Ученик";
+    const grade = document.getElementById("gate-input-grade").value;
+    const avatar = document.getElementById("gate-input-avatar").value || "🦊";
+
+    this.saveProfile({
+      name: name,
+      role: "student",
+      grade: grade,
+      school: "МБОУ СОШ №6 им. Д.К. Потапова",
+      avatar: avatar
+    });
+
+    this.completeGate();
+  },
+
+  submitGateTeacher(e) {
+    e.preventDefault();
+    const name = document.getElementById("gate-teacher-name").value.trim() || "Преподаватель";
+    const code = document.getElementById("gate-teacher-code").value.trim().toLowerCase();
+    const errEl = document.getElementById("gate-teacher-err");
+
+    if (code !== "учитель2026") {
+      if (errEl) {
+        errEl.textContent = "⛔ Неверное кодовое слово! Доступ открыт только для учителей (учитель2026).";
+        errEl.style.display = "block";
+      }
+      return;
+    }
+
+    if (errEl) errEl.style.display = "none";
+
+    this.saveProfile({
+      name: name,
+      role: "teacher",
+      grade: "9А",
+      school: "МБОУ СОШ №6 им. Д.К. Потапова",
+      avatar: "👨‍🏫"
+    });
+
+    this.completeGate();
+
+    // Преподавателя сразу переключаем на вкладку кабинета!
+    if (typeof App !== "undefined" && App.switchView) {
+      setTimeout(() => App.switchView("cabinet"), 100);
+    }
+  },
+
+  completeGate() {
+    localStorage.setItem("oge_auth_gate_passed", "true");
+    const gate = document.getElementById("welcome-gate");
+    if (gate) {
+      gate.classList.add("fade-out");
+      setTimeout(() => {
+        gate.style.display = "none";
+        document.body.style.overflow = "";
+      }, 350);
+    }
+    if (typeof Gamification !== "undefined" && Gamification.recordActivity) {
+      Gamification.recordActivity();
+    }
+  },
+
+  showGateScreen() {
+    localStorage.removeItem("oge_auth_gate_passed");
+    const gate = document.getElementById("welcome-gate");
+    if (gate) {
+      gate.classList.remove("fade-out");
+      gate.style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+    this.closeProfileModal();
   }
 };
