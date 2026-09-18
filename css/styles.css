@@ -2060,6 +2060,51 @@ button {
   background: rgba(37, 99, 235, 0.85);
 }
 
+/* Стили для карточек библиотек без фото / без аватарки */
+.library-card.no-image {
+  border-top: 3px solid #38bdf8;
+}
+
+.library-card-header-bar {
+  padding: 1.25rem 1.5rem 0.5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.library-card-icon-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lib-header-icon {
+  font-size: 1.25rem;
+}
+
+.library-status-tag-static {
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #38bdf8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.7rem;
+  border-radius: var(--radius-full);
+}
+
+.library-read-hall-tag {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-full);
+}
+
 .library-info {
   padding: 1.5rem;
   flex: 1;
