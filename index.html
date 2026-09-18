@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ОГЭ-Выжимка — Единый портал экспресс-подготовки по всем предметам</title>
+  
+  <!-- Мобильные PWA мета-теги -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ОГЭ Выжимка">
+  <meta name="theme-color" content="#0d1117">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- Шрифты Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Основные стили -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- ========================================================================
+       Шапка сайта
+       ======================================================================== -->
+  <header class="site-header">
+    <!-- Индикатор последнего изменения (всегда в левом верхнем углу) -->
+    <div class="header-top-ribbon">
+      <div class="header-top-ribbon-inner">
+        <div class="last-update-indicator" id="last-update-badge" title="Последнее обновление материалов и базы заданий">
+          <span class="update-pulse-dot"></span>
+          <span class="update-label">18.09 последнее изменение</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="header-container">
+      <a href="#" class="logo-block" onclick="App.switchView('cheatsheet'); return false;">
+        <span class="logo-badge">ОГЭ</span>
+        <span class="logo-title">Выжимка<span>.Экспресс</span></span>
+      </a>
+
+      <!-- Поле глобального поиска -->
+      <div class="header-search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="global-search-input" class="search-input" placeholder="Поиск формулы, правила, ловушки или темы...">
+      </div>
+
+      <!-- Переключатели темы и действия -->
+      <div class="header-actions">
+        <!-- Специальная кнопка школы №6 им. Потапова -->
+        <button class="nav-pill-btn school-highlight-btn" onclick="App.switchView('school')" title="Раздел для учеников 6 школы имени Д.К. Потапова">
+          <span>🏫</span>
+          <span class="school-btn-text-desktop">6 школа им. Д.К. Потапова</span>
+          <span class="school-btn-text-mobile">Школа №6</span>
+        </button>
+        <button class="nav-pill-btn ege-header-btn" onclick="App.openEgeModal()" title="Подготовка к ЕГЭ (В разработке)">
+          <span>🎓</span>
+          <span>ЕГЭ</span>
+          <span class="ege-tag-pill">Скоро</span>
+        </button>
+        <button class="btn-icon" id="theme-toggle-btn" title="Сменить тему оформления" onclick="App.toggleTheme()">
+          <span id="theme-toggle-icon">☀️</span>
+        </button>
+        <button class="nav-pill-btn print-header-btn" onclick="window.print()" title="Распечатать шпаргалку текущего предмета">
+          <span>🖨️</span>
+          <span>Печать</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================================
+       Главный баннер с таймером и статистикой
+       ======================================================================== -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <div>
+        <div class="hero-tag">
+          <span>🎓</span> Индивидуальный проект 9 класс
+        </div>
+        <h1 class="hero-title">
+          Вся выжимка ОГЭ <br>по всем 11 предметам
+        </h1>
+        <p class="hero-desc">
+          Только ключевая теория, официальные формулы ФИПИ, алгоритмы решений и разбор частых ловушек. Никаких многостраничных занудных учебников — только то, что реально встретится в КИМ.
+        </p>
+      </div>
+
+      <div class="hero-stats-panel">
+        <div class="timer-box">
+          <div class="timer-label">⏳ До основных дней ОГЭ:</div>
+          <div class="timer-digits" id="oge-countdown-timer">Загрузка...</div>
+        </div>
+        <div class="quick-meta-row">
+          <div class="quick-meta-item">
+            <div class="quick-meta-val">11</div>
+            <div class="quick-meta-lbl">Предметов</div>
+          </div>
+          <div class="quick-meta-item">
+            <div class="quick-meta-val">100%</div>
+            <div class="quick-meta-lbl">ФИПИ 2025/26</div>
+          </div>
+          <div class="quick-meta-item">
+            <div class="quick-meta-val">0%</div>
+            <div class="quick-meta-lbl">Лишней воды</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Панель навигации по предметам
+       ======================================================================== -->
+  <section class="subjects-nav-section">
+    <div class="filter-bar">
+      <div class="filter-pills">
+        <button class="filter-pill active" data-category="all" onclick="App.filterCategory('all')">Все предметы (11)</button>
+        <button class="filter-pill" data-category="mandatory" onclick="App.filterCategory('mandatory')">Обязательные (2)</button>
+        <button class="filter-pill" data-category="technical" onclick="App.filterCategory('technical')">Технические (2)</button>
+        <button class="filter-pill" data-category="humanities" onclick="App.filterCategory('humanities')">Гуманитарные (4)</button>
+        <button class="filter-pill" data-category="science" onclick="App.filterCategory('science')">Естественнонаучные (3)</button>
+      </div>
+      <button class="ege-badge-btn" onclick="App.openEgeModal()" title="Раздел подготовки к ЕГЭ">
+        <span class="ege-icon">🎓</span>
+        <span class="ege-btn-text">Подготовка к ЕГЭ</span>
+        <span class="ege-tag-soon">В разработке</span>
+      </button>
+    </div>
+
+    <!-- Сетка карточек предметов -->
+    <div class="subjects-grid" id="subjects-grid">
+      <!-- Генерируется из subjects.js -->
+    </div>
+  </section>
+
+  <!-- ========================================================================
+       Основная рабочая область (Табы представлений)
+       ======================================================================== -->
+  <main class="main-wrapper">
+    <div class="view-tabs">
+      <button class="view-tab-btn active" data-view="cheatsheet" onclick="App.switchView('cheatsheet')">
+        📖 Выжимка теории и формул
+      </button>
+      <button class="view-tab-btn tab-demos-btn" data-view="demos" onclick="App.switchView('demos')">
+        📋 Пробники и демо-версии
+      </button>
+      <button class="view-tab-btn tab-guide-btn" data-view="guide" onclick="App.switchView('guide')">
+        🚀 Стратегия и бланки ОГЭ
+      </button>
+      <button class="view-tab-btn" data-view="quiz" onclick="App.switchView('quiz')">
+        🎯 Экспресс-тест (Тренажёр)
+      </button>
+      <button class="view-tab-btn" data-view="calculator" onclick="App.switchView('calculator')">
+        🧮 Калькулятор баллов ФИПИ
+      </button>
+      <button class="view-tab-btn" data-view="tracker" onclick="App.switchView('tracker')">
+        📝 Чек-лист тем и прогресс
+      </button>
+      <button class="view-tab-btn tab-store-btn" data-view="store" onclick="App.switchView('store')">
+        🛒 Где купить КИМы
+      </button>
+      <button class="view-tab-btn tab-school-btn" data-view="school" onclick="App.switchView('school')">
+        🏫 6 школа и библиотеки
+      </button>
+    </div>
+
+    <!-- Вкладка: Пробники и демо-версии (Полные демоверсии 4ЕГЭ, Умскул, Задачи села Прокудское) -->
+    <section id="view-demos" style="display: none;">
+      <div id="demos-main-content"></div>
+    </section>
+
+    <!-- Вкладка: Стратегия и руководство по сдаче ОГЭ -->
+    <section id="view-guide" style="display: none;">
+      <div id="guide-main-content"></div>
+    </section>
+
+    <!-- Вкладка 1: Выжимка теории -->
+    <section id="view-cheatsheet">
+      <div id="cheatsheet-banner-container"></div>
+      <div id="cheatsheet-fipi-container"></div>
+      <div id="cheatsheet-traps-container"></div>
+      <div id="cheatsheet-demos-container"></div>
+      <div id="cheatsheet-cards-container"></div>
+    </section>
+
+    <!-- Вкладка 2: Интерактивный тест (Квиз) -->
+    <section id="view-quiz" style="display: none;">
+      <div id="quiz-main-content">
+        <!-- Генерируется движком quiz.js -->
+      </div>
+    </section>
+
+    <!-- Вкладка 3: Калькулятор баллов ОГЭ -->
+    <section id="view-calculator" style="display: none;">
+      <div class="calc-container">
+        <div class="calc-header">
+          <h2 class="calc-title">Калькулятор перевода баллов ОГЭ в оценку</h2>
+          <p class="calc-subtitle">
+            Официальная шкала соответствия первичных баллов школьным оценкам (2, 3, 4, 5) по рекомендациям ФИПИ.
+          </p>
+        </div>
+
+        <div class="calc-form-group">
+          <label class="calc-label" for="calc-subject-select">Выберите экзаменационный предмет:</label>
+          <select id="calc-subject-select" class="calc-select">
+            <!-- Заполняется автоматически -->
+          </select>
+        </div>
+
+        <div class="calc-form-group">
+          <label class="calc-label" for="calc-score-input">
+            Набранные первичные баллы: <span id="calc-score-max-label" style="color: var(--accent-blue); font-weight: normal;"></span>
+          </label>
+          <input type="number" id="calc-score-input" class="calc-input" min="0" max="48" value="18">
+        </div>
+
+        <!-- Специфика для математики (порог геометрии) -->
+        <div id="calc-math-geom-group" class="calc-special-rules" style="display: none;">
+          <label class="calc-label" for="calc-geom-input">
+            ⚠️ Баллы за блок «Геометрия» (№15–19, 23–25):
+          </label>
+          <input type="number" id="calc-geom-input" class="calc-input" min="0" max="8" value="3" style="max-width: 200px;">
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem;">
+            * Для получения любой положительной оценки («3», «4» или «5») необходимо набрать не менее 2 баллов по геометрии!
+          </p>
+        </div>
+
+        <!-- Специфика для русского языка (критерии грамотности) -->
+        <div id="calc-rus-lit-group" class="calc-special-rules" style="display: none;">
+          <label class="calc-label" for="calc-lit-input">
+            ⚠️ Баллы за грамотность ГК1–ГК4 (изложение и сочинение):
+          </label>
+          <input type="number" id="calc-lit-input" class="calc-input" min="0" max="10" value="7" style="max-width: 200px;">
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem;">
+            * Для оценки «4» требуется ≥ 4 баллов за грамотность. Для оценки «5» требуется ≥ 6 баллов за грамотность.
+          </p>
+        </div>
+
+        <div class="calc-result-box">
+          <div style="font-size: 0.9rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700;">Ваша экзаменационная оценка:</div>
+          <div class="calc-grade-display grade-4" id="calc-grade-display">4</div>
+          <div class="calc-status-text" id="calc-status-display">Хорошо</div>
+          <div id="calc-warning-display" class="callout callout-warning" style="display: none; margin-top: 0.75rem; text-align: left;"></div>
+          <div class="calc-progress-track">
+            <div class="calc-progress-fill" id="calc-progress-fill" style="width: 50%;"></div>
+          </div>
+        </div>
+
+        <div id="calc-scale-table-container"></div>
+      </div>
+    </section>
+
+    <!-- Вкладка 4: Трекер / Чек-лист готовности -->
+    <section id="view-tracker" style="display: none;">
+      <div id="tracker-content">
+        <!-- Генерируется app.js -->
+      </div>
+    </section>
+
+    <!-- Вкладка: Где купить КИМы (Маркетплейсы, Новосибирская область, ПВЗ) -->
+    <section id="view-store" style="display: none;">
+      <div id="store-main-content"></div>
+    </section>
+
+    <!-- Вкладка 5: Раздел 6 школы им. Д.К. Потапова и библиотек с. Прокудское -->
+    <section id="view-school" style="display: none;">
+      <div class="school-portal-container">
+        <!-- Быстрый возврат к предметам ОГЭ -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <button class="btn-action" onclick="App.switchView('cheatsheet')" style="font-size: 0.95rem; padding: 0.6rem 1.2rem; background: var(--accent-blue); color: white; border-color: var(--accent-blue);">
+            ← Вернуться к выжимке ОГЭ
+          </button>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <button class="filter-pill" onclick="App.selectSubject('math')">📐 Математика</button>
+            <button class="filter-pill" onclick="App.selectSubject('russian')">📖 Русский</button>
+            <button class="filter-pill" onclick="App.selectSubject('social')">⚖️ Общество</button>
+            <button class="filter-pill" onclick="App.selectSubject('informatics')">💻 Информатика</button>
+          </div>
+        </div>
+
+        <div class="school-hero-banner">
+          <div class="school-badge-tag">📍 с. Прокудское • Коченёвский район • Новосибирская область</div>
+          <h2 class="school-hero-title">Для пользователей 6 школы имени Д.К. Потапова</h2>
+          <p class="school-hero-subtitle">
+            Специальный раздел для учащихся и педагогов МКОУ Чикской СОШ № 6 имени Героя Советского Союза Д.К. Потапова (с. Прокудское). Адреса библиотек села Прокудского, учебные фонды и полезные ресурсы для сдачи ОГЭ.
+          </p>
+        </div>
+
+        <div class="libraries-grid">
+          <!-- Карточка 1: Школьная библиотека СОШ 6 -->
+          <div class="library-card">
+            <div class="library-image-wrap">
+              <img src="images/school6.jpg" alt="МКОУ Чикская СОШ №6 имени Д.К. Потапова" class="library-img">
+              <span class="library-status-tag">Школа № 6</span>
+            </div>
+            <div class="library-info">
+              <h3 class="library-title">Школьная библиотека МКОУ Чикской СОШ № 6 им. Д.К. Потапова</h3>
+              <div class="library-address-line">
+                <span class="lib-icon">📍</span>
+                <div>
+                  <strong>632660, Новосибирская область, Коченёвский район, село Прокудское, ул. Совхозная, здание 25</strong>
+                  <div class="lib-subtext">Здание школы, 1 этаж (библиотечный центр)</div>
+                </div>
+              </div>
+              <p class="library-desc">
+                Основной учебный фонд школы: учебники по всем предметам 5–9 классов, официальные демонстрационные варианты и сборники типовых экзаменационных заданий ОГЭ от ФИПИ, художественная литература школьной программы.
+              </p>
+              <div class="library-features">
+                <span class="lib-feat">📚 Сборники КИМ ОГЭ</span>
+                <span class="lib-feat">📖 Литература по программе</span>
+                <span class="lib-feat">💻 Компьютерная зона</span>
+              </div>
+              <div class="library-actions">
+                <a href="https://yandex.ru/maps/?text=село+Прокудское+Совхозная+25+школа+6" target="_blank" rel="noopener noreferrer" class="btn-action map-btn">
+                  🗺️ Открыть на Яндекс.Картах
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Карточка 2: Библиотека в КДЦ Гармония -->
+          <div class="library-card">
+            <div class="library-image-wrap">
+              <img src="images/kdc_library.jpg" alt="Библиотека в КДЦ Гармония с. Прокудское" class="library-img">
+              <span class="library-status-tag tag-kdc">КДЦ «Гармония»</span>
+            </div>
+            <div class="library-info">
+              <h3 class="library-title">Прокудская сельская библиотека в МБУ КДЦ «Гармония»</h3>
+              <div class="library-address-line">
+                <span class="lib-icon">📍</span>
+                <div>
+                  <strong>632660, Новосибирская область, Коченёвский район, село Прокудское, ул. Совхозная, здание 29</strong>
+                  <div class="lib-subtext">Здание КДЦ «Гармония» (в 150 метрах от школы №6)</div>
+                </div>
+              </div>
+              <p class="library-desc">
+                Центральная сельская библиотека села Прокудское при Культурно-досуговом центре «Гармония». Богатый фонд художественной и научно-популярной литературы, энциклопедии, периодика, уютный читальный зал для подготовки к индивидуальным проектам и экзаменам.
+              </p>
+              <div class="library-features">
+                <span class="lib-feat">🏛️ КДЦ «Гармония»</span>
+                <span class="lib-feat">📖 Читальный зал</span>
+                <span class="lib-feat">🌐 Электронные ресурсы</span>
+              </div>
+              <div class="library-actions">
+                <a href="https://yandex.ru/maps/?text=село+Прокудское+Совхозная+29+КДЦ+Гармония" target="_blank" rel="noopener noreferrer" class="btn-action map-btn">
+                  🗺️ Открыть на Яндекс.Картах
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Блок практических задач ОГЭ по объектам села Прокудское -->
+        <div class="prokudskoe-hero-card" style="margin-top: 1.5rem;">
+          <div class="prokudskoe-hero-badge">🎯 Интерактивный краеведческий тренажёр</div>
+          <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--text-primary);">
+            📍 Задачи ОГЭ на реальных объектах села Прокудское!
+          </h3>
+          <p style="font-size: 0.88rem; line-height: 1.5; color: var(--text-secondary); margin-bottom: 1rem;">
+            В платформу интегрированы уникальные авторские задачи формата КИМ ОГЭ, привязанные к МКОУ Чикской СОШ №6 (план пришкольной территории, пешеходные дорожки, агроучасток, мемориал Д.К. Потапова), МБУ КДЦ «Гармония», реке Чик, о.п. Прокудское и птицефабрике. Готовьтесь к экзамену на задачах родного села!
+          </p>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+            <button class="btn-action" onclick="App.openProkudskoeTasks('math')" style="background: linear-gradient(135deg, #059669, #10b981); color: white; border: none; font-weight: 700; padding: 0.6rem 1.2rem;">
+              📐 План школы №6 (Математика) →
+            </button>
+            <button class="btn-action" onclick="App.openProkudskoeTasks('physics')" style="background: var(--bg-card); border-color: var(--border-color); font-weight: 700;">
+              ⚡ Задачи по р. Чик (Физика)
+            </button>
+            <button class="btn-action" onclick="App.openProkudskoeTasks('social')" style="background: var(--bg-card); border-color: var(--border-color); font-weight: 700;">
+              ⚖️ Сельсовет Прокудского (Общество)
+            </button>
+          </div>
+        </div>
+
+        <!-- Памятка выпускникам 9 класса -->
+        <div class="callout callout-tip" style="margin-top: 1.5rem;">
+          <strong>💡 Полезно знать ученикам 9 класса:</strong>
+          <p style="margin-top: 0.35rem; font-size: 0.88rem;">
+            Обе библиотеки села Прокудское расположены рядом друг с другом на улице Совхозной (здания 25 и 29). Вы можете бесплатно брать необходимые книги классиков для сочинения 13.3 по русскому языку и заданий по литературе, а также пользоваться читальным залом для спокойной подготовки.
+          </p>
+        </div>
+
+        <div style="text-align: center; margin: 2rem 0 1rem;">
+          <button class="btn-action" onclick="App.switchView('cheatsheet')" style="font-size: 1rem; padding: 0.8rem 1.8rem; background: var(--accent-blue); color: white; border-color: var(--accent-blue); box-shadow: 0 4px 14px rgba(56, 139, 253, 0.35);">
+            🚀 Начать подготовку: перейти к выжимке ОГЭ →
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========================================================================
+       Всплывающее окно глобального поиска
+       ======================================================================== -->
+  <div class="search-results-overlay" id="search-results-overlay">
+    <div class="search-results-card">
+      <div class="search-results-header">
+        <h3 style="font-size: 1.15rem; font-weight: 700;">Результаты поиска по базе знаний</h3>
+        <button class="btn-icon" onclick="document.getElementById('search-results-overlay').classList.remove('open')">✕</button>
+      </div>
+      <div id="search-results-list"></div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Подвал сайта с указанием создателя
+       ======================================================================== -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <strong>ОГЭ-Выжимка</strong> — Интерактивный образовательный продукт для подготовки к государственной итоговой аттестации.
+        <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 0.3rem;">
+          Создано в рамках индивидуального итогового проекта ученика 9 класса МКОУ Чикской СОШ № 6.
+        </div>
+      </div>
+
+      <!-- Фирменный блок автора проекта -->
+      <div class="creator-card">
+        <div class="creator-avatar">👨‍💻</div>
+        <div class="creator-details">
+          <div class="creator-role">Создатель проекта:</div>
+          <div class="creator-name">Алексей Игонин</div>
+        </div>
+        <a href="https://t.me/nezovsky" target="_blank" rel="noopener noreferrer" class="telegram-link-btn" title="Написать создателю в Telegram">
+          <svg class="tg-icon" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+          </svg>
+          <span>@nezovsky</span>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================================
+       Мобильная нижняя панель навигации (Native Mobile App Tab Bar)
+       ======================================================================== -->
+  <nav class="mobile-bottom-nav">
+    <button class="mobile-nav-btn active" data-view="cheatsheet" onclick="App.switchView('cheatsheet')">
+      <span class="mobile-nav-icon">📖</span>
+      <span class="mobile-nav-label">Выжимка</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="demos" onclick="App.switchView('demos')">
+      <span class="mobile-nav-icon">📋</span>
+      <span class="mobile-nav-label">Пробники</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="guide" onclick="App.switchView('guide')">
+      <span class="mobile-nav-icon">🚀</span>
+      <span class="mobile-nav-label">Гид ОГЭ</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="quiz" onclick="App.switchView('quiz')">
+      <span class="mobile-nav-icon">🎯</span>
+      <span class="mobile-nav-label">Тренажёр</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="calculator" onclick="App.switchView('calculator')">
+      <span class="mobile-nav-icon">🧮</span>
+      <span class="mobile-nav-label">Баллы</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="tracker" onclick="App.switchView('tracker')">
+      <span class="mobile-nav-icon">📝</span>
+      <span class="mobile-nav-label">Чек-лист</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="store" onclick="App.switchView('store')">
+      <span class="mobile-nav-icon">🛒</span>
+      <span class="mobile-nav-label">Купить КИМ</span>
+    </button>
+    <button class="mobile-nav-btn" data-view="school" onclick="App.switchView('school')">
+      <span class="mobile-nav-icon">🏫</span>
+      <span class="mobile-nav-label">Школа №6</span>
+    </button>
+  </nav>
+
+  <!-- ========================================================================
+       Модальное окно: Подготовка к ЕГЭ (В разработке)
+       ======================================================================== -->
+  <div id="ege-modal" class="custom-modal-overlay" onclick="App.closeEgeModal(event)" style="display: none;">
+    <div class="custom-modal-card ege-modal-card">
+      <button class="modal-close-btn" onclick="App.closeEgeModal()">&times;</button>
+      <div class="ege-modal-badge">В разработке 🚀</div>
+      <div class="ege-modal-icon">🎓</div>
+      <h2 class="ege-modal-title">Раздел «Подготовка к ЕГЭ 11 класс»</h2>
+      <p class="ege-modal-desc">
+        Данный раздел находится в активной разработке! В ближайших обновлениях здесь появятся полные выжимки формул, кодификаторы и разборы профильных заданий ЕГЭ (Математика профиль/база, Русский язык, Обществознание, Физика, Информатика и другие).
+      </p>
+      <div class="ege-modal-features">
+        <div class="ege-feature-item">✓ Формулы и алгоритмы для ЕГЭ 2025/2026</div>
+        <div class="ege-feature-item">✓ Тренажёры первой и второй части КИМ</div>
+        <div class="ege-feature-item">✓ Экспресс-калькулятор баллов вузов</div>
+      </div>
+      <div style="margin-top: 1.5rem; text-align: center;">
+        <button class="btn-action ege-confirm-btn" onclick="App.closeEgeModal()">
+          Понятно, ждём! 👍
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Модальное окно: Пробник ОГЭ ФИПИ с решением и ответами
+       ======================================================================== -->
+  <div id="mock-modal" class="custom-modal-overlay" onclick="App.closeMockModal(event)" style="display: none;">
+    <div class="custom-modal-card mock-modal-card">
+      <button class="modal-close-btn" onclick="App.closeMockModal()">&times;</button>
+      <div id="mock-modal-content">
+        <!-- Генерируется из demos.js через App.openMockModal -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Модальное окно: Просмотр сборников КИМ ФИПИ и ориентировочных цен
+       ======================================================================== -->
+  <div id="kim-modal" class="custom-modal-overlay" onclick="App.closeKimModal(event)" style="display: none;">
+    <div class="custom-modal-card kim-modal-card">
+      <button class="modal-close-btn" onclick="App.closeKimModal()">&times;</button>
+      <div id="kim-modal-content">
+        <!-- Генерируется из kims.js через App.openKimModal -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       Модальное окно: Тренировочный пробник от ведущих преподавателей «Умскул»
+       ======================================================================== -->
+  <div id="umschool-modal" class="custom-modal-overlay" onclick="App.closeUmschoolModal(event)" style="display: none;">
+    <div class="custom-modal-card umschool-modal-card">
+      <button class="modal-close-btn" onclick="App.closeUmschoolModal()">&times;</button>
+      <div id="umschool-modal-content">
+        <!-- Генерируется из umschool.js через App.openUmschoolModal -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Подключение скриптов приложения -->
+  <script src="js/data/subjects.js"></script>
+  <script src="js/data/demos.js"></script>
+  <script src="js/data/full_demos.js"></script>
+  <script src="js/data/prokudskoe_tasks.js"></script>
+  <script src="js/data/guide.js"></script>
+  <script src="js/data/kims.js"></script>
+  <script src="js/data/umschool.js"></script>
+  <script src="js/data/quizzes.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/quiz.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
