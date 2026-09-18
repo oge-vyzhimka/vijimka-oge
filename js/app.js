@@ -277,6 +277,8 @@ const App = {
     this.renderHomeSubjects();
     const navCapsule = document.getElementById("main-nav-capsule");
     if (navCapsule) navCapsule.style.display = "none";
+    const searchWrap = document.querySelector(".header-search-wrap");
+    if (searchWrap) searchWrap.style.display = "none";
     if (scroll) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -368,6 +370,12 @@ const App = {
     const navCapsule = document.getElementById("main-nav-capsule");
     if (navCapsule) {
       navCapsule.style.display = (viewName === "home") ? "none" : "flex";
+    }
+
+    // Управление видимостью поиска: скрываем на Главной, показываем внутри предметов
+    const searchWrap = document.querySelector(".header-search-wrap");
+    if (searchWrap) {
+      searchWrap.style.display = (viewName === "home") ? "none" : "flex";
     }
 
     // Мобильная нижняя навигация
@@ -570,7 +578,7 @@ const App = {
     if (cardsArea) {
       cardsArea.innerHTML = `
         <div class="cheatsheet-grid">
-          ${subj.cheatsheets.map(section => `
+          ${subj.cheatsheets.map((section, sIdx) => `
             <div class="cheatsheet-card">
               <div class="cheatsheet-header">
                 <div class="cheatsheet-title">
@@ -579,15 +587,18 @@ const App = {
                 </div>
               </div>
               <div class="cheatsheet-body">
-                ${section.items.map(item => `
+                ${section.items.map((item, iIdx) => `
                   <div class="formula-item clickable-task-card" 
-                       onclick="TaskDetails.openForSubjectItem('${subj.id}', '${item.title.replace(/'/g, "\\'")}')" 
+                       onclick="TaskDetails.openByIndices('${subj.id}', ${sIdx}, ${iIdx})" 
                        role="button" tabindex="0" 
-                       onkeydown="if(event.key==='Enter')TaskDetails.openForSubjectItem('${subj.id}', '${item.title.replace(/'/g, "\\'")}')"
+                       onkeydown="if(event.key==='Enter')TaskDetails.openByIndices('${subj.id}', ${sIdx}, ${iIdx})"
+                       data-subject="${subj.id}"
+                       data-section="${sIdx}"
+                       data-item="${iIdx}"
                        title="Нажмите, чтобы открыть подробный разбор задания из ФИПИ и Решу ОГЭ">
                     <div class="formula-card-top">
                       <div class="formula-title">${item.title}</div>
-                      <span class="formula-open-hint">Разбор ФИПИ / Решу ОГЭ →</span>
+                      <span class="formula-open-hint" onclick="event.stopPropagation(); TaskDetails.openByIndices('${subj.id}', ${sIdx}, ${iIdx});">Разбор ФИПИ / Решу ОГЭ →</span>
                     </div>
                     <div class="formula-math">${item.formula.replace(/\n/g, '<br>')}</div>
                     ${item.note ? `<div class="formula-note">${item.note}</div>` : ''}
