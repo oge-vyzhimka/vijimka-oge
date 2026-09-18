@@ -393,7 +393,7 @@ const CabinetView = {
           <div class="cab-stat-data">
             <div class="cab-stat-num">5 / 5</div>
             <div class="cab-stat-lbl">Целевой балл</div>
-            <div class="cab-stat-hint">ОГЭ 2025/2026</div>
+            <div class="cab-stat-hint">ОГЭ 2026/2027</div>
           </div>
         </div>
       </div>
@@ -457,7 +457,7 @@ const CabinetView = {
   },
 
   copyClassSummary() {
-    const summary = `Сводка по 9А классу СОШ №6 (ОГЭ 2025/2026): Средняя готовность 74%. Топ ошибок: ОДЗ корней, знаки в неравенствах, -Н-/-НН-.`;
+    const summary = `Сводка по 9А классу СОШ №6 (ОГЭ 2026/2027): Средняя готовность 74%. Топ ошибок: ОДЗ корней, знаки в неравенствах, -Н-/-НН-.`;
     navigator.clipboard.writeText(summary).then(() => {
       alert("Сводка успеваемости класса скопирована!");
     });
