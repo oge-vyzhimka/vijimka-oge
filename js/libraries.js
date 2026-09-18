@@ -44,7 +44,7 @@ const Libraries = {
         title: "Коченёвская центральная библиотека имени П.Н. Дорофеева",
         address: "632640, Новосибирская область, р.п. Коченёво, ул. Октябрьская, д. 52",
         subtext: "Главный библиотечно-методический центр района",
-        image: "images/school6.jpg",
+        image: null,
         statusTag: "Районный центр",
         hours: "Пн–Пт: 09:00 – 18:00, Вс: 10:00 – 17:00",
         description: "Крупнейший книжный фонд района. Доступ к Национальной электронной библиотеке (НЭБ), справочным правовым системам, редким краеведческим изданиям и словарям.",
@@ -56,7 +56,7 @@ const Libraries = {
         title: "ГПНТБ СО РАН (Государственная публичная научно-техническая библиотека)",
         address: "630200, г. Новосибирск, ул. Восход, 15 (метро «Речной вокзал»)",
         subtext: "Крупнейшая библиотека за Уралом и в азиатской части России",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/GPNTB_Novosibirsk.jpg/640px-GPNTB_Novosibirsk.jpg",
+        image: "images/nsk_gpntb.jpg",
         statusTag: "Федеральный уровень",
         hours: "Пн–Пт: 09:00 – 19:00, Сб–Вс: 10:00 – 18:00",
         description: "Флагман сибирской науки. Фонд свыше 10 миллионов изданий, современные мультимедийные читальные залы, бесплатный Wi-Fi и специализированные залы для научной подготовки.",
@@ -72,7 +72,7 @@ const Libraries = {
         title: "ГПНТБ СО РАН (Государственная публичная научно-техническая библиотека)",
         address: "г. Новосибирск, ул. Восход, 15 (метро «Речной вокзал»)",
         subtext: "Крупнейшая научно-техническая библиотека Азии",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/GPNTB_Novosibirsk.jpg/640px-GPNTB_Novosibirsk.jpg",
+        image: "images/nsk_gpntb.jpg",
         statusTag: "СО РАН",
         hours: "Пн–Пт: 09:00 – 19:00, Сб–Вс: 10:00 – 18:00",
         description: "Главный научный и образовательный хаб Новосибирска. Огромные фонды учебной литературы по математике, физике, химии и информатике. Комфортные залы со столами для учебы.",
@@ -84,7 +84,7 @@ const Libraries = {
         title: "Новосибирская государственная областная научная библиотека (НГОНБ)",
         address: "г. Новосибирск, ул. Советская, 6 (метро «Площадь Ленина»)",
         subtext: "Центральная библиотека Новосибирской области",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Novosibirsk_State_Regional_Scientific_Library.jpg/640px-Novosibirsk_State_Regional_Scientific_Library.jpg",
+        image: null,
         statusTag: "Областная библиотека",
         hours: "Вт–Пт: 10:00 – 20:00, Сб–Вс: 10:00 – 18:00",
         description: "Историческое здание в самом сердце города. Интерактивные лектории, центр грамотности, книги русских классиков и подготовка к устному собеседованию и сочинению ОГЭ.",
@@ -96,7 +96,7 @@ const Libraries = {
         title: "Новосибирская областная молодежная библиотека",
         address: "г. Новосибирск, Красный проспект, 26 (метро «Площадь Ленина»)",
         subtext: "Молодежное культурное пространство",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Novosibirsk_State_Regional_Scientific_Library.jpg/640px-Novosibirsk_State_Regional_Scientific_Library.jpg",
+        image: null,
         statusTag: "Для старшеклассников",
         hours: "Пн–Пт: 10:00 – 19:00, Вс: 10:00 – 18:00",
         description: "Специализированная библиотека для школьников 8–11 классов и студентов. Клубы подготовки к экзаменам, настольные игры, современные зоны самоподготовки.",
@@ -112,7 +112,7 @@ const Libraries = {
         title: "Российская государственная библиотека («Ленинка»)",
         address: "г. Москва, ул. Воздвиженка, 3/5 (метро «Библиотека им. Ленина»)",
         subtext: "Главная библиотека Российской Федерации",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Russian_State_Library_2011.jpg/640px-Russian_State_Library_2011.jpg",
+        image: null,
         statusTag: "Национальная библиотека",
         hours: "Пн–Сб: 09:00 – 20:00",
         description: "Крупнейшая библиотека России и одна из величайших в мире. Свыше 47 миллионов документов. Легендарный читальный зал №3.",
@@ -124,7 +124,7 @@ const Libraries = {
         title: "Центральная универсальная научная библиотека им. Н.А. Некрасова",
         address: "г. Москва, ул. Бауманская, 58/25, стр. 14 (метро «Бауманская»)",
         subtext: "Современное коворкинг-пространство и книжный фонд",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Nekrasov_Library_Moscow.jpg/640px-Nekrasov_Library_Moscow.jpg",
+        image: null,
         statusTag: "Некрасовка",
         hours: "Пн–Сб: 10:00 – 22:00, Вс: 10:00 – 20:00",
         description: "Популярнейшее место подготовки московских школьников к ОГЭ и ЕГЭ. Удобные рабочие столы с розетками, открытые книжные фонды, тихие зоны.",
@@ -136,7 +136,7 @@ const Libraries = {
         title: "Российская государственная детская библиотека (РГДБ)",
         address: "г. Москва, Калужская площадь, 1 (метро «Октябрьская»)",
         subtext: "Крупнейшая библиотека для детей и подростков",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/91/Russian_State_Library_2011.jpg/640px-Russian_State_Library_2011.jpg",
+        image: null,
         statusTag: "Для школьников",
         hours: "Пн–Сб: 10:00 – 20:00, Вс: 11:00 – 17:00",
         description: "Огромная коллекция художественной литературы школьной программы, учебные пособия, залы индивидуальной работы для девятиклассников.",
@@ -152,7 +152,7 @@ const Libraries = {
         title: "Российская национальная библиотека (РНБ)",
         address: "г. Санкт-Петербург, Садовая ул., 18 / Московский пр., 165",
         subtext: "Старейшая публичная библиотека России (осн. 1795 г.)",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/National_Library_of_Russia_SPB.jpg/640px-National_Library_of_Russia_SPB.jpg",
+        image: null,
         statusTag: "РНБ",
         hours: "Пн–Пт: 09:00 – 21:00, Сб–Вс: 11:00 – 19:00",
         description: "Национальное книгохранилище мирового масштаба. Главное здание на Садовой и Новое здание на Московском проспекте с ультрасовременными залами.",
@@ -164,7 +164,7 @@ const Libraries = {
         title: "Центральная городская публичная библиотека им. В.В. Маяковского",
         address: "г. Санкт-Петербург, наб. реки Фонтанки, 44 (метро «Гостиный двор»)",
         subtext: "Главная городская библиотека Петербурга",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Mayakovsky_Library_SPB.jpg/640px-Mayakovsky_Library_SPB.jpg",
+        image: null,
         statusTag: "Маяковка",
         hours: "Пн–Сб: 11:00 – 20:00, Вс: 11:00 – 18:00",
         description: "Высокотехнологичный библиотечный комплекс на Фонтанке: автоматическая книговыдача, мультимедийные капсулы, тихие кабинеты для учебы.",
@@ -180,7 +180,7 @@ const Libraries = {
         title: "Свердловская областная универсальная научная библиотека им. В.Г. Белинского",
         address: "г. Екатеринбург, ул. Белинского, 15",
         subtext: "Главная библиотека Урала («Белинка»)",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Belinsky_Library_Ekaterinburg.jpg/640px-Belinsky_Library_Ekaterinburg.jpg",
+        image: null,
         statusTag: "Белинка",
         hours: "Пн–Пт: 09:00 – 20:00, Сб: 10:00 – 18:00",
         description: "Крупнейший информационный и культурный центр Урала. Фонд свыше 2.3 млн книг, доступ к Президентской библиотеке и фондам ФИПИ.",
@@ -196,7 +196,7 @@ const Libraries = {
         title: "Национальная библиотека Республики Татарстан",
         address: "г. Казань, ул. Пушкина, 86 (здание НКЦ «Казань»)",
         subtext: "Самая современная библиотека Поволжья",
-        image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/National_Library_of_Tatarstan.jpg/640px-National_Library_of_Tatarstan.jpg",
+        image: null,
         statusTag: "Нацбиблиотека РТ",
         hours: "Ежедневно: 09:00 – 21:00",
         description: "Культурная доминанта Казани с видом на реку Казанку. Панорамные читальные залы, просторные столы для самостоятельной работы, коворкинг и терраса.",
@@ -348,12 +348,24 @@ const Libraries = {
     const container = document.getElementById("libraries-cards-grid");
     if (!container || !libList) return;
 
-    container.innerHTML = libList.map(lib => `
-      <div class="library-card">
-        <div class="library-image-wrap">
-          <img src="${lib.image}" alt="${lib.title}" class="library-img" onerror="this.src='images/school6.jpg'">
-          <span class="library-status-tag">${lib.statusTag || 'Библиотека'}</span>
-        </div>
+    container.innerHTML = libList.map(lib => {
+      const hasImage = Boolean(lib.image);
+      return `
+      <div class="library-card ${hasImage ? 'has-image' : 'no-image'}">
+        ${hasImage ? `
+          <div class="library-image-wrap">
+            <img src="${lib.image}" alt="${lib.title}" class="library-img" onerror="this.closest('.library-image-wrap').style.display='none'; this.closest('.library-card').classList.add('no-image');">
+            <span class="library-status-tag">${lib.statusTag || 'Библиотека'}</span>
+          </div>
+        ` : `
+          <div class="library-card-header-bar">
+            <div class="library-card-icon-tag">
+              <span class="lib-header-icon">🏛️</span>
+              <span class="library-status-tag-static">${lib.statusTag || 'Библиотека'}</span>
+            </div>
+            <span class="library-read-hall-tag">📖 Читальный зал</span>
+          </div>
+        `}
         <div class="library-info">
           <h3 class="library-title">${lib.title}</h3>
           <div class="library-address-line">
@@ -375,7 +387,8 @@ const Libraries = {
           </div>
         </div>
       </div>
-    `).join("");
+    `;
+    }).join("");
   },
 
   resetToDefault() {
