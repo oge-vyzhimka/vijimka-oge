@@ -130,7 +130,7 @@
               <span class="dd-icon">🚀</span> Стратегия и гид ОГЭ
             </button>
             <button class="nav-dropdown-item view-tab-btn tab-school-btn" data-view="school" onclick="App.switchView('school'); App.closeMoreMenu();">
-              <span class="dd-icon">🏫</span> Чикская СОШ №6
+              <span class="dd-icon">📚</span> Библиотеки рядом
             </button>
             <button class="nav-dropdown-item view-tab-btn tab-store-btn" data-view="store" onclick="App.switchView('store'); App.closeMoreMenu();">
               <span class="dd-icon">🛒</span> Где купить сборники
@@ -146,9 +146,9 @@
         </div>
       </nav>
 
-      <!-- Поиск и действия справа -->
+      <!-- Поиск (показывается только внутри предметов) и действия справа -->
       <div class="header-right-actions">
-        <div class="header-search-wrap">
+        <div class="header-search-wrap" id="header-search-box" style="display: none;">
           <span class="search-icon">🔍</span>
           <input type="text" id="global-search-input" class="search-input" placeholder="Поиск формулы, правила..." autocomplete="off">
         </div>
@@ -181,12 +181,7 @@
           <span>До ОГЭ: <strong id="oge-countdown-timer">Загрузка...</strong></span>
         </div>
       </div>
-      <div class="status-right">
-        <button class="status-chip school-chip" onclick="App.switchView('school')" title="Раздел для учеников Чикской СОШ № 6">
-          <span>🏫</span>
-          <span>Чикская СОШ №6</span>
-        </button>
-      </div>
+      <div class="status-right"></div>
     </div>
   </div>
 
@@ -202,7 +197,7 @@
       <div class="home-hero-section">
         <div class="home-hero-badge-row">
           <span class="home-badge-pill">🎓 ОГЭ 2026/2027</span>
-          <span class="home-badge-pill school-pill" onclick="App.switchView('school')" title="Перейти в раздел школы">🏫 МКОУ Чикская СОШ №6</span>
+          <span class="home-badge-pill" onclick="App.switchView('school')" title="Перейти к разделу библиотек" style="cursor: pointer;">📚 Библиотеки рядом</span>
         </div>
         <h1 class="home-hero-title">Выберите предмет для подготовки к ОГЭ</h1>
         <p class="home-hero-subtitle">
@@ -337,7 +332,7 @@
       <div id="store-main-content"></div>
     </section>
 
-    <!-- Вкладка 5: Раздел 6 школы им. Д.К. Потапова и библиотек с. Прокудское -->
+    <!-- Вкладка 5: Раздел «Библиотеки рядом» (Геолокация, читальные залы, Прокудское и РФ) -->
     <section id="view-school" style="display: none;">
       <div class="school-portal-container">
         <!-- Быстрый возврат к предметам ОГЭ -->
@@ -354,14 +349,34 @@
         </div>
 
         <div class="school-hero-banner">
-          <div class="school-badge-tag">📍 с. Прокудское • Коченёвский район • Новосибирская область</div>
-          <h2 class="school-hero-title">Для пользователей 6 школы имени Д.К. Потапова</h2>
+          <div class="school-badge-tag">📍 Публичные библиотеки и читальные залы</div>
+          <h2 class="school-hero-title">Библиотеки рядом</h2>
           <p class="school-hero-subtitle">
-            Специальный раздел для учащихся и педагогов МКОУ Чикской СОШ № 6 имени Героя Советского Союза Д.К. Потапова (с. Прокудское). Адреса библиотек села Прокудского, учебные фонды и полезные ресурсы для сдачи ОГЭ.
+            Каталог реальных библиотек и читальных залов для спокойной подготовки к ОГЭ, поиска литературы к сочинению 13.3 и доступа к учебным пособиям.
           </p>
         </div>
 
-        <div class="libraries-grid">
+        <!-- Панель геолокации: определение ближайших библиотек -->
+        <div class="geo-finder-card">
+          <div class="geo-status-indicator">
+            <span class="geo-pulse-dot"></span>
+            <div>
+              <div style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 700;">Регион поиска библиотек:</div>
+              <div id="geo-location-label" style="font-size: 0.95rem; font-weight: 600; color: var(--text-primary);">Локация: с. Прокудское / р.п. Чик (Новосибирская обл., по умолчанию)</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+            <button id="geo-request-btn" class="btn-action geo-detect-btn" onclick="Libraries.requestLocation()">
+              <span>📍</span> <span>Определить моё местоположение</span>
+            </button>
+            <button id="geo-reset-btn" class="btn-action geo-reset-btn" onclick="Libraries.resetToDefault()" style="display: none;">
+              <span>🔄</span> <span>Сбросить к с. Прокудское</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Сетка карточек библиотек (по умолчанию Прокудское, при геолокации подгружает библиотеки города пользователя) -->
+        <div class="libraries-grid" id="libraries-cards-grid">
           <!-- Карточка 1: Школьная библиотека СОШ 6 -->
           <div class="library-card">
             <div class="library-image-wrap">
@@ -374,14 +389,15 @@
                 <span class="lib-icon">📍</span>
                 <div>
                   <strong>632660, Новосибирская область, Коченёвский район, село Прокудское, ул. Совхозная, здание 25</strong>
-                  <div class="lib-subtext">Здание школы, 1 этаж (библиотечный центр)</div>
+                  <div class="lib-subtext">Здание школы, 1 этаж (библиотечно-информационный центр)</div>
+                  <div class="lib-subtext" style="color: #38bdf8; margin-top: 3px;">🕒 Пн–Пт: 08:30 – 16:30</div>
                 </div>
               </div>
               <p class="library-desc">
-                Основной учебный фонд школы: учебники по всем предметам 5–9 классов, официальные демонстрационные варианты и сборники типовых экзаменационных заданий ОГЭ от ФИПИ, художественная литература школьной программы.
+                Основной учебный фонд школы: учебники по всем предметам 5–9 классов, официальные демонстрационные варианты и сборники типовых экзаменационных заданий ОГЭ 2026/2027 от ФИПИ, художественная литература школьной программы.
               </p>
               <div class="library-features">
-                <span class="lib-feat">📚 Сборники КИМ ОГЭ</span>
+                <span class="lib-feat">📚 Сборники КИМ ОГЭ 2026/2027</span>
                 <span class="lib-feat">📖 Литература по программе</span>
                 <span class="lib-feat">💻 Компьютерная зона</span>
               </div>
@@ -400,12 +416,13 @@
               <span class="library-status-tag tag-kdc">КДЦ «Гармония»</span>
             </div>
             <div class="library-info">
-              <h3 class="library-title">Прокудская сельская библиотека в МБУ КДЦ «Гармония»</h3>
+              <h3 class="library-title">Прокудская сельская библиотека при МБУ КДЦ «Гармония»</h3>
               <div class="library-address-line">
                 <span class="lib-icon">📍</span>
                 <div>
                   <strong>632660, Новосибирская область, Коченёвский район, село Прокудское, ул. Совхозная, здание 29</strong>
                   <div class="lib-subtext">Здание КДЦ «Гармония» (в 150 метрах от школы №6)</div>
+                  <div class="lib-subtext" style="color: #38bdf8; margin-top: 3px;">🕒 Вт–Сб: 10:00 – 18:00</div>
                 </div>
               </div>
               <p class="library-desc">
@@ -425,33 +442,11 @@
           </div>
         </div>
 
-        <!-- Блок практических задач ОГЭ по объектам села Прокудское -->
-        <div class="prokudskoe-hero-card" style="margin-top: 1.5rem;">
-          <div class="prokudskoe-hero-badge">🎯 Интерактивный краеведческий тренажёр</div>
-          <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--text-primary);">
-            📍 Задачи ОГЭ на реальных объектах села Прокудское!
-          </h3>
-          <p style="font-size: 0.88rem; line-height: 1.5; color: var(--text-secondary); margin-bottom: 1rem;">
-            В платформу интегрированы уникальные авторские задачи формата КИМ ОГЭ, привязанные к МКОУ Чикской СОШ №6 (план пришкольной территории, пешеходные дорожки, агроучасток, мемориал Д.К. Потапова), МБУ КДЦ «Гармония», реке Чик, о.п. Прокудское и птицефабрике. Готовьтесь к экзамену на задачах родного села!
-          </p>
-          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-            <button class="btn-action" onclick="App.openProkudskoeTasks('math')" style="background: linear-gradient(135deg, #059669, #10b981); color: white; border: none; font-weight: 700; padding: 0.6rem 1.2rem;">
-              📐 План школы №6 (Математика) →
-            </button>
-            <button class="btn-action" onclick="App.openProkudskoeTasks('physics')" style="background: var(--bg-card); border-color: var(--border-color); font-weight: 700;">
-              ⚡ Задачи по р. Чик (Физика)
-            </button>
-            <button class="btn-action" onclick="App.openProkudskoeTasks('social')" style="background: var(--bg-card); border-color: var(--border-color); font-weight: 700;">
-              ⚖️ Сельсовет Прокудского (Общество)
-            </button>
-          </div>
-        </div>
-
         <!-- Памятка выпускникам 9 класса -->
         <div class="callout callout-tip" style="margin-top: 1.5rem;">
           <strong>💡 Полезно знать ученикам 9 класса:</strong>
           <p style="margin-top: 0.35rem; font-size: 0.88rem;">
-            Обе библиотеки села Прокудское расположены рядом друг с другом на улице Совхозной (здания 25 и 29). Вы можете бесплатно брать необходимые книги классиков для сочинения 13.3 по русскому языку и заданий по литературе, а также пользоваться читальным залом для спокойной подготовки.
+            В библиотеках можно бесплатно пользоваться читальными залами, брать произведения русской классической литературы для подготовки к сочинению 13.3 по русскому языку и заданиям по литературе, а также готовиться в спокойной обстановке с доступом к справочным материалам.
           </p>
         </div>
 
@@ -703,6 +698,7 @@
   <script src="js/mistakes.js?v=20260918-v5"></script>
   <script src="js/gamification.js?v=20260918-v5"></script>
   <script src="js/quiz.js?v=20260918-v5"></script>
-  <script src="js/app.js?v=20260918-v5"></script>
+  <script src="js/libraries.js?v=20260918-v6"></script>
+  <script src="js/app.js?v=20260918-v6"></script>
 </body>
 </html>
