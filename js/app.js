@@ -26,9 +26,9 @@ const App = {
     if (hash.startsWith("demos")) {
       const parts = hash.split("-");
       if (parts[1]) this.currentDemosSubtab = parts[1];
-      this.switchView("demos");
+      this.switchView("demos", false);
     } else if (hash && ["cheatsheet", "guide", "quiz", "calculator", "tracker", "store", "school"].includes(hash)) {
-      this.switchView(hash);
+      this.switchView(hash, false);
     } else {
       this.renderCurrentView();
     }
@@ -214,7 +214,7 @@ const App = {
   /* --------------------------------------------------------------------------
      Переключение представлений (Выжимка, Тест, Калькулятор, Чек-лист, Школа, Магазин)
      -------------------------------------------------------------------------- */
-  switchView(viewName) {
+  switchView(viewName, autoScroll = true) {
     this.currentView = viewName;
     document.querySelectorAll(".view-tab-btn").forEach(btn => {
       btn.classList.toggle("active", btn.dataset.view === viewName);
@@ -245,8 +245,20 @@ const App = {
 
     this.renderCurrentView();
 
-    // Плавная прокрутка наверх экрана, чтобы пользователь сразу видел контент
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    // Автоматическая плавная прокрутка экрана вниз к выбранному разделу
+    if (autoScroll) {
+      setTimeout(() => {
+        const viewTabs = document.querySelector(".view-tabs");
+        const activeSection = document.getElementById(`view-${viewName}`);
+        const target = viewTabs || activeSection;
+        if (target) {
+          const header = document.querySelector(".site-header");
+          const headerHeight = header ? header.offsetHeight : 65;
+          const targetTop = target.getBoundingClientRect().top + window.pageYOffset - headerHeight - 12;
+          window.scrollTo({ top: Math.max(0, targetTop), behavior: "smooth" });
+        }
+      }, 50);
+    }
   },
 
   renderCurrentView() {
