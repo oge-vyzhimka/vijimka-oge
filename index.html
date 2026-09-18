@@ -18,7 +18,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   
   <!-- Основные стили -->
-  <link rel="stylesheet" href="css/styles.css?v=20260918-v5">
+  <link rel="stylesheet" href="css/styles.css?v=20260918-v6">
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -41,17 +41,14 @@
         </p>
       </div>
 
-      <!-- Переключатель роли на начальном экране (3 вкладки: Ученик, Telegram, Преподаватель) -->
+      <!-- Переключатель роли на начальном экране (Ученик и Telegram) -->
       <div class="gate-role-tabs">
         <button type="button" class="gate-tab-btn active" id="gate-tab-student" onclick="Auth.switchGateTab('student')">
-          🎒 Я Ученик
+          🎒 Быстрый старт
         </button>
         <button type="button" class="gate-tab-btn tg-gate-tab" id="gate-tab-telegram" onclick="Auth.switchGateTab('telegram')">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="#38bdf8" style="vertical-align: -2px; margin-right: 4px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
-          Telegram
-        </button>
-        <button type="button" class="gate-tab-btn" id="gate-tab-teacher" onclick="Auth.switchGateTab('teacher')">
-          👨‍🏫 Преподаватель
+          Войти через Telegram
         </button>
       </div>
 
@@ -176,31 +173,6 @@
         </div>
       </div>
 
-      <!-- ФОРМА 3: Вход для преподавателя -->
-      <div id="gate-panel-teacher" class="gate-panel" style="display: none;">
-        <form onsubmit="Auth.submitGateTeacher(event)">
-          <div class="gate-form-group">
-            <label class="gate-label">ФИО преподавателя:</label>
-            <input type="text" id="gate-teacher-name" class="gate-input" required placeholder="Например, Елена Викторовна" value="Преподаватель">
-          </div>
-
-          <div class="gate-form-group">
-            <label class="gate-label" style="color: #c084fc;">
-              🔑 Секретное кодовое слово доступа:
-            </label>
-            <input type="password" id="gate-teacher-code" class="gate-input" required placeholder="Введите кодовое слово">
-            <div id="gate-teacher-err" class="gate-error-msg" style="display: none;"></div>
-            <div class="gate-hint-text">
-              * Доступ к классным ведомостям и сводкам СОШ №6 им. Д.К. Потапова защищён кодовым словом.
-            </div>
-          </div>
-
-          <button type="submit" class="gate-submit-btn teacher-btn">
-            Войти в кабинет преподавателя 👨‍🏫
-          </button>
-        </form>
-      </div>
-
       <div class="gate-footer">
         <span>Данные сохраняются автоматически. Настройки профиля можно изменить в любой момент.</span>
       </div>
@@ -236,21 +208,25 @@
       <!-- Переключатели темы и действия -->
       <div class="header-actions">
         <!-- Кнопка Личного кабинета и стрика -->
-        <button class="nav-pill-btn profile-header-btn" id="header-profile-btn" onclick="Auth.openProfileModal()" title="Личный кабинет и серия занятий">
+        <button class="nav-pill-btn profile-header-btn" id="header-profile-btn" onclick="Auth.openProfileModal()" title="Личный кабинет и профиль">
           <span id="header-profile-avatar">🦊</span>
           <span id="header-profile-name">Войти</span>
           <span class="streak-badge-pill" id="header-streak-badge" style="display:none;">🔥 1 день</span>
         </button>
+        <!-- Кнопка Выход на начальный экран -->
+        <button class="nav-pill-btn logout-header-btn" id="header-logout-btn" onclick="Auth.showGateScreen()" title="Выйти на начальный экран">
+          <span>🚪</span>
+          <span class="logout-btn-text">Выход</span>
+        </button>
         <!-- Специальная кнопка школы №6 им. Потапова -->
         <button class="nav-pill-btn school-highlight-btn" onclick="App.switchView('school')" title="Раздел для учеников 6 школы имени Д.К. Потапова">
           <span>🏫</span>
-          <span class="school-btn-text-desktop">6 школа им. Д.К. Потапова</span>
-          <span class="school-btn-text-mobile">Школа №6</span>
+          <span class="school-btn-text-desktop">Школа №6</span>
+          <span class="school-btn-text-mobile">№6</span>
         </button>
         <button class="nav-pill-btn ege-header-btn" onclick="App.openEgeModal()" title="Подготовка к ЕГЭ (В разработке)">
           <span>🎓</span>
           <span>ЕГЭ</span>
-          <span class="ege-tag-pill">Скоро</span>
         </button>
         <button class="btn-icon" id="theme-toggle-btn" title="Сменить тему оформления" onclick="App.toggleTheme()">
           <span id="theme-toggle-icon">☀️</span>
@@ -334,34 +310,34 @@
   <main class="main-wrapper">
     <div class="view-tabs">
       <button class="view-tab-btn active" data-view="cheatsheet" onclick="App.switchView('cheatsheet')">
-        📖 Выжимка теории и формул
+        📖 Шпаргалки
       </button>
       <button class="view-tab-btn tab-demos-btn" data-view="demos" onclick="App.switchView('demos')">
-        📋 Пробники и демо-версии
+        📋 Пробники ФИПИ
       </button>
       <button class="view-tab-btn tab-guide-btn" data-view="guide" onclick="App.switchView('guide')">
-        🚀 Стратегия и бланки ОГЭ
+        🚀 Гид ОГЭ
       </button>
       <button class="view-tab-btn" data-view="quiz" onclick="App.switchView('quiz')">
-        🎯 Экспресс-тест (Тренажёр)
+        🎯 Тренажёр
       </button>
       <button class="view-tab-btn" data-view="calculator" onclick="App.switchView('calculator')">
-        🧮 Калькулятор баллов ФИПИ
+        🧮 Калькулятор
       </button>
       <button class="view-tab-btn tab-tracker-btn" data-view="tracker" onclick="App.switchView('tracker')">
-        📚 Все темы ОГЭ (ФИПИ)
+        📚 Темы
       </button>
       <button class="view-tab-btn tab-store-btn" data-view="store" onclick="App.switchView('store')">
-        🛒 Где купить КИМы
+        🛒 Где купить
       </button>
       <button class="view-tab-btn tab-school-btn" data-view="school" onclick="App.switchView('school')">
-        🏫 6 школа и библиотеки
+        🏫 Школа №6
       </button>
       <button class="view-tab-btn tab-mistakes-btn" data-view="mistakes" onclick="App.switchView('mistakes')">
-        ❌ Мои ошибки <span class="tab-badge-count" id="mistakes-tab-badge" style="display:none;">0</span>
+        ❌ Ошибки <span class="tab-badge-count" id="mistakes-tab-badge" style="display:none;">0</span>
       </button>
       <button class="view-tab-btn tab-cabinet-btn" data-view="cabinet" onclick="App.switchView('cabinet')">
-        👤 Личный кабинет
+        👤 Кабинет
       </button>
     </div>
 
