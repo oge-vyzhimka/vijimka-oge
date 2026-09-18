@@ -173,9 +173,9 @@ const App = {
       const passThreshold = subj.examInfo ? subj.examInfo.passThreshold.split("(")[0].trim() : "";
 
       return `
-        <div class="home-subject-card" style="--card-accent: ${subj.accentColor};" onclick="App.openSubject('${subj.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')App.openSubject('${subj.id}')">
+        <div class="home-subject-card" onclick="App.openSubject('${subj.id}')" role="button" tabindex="0" onkeydown="if(event.key==='Enter')App.openSubject('${subj.id}')">
           <div class="home-subject-header">
-            <div class="home-subject-icon-box" style="background: ${subj.accentColor}18; color: ${subj.accentColor}; border: 1px solid ${subj.accentColor}33;">
+            <div class="home-subject-icon-box">
               <span class="home-subject-icon">${subj.icon}</span>
             </div>
             <div class="home-subject-badges">
@@ -218,7 +218,6 @@ const App = {
       return `
         <button type="button" 
              class="subject-chip subject-card ${isActive ? 'active' : ''}" 
-             style="--chip-accent: ${subj.accentColor};"
              onclick="App.openSubject('${subj.id}')"
              title="${subj.title} — ${subj.examInfo ? subj.examInfo.questionsCount : ''}, макс. ${maxScore} б.">
           <span class="chip-icon">${subj.icon}</span>
@@ -378,11 +377,6 @@ const App = {
       searchWrap.style.display = (viewName === "home") ? "none" : "flex";
     }
 
-    // Мобильная нижняя навигация
-    document.querySelectorAll(".mobile-nav-btn").forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.view === viewName);
-    });
-
     // Переключение секций
     const viewSections = ["home", "cheatsheet", "demos", "guide", "quiz", "calculator", "tracker", "store", "school", "mistakes", "cabinet"];
     viewSections.forEach(v => {
@@ -402,17 +396,24 @@ const App = {
       if (crumb) crumb.textContent = SUBJECTS_DATA[this.currentSubject].title;
     }
 
-    // Достижение при посещении раздела школы №6
-    if (viewName === "school" && typeof Gamification !== "undefined") {
-      Gamification.unlockAchievement("potapov_school");
+    // Рендерим контент соответствующего раздела
+    if (viewName === "cheatsheet") this.renderCheatsheet();
+    else if (viewName === "demos") this.renderDemos();
+    else if (viewName === "guide") this.renderGuide();
+    else if (viewName === "quiz") this.renderQuiz();
+    else if (viewName === "calculator") this.renderCalculator();
+    else if (viewName === "tracker") this.renderTracker();
+    else if (viewName === "store") this.renderStore();
+    else if (viewName === "school") this.renderSchool();
+    else if (viewName === "mistakes") {
+      if (typeof MistakesBank !== "undefined") MistakesBank.render();
+    }
+    else if (viewName === "cabinet") {
+      if (typeof Gamification !== "undefined") Gamification.renderCabinet();
     }
 
-    this.renderCurrentView();
-
-    // Плавная прокрутка, только если автоскролл явно запрошен и страница уже прокручена
-    if (autoScroll && window.scrollY > 200) {
-      this.scrollToViewContent(viewName);
-    }
+    // Прокручиваем наверх страницы
+    window.scrollTo({ top: 0, behavior: "smooth" });
   },
 
   toggleMoreMenu(e) {
@@ -483,14 +484,14 @@ const App = {
             </div>
           </div>
           <div class="subject-banner-actions">
-            <button class="btn-action" onclick="App.switchView('demos')" title="Полная демоверсия ФИПИ, варианты Умскул и задачи села Прокудское" style="background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; border: none; font-weight: 700;">
+            <button class="btn-action" onclick="App.switchView('demos')" title="Полная демоверсия ФИПИ, варианты Умскул и задачи села Прокудское">
               📋 Пробники и демо-версии
             </button>
             <button class="btn-action btn-kim-action" onclick="App.openKimModal('${subj.id}')" title="Просмотр официальных сборников КИМ ФИПИ и ориентировочных цен">
               📚 КИМы и цены
             </button>
             <button class="btn-action btn-umschool-action" onclick="App.openUmschoolModal('${subj.id}')" title="Пробник ОГЭ от преподавателей Умскул">
-              🟣 Пробник Умскул
+              🎓 Пробник Умскул
             </button>
             <button class="btn-action" onclick="App.switchView('quiz')">
               🎯 Пройти тест
@@ -1799,7 +1800,7 @@ const App = {
           <div class="demo-task-card">
             <div class="demo-task-top">
               <div class="demo-task-meta-left">
-                <span class="demo-task-num-badge" style="background: linear-gradient(135deg, #7c3aed, #9333ea);">№ ${task.num}</span>
+                <span class="demo-task-num-badge">№ ${task.num}</span>
                 <span class="demo-task-topic">${task.topic}</span>
               </div>
               <span class="demos-badge-pill umschool-pill">Умскул</span>
@@ -1818,15 +1819,15 @@ const App = {
               <div id="demo-feedback-um-${idx}" class="demo-feedback-text"></div>
             </div>
 
-            <div id="full-demo-solution-um-${idx}" class="demo-task-solution-box" style="border-left-color: #a855f7;">
-              <div class="demo-solution-answer-tag" style="color: #c084fc;">
+            <div id="full-demo-solution-um-${idx}" class="demo-task-solution-box">
+              <div class="demo-solution-answer-tag">
                 ✓ Правильный ответ Умскул: <code>${task.answer}</code>
               </div>
               <div class="demo-solution-body">
                 <strong>Пошаговое решение:</strong><br>
                 ${task.solution.replace(/\n/g, '<br>')}
               </div>
-              <div style="margin-top: 0.75rem; padding: 0.6rem 0.9rem; background: rgba(168, 85, 247, 0.12); border: 1px solid rgba(168, 85, 247, 0.3); border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-primary);">
+              <div style="margin-top: 0.75rem; padding: 0.6rem 0.9rem; background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: var(--radius-sm); font-size: 0.85rem; color: var(--text-primary);">
                 💡 <strong>Лайфхак от преподавателя:</strong> ${task.teacherTip}
               </div>
             </div>
@@ -1835,7 +1836,7 @@ const App = {
       </div>
 
       <div style="margin: 2rem 0; text-align: center;">
-        <a href="${um.umschoolUrl}" target="_blank" rel="noopener noreferrer" class="btn-action" style="background: linear-gradient(135deg, #7c3aed, #9333ea); color: white; border: none; font-weight: 700; padding: 0.65rem 1.4rem;">
+        <a href="${um.umschoolUrl}" target="_blank" rel="noopener noreferrer" class="btn-action" style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; font-weight: 700; padding: 0.65rem 1.4rem;">
           🌐 Открыть открытые уроки на портале Умскул ↗
         </a>
       </div>
@@ -1878,10 +1879,10 @@ const App = {
 
         <div class="prokudskoe-tasks-list">
           ${prokudskoe.tasks.map((task, idx) => `
-            <div class="demo-task-card" style="border-left: 4px solid #10b981;">
+            <div class="demo-task-card">
               <div class="demo-task-top">
                 <div class="demo-task-meta-left">
-                  <span class="demo-task-num-badge" style="background: linear-gradient(135deg, #059669, #10b981);">№ ${task.num}</span>
+                  <span class="demo-task-num-badge">№ ${task.num}</span>
                   <span class="prokudskoe-task-badge">📍 с. Прокудское</span>
                   <span class="demo-task-topic">${task.badge}</span>
                 </div>
@@ -1906,8 +1907,8 @@ const App = {
                 <div id="prokudskoe-feedback-${sId}-${idx}" class="demo-feedback-text"></div>
               </div>
 
-              <div id="prokudskoe-solution-${sId}-${idx}" class="demo-task-solution-box" style="border-left-color: #10b981;">
-                <div class="demo-solution-answer-tag" style="color: #34d399;">
+              <div id="prokudskoe-solution-${sId}-${idx}" class="demo-task-solution-box">
+                <div class="demo-solution-answer-tag">
                   ✓ Правильный ответ: <code>${task.answer}</code>
                 </div>
                 <div class="demo-solution-body">
