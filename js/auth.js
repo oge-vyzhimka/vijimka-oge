@@ -197,28 +197,13 @@ const Auth = {
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem;">
               <div>
-                <label class="auth-field-lbl">Роль:</label>
-                <select id="prof-input-role" class="auth-text-input" onchange="Auth.onRoleChange(this.value)">
-                  <option value="student" ${p.role === 'student' ? 'selected' : ''}>🎒 Ученик (9 класс)</option>
-                  <option value="teacher" ${p.role === 'teacher' ? 'selected' : ''}>👨‍🏫 Учитель / Репетитор</option>
-                </select>
+                <label class="auth-field-lbl">Класс:</label>
+                <input type="text" id="prof-input-grade" class="auth-text-input" value="${p.grade || '9 «А»'}" placeholder="9 «А», 9 «Б»...">
               </div>
               <div>
-                <label class="auth-field-lbl">Класс / Группа:</label>
-                <input type="text" id="prof-input-grade" class="auth-text-input" value="${p.grade || '9А'}" placeholder="9А, 9Б...">
+                <label class="auth-field-lbl">Школа:</label>
+                <input type="text" id="prof-input-school" class="auth-text-input" value="${p.school || 'СОШ №6 им. Д.К. Потапова'}" placeholder="СОШ №6...">
               </div>
-            </div>
-
-            <!-- Поле ввода кодового слова для роли учителя -->
-            <div id="teacher-code-field" style="display: ${p.role === 'teacher' ? 'block' : 'none'}; background: rgba(147, 51, 234, 0.08); padding: 0.85rem; border-radius: 8px; border: 1px dashed #9333ea;">
-              <label class="auth-field-lbl" style="color: #9333ea;">🔑 Секретное кодовое слово преподавателя:</label>
-              <input type="password" id="prof-input-teacher-code" class="auth-text-input" placeholder="Введите кодовое слово" value="${p.role === 'teacher' ? 'учитель2026' : ''}">
-              <div style="font-size: 0.74rem; color: var(--text-secondary); margin-top: 0.3rem;">Доступ к журналу класса и ведомостям защищён паролем (учитель2026).</div>
-            </div>
-
-            <div>
-              <label class="auth-field-lbl">Школа / Учебное заведение:</label>
-              <input type="text" id="prof-input-school" class="auth-text-input" value="${p.school || 'СОШ №6 им. Д.К. Потапова'}" placeholder="СОШ №6...">
             </div>
 
             <div>
@@ -479,37 +464,19 @@ const Auth = {
     if (inp) inp.value = emoji;
   },
 
-  onRoleChange(role) {
-    const field = document.getElementById("teacher-code-field");
-    if (field) {
-      field.style.display = (role === "teacher") ? "block" : "none";
-    }
-  },
-
   handleProfileSave(e) {
     e.preventDefault();
-    const name = document.getElementById("prof-input-name").value.trim();
-    const role = document.getElementById("prof-input-role").value;
-    const grade = document.getElementById("prof-input-grade").value.trim();
-    const school = document.getElementById("prof-input-school").value.trim();
-    const avatar = document.getElementById("prof-input-avatar").value;
-
-    // Проверка секретного кодового слова для роли преподавателя
-    if (role === "teacher") {
-      const codeInput = document.getElementById("prof-input-teacher-code");
-      const code = codeInput ? codeInput.value.trim().toLowerCase() : "";
-      if (code !== "учитель2026") {
-        alert("⛔ Неверное кодовое слово! Доступ к роли Преподавателя закрыт. Введите верное кодовое слово (учитель2026).");
-        return;
-      }
-    }
+    const name = document.getElementById("prof-input-name")?.value.trim() || "Ученик";
+    const grade = document.getElementById("prof-input-grade")?.value.trim() || "9 «А»";
+    const school = document.getElementById("prof-input-school")?.value.trim() || "СОШ №6 им. Д.К. Потапова";
+    const avatar = document.getElementById("prof-input-avatar")?.value || "🦊";
 
     this.saveProfile({
-      name: name || "Ученик",
-      role: role || "student",
-      grade: grade || "9А",
-      school: school || "СОШ №6",
-      avatar: avatar || "🦊"
+      name: name,
+      role: "student",
+      grade: grade,
+      school: school,
+      avatar: avatar
     });
 
     this.renderModalContent("overview");
@@ -678,18 +645,14 @@ const Auth = {
   switchGateTab(tab) {
     const btnStudent = document.getElementById("gate-tab-student");
     const btnTelegram = document.getElementById("gate-tab-telegram");
-    const btnTeacher = document.getElementById("gate-tab-teacher");
     const panelStudent = document.getElementById("gate-panel-student");
     const panelTelegram = document.getElementById("gate-panel-telegram");
-    const panelTeacher = document.getElementById("gate-panel-teacher");
 
     if (btnStudent) btnStudent.classList.toggle("active", tab === "student");
     if (btnTelegram) btnTelegram.classList.toggle("active", tab === "telegram");
-    if (btnTeacher) btnTeacher.classList.toggle("active", tab === "teacher");
 
     if (panelStudent) panelStudent.style.display = (tab === "student") ? "block" : "none";
     if (panelTelegram) panelTelegram.style.display = (tab === "telegram") ? "block" : "none";
-    if (panelTeacher) panelTeacher.style.display = (tab === "teacher") ? "block" : "none";
 
     if (tab === "telegram") {
       setTimeout(() => {
@@ -746,38 +709,6 @@ const Auth = {
     });
 
     this.completeGate();
-  },
-
-  submitGateTeacher(e) {
-    e.preventDefault();
-    const name = document.getElementById("gate-teacher-name").value.trim() || "Преподаватель";
-    const code = document.getElementById("gate-teacher-code").value.trim().toLowerCase();
-    const errEl = document.getElementById("gate-teacher-err");
-
-    if (code !== "учитель2026") {
-      if (errEl) {
-        errEl.textContent = "⛔ Неверное кодовое слово! Доступ открыт только для учителей (учитель2026).";
-        errEl.style.display = "block";
-      }
-      return;
-    }
-
-    if (errEl) errEl.style.display = "none";
-
-    this.saveProfile({
-      name: name,
-      role: "teacher",
-      grade: "9А",
-      school: "МБОУ СОШ №6 им. Д.К. Потапова",
-      avatar: "👨‍🏫"
-    });
-
-    this.completeGate();
-
-    // Преподавателя сразу переключаем на вкладку кабинета!
-    if (typeof App !== "undefined" && App.switchView) {
-      setTimeout(() => App.switchView("cabinet"), 100);
-    }
   },
 
   completeGate() {
