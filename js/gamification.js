@@ -437,7 +437,12 @@ const CabinetView = {
       <div class="cabinet-section-card teacher-panel">
         <div class="sec-card-header">
           <div>
-            <h3 class="sec-card-title">👨‍🏫 Панель преподавателя (Школа №6 им. Д.К. Потапова)</h3>
+            <div style="display: flex; gap: 0.6rem; align-items: center; flex-wrap: wrap;">
+              <h3 class="sec-card-title">👨‍🏫 Панель преподавателя (Школа №6 им. Д.К. Потапова)</h3>
+              <span style="display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; background: rgba(16, 185, 129, 0.15); color: var(--accent-green); padding: 0.2rem 0.6rem; border-radius: 9999px; font-weight: 700;">
+                🔑 Кодовое слово подтверждено
+              </span>
+            </div>
             <p class="sec-card-sub">Сводная ведомость готовности класса к основному государственному экзамену</p>
           </div>
           <div style="display: flex; gap: 0.5rem;">
@@ -524,6 +529,17 @@ const CabinetView = {
   toggleRole() {
     const current = (Auth.profile && Auth.profile.role) || "student";
     const next = current === "teacher" ? "student" : "teacher";
+
+    // Запрос кодового слова при переключении на роль преподавателя
+    if (next === "teacher") {
+      const code = prompt("🔑 Введите секретное кодовое слово преподавателя для доступа к журналу класса:");
+      if (!code || code.trim().toLowerCase() !== "учитель2026") {
+        alert("⛔ Неверное кодовое слово! Доступ к панели преподавателя закрыт.");
+        return;
+      }
+      alert("✅ Доступ подтверждён! Вы переключились в режим Преподавателя.");
+    }
+
     Auth.saveProfile({ role: next });
     this.render();
   },
