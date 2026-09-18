@@ -587,6 +587,11 @@ const Auth = {
   checkGateState() {
     const gate = document.getElementById("welcome-gate");
     if (!gate) return;
+    if (window.location.search.includes("skip_gate=1")) {
+      gate.style.display = "none";
+      document.body.style.overflow = "";
+      return;
+    }
     const passed = localStorage.getItem("oge_auth_gate_passed");
     if (passed === "true") {
       gate.style.display = "none";
