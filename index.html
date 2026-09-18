@@ -50,6 +50,12 @@
 
       <!-- Переключатели темы и действия -->
       <div class="header-actions">
+        <!-- Кнопка Личного кабинета и стрика -->
+        <button class="nav-pill-btn profile-header-btn" id="header-profile-btn" onclick="Auth.openProfileModal()" title="Личный кабинет и серия занятий">
+          <span id="header-profile-avatar">🦊</span>
+          <span id="header-profile-name">Войти</span>
+          <span class="streak-badge-pill" id="header-streak-badge" style="display:none;">🔥 1 день</span>
+        </button>
         <!-- Специальная кнопка школы №6 им. Потапова -->
         <button class="nav-pill-btn school-highlight-btn" onclick="App.switchView('school')" title="Раздел для учеников 6 школы имени Д.К. Потапова">
           <span>🏫</span>
@@ -165,6 +171,12 @@
       </button>
       <button class="view-tab-btn tab-school-btn" data-view="school" onclick="App.switchView('school')">
         🏫 6 школа и библиотеки
+      </button>
+      <button class="view-tab-btn tab-mistakes-btn" data-view="mistakes" onclick="App.switchView('mistakes')">
+        ❌ Мои ошибки <span class="tab-badge-count" id="mistakes-tab-badge" style="display:none;">0</span>
+      </button>
+      <button class="view-tab-btn tab-cabinet-btn" data-view="cabinet" onclick="App.switchView('cabinet')">
+        👤 Личный кабинет
       </button>
     </div>
 
@@ -391,6 +403,16 @@
         </div>
       </div>
     </section>
+
+    <!-- Вкладка: Персональный банк ошибок и отработка ловушек (Фича 3) -->
+    <section id="view-mistakes" style="display: none;">
+      <div id="mistakes-main-content"></div>
+    </section>
+
+    <!-- Вкладка: Личный кабинет, стрик, ачивки и кабинет преподавателя (Фичи 4 и 5) -->
+    <section id="view-cabinet" style="display: none;">
+      <div id="cabinet-main-content"></div>
+    </section>
   </main>
 
   <!-- ========================================================================
@@ -534,18 +556,36 @@
     </div>
   </div>
 
+  <!-- ========================================================================
+       Модальное окно: Личный кабинет / Авторизация Supabase (Фичи 3, 4, 5)
+       ======================================================================== -->
+  <div id="auth-modal" class="custom-modal-overlay" onclick="if(event.target===this) Auth.closeProfileModal();" style="display: none;">
+    <div class="custom-modal-card auth-modal-card">
+      <button class="modal-close-btn" onclick="Auth.closeProfileModal()">&times;</button>
+      <div id="auth-modal-body">
+        <!-- Генерируется из auth.js через Auth.renderModalContent -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Подключение Supabase JS Client v2 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <!-- Подключение скриптов приложения -->
-  <script src="js/data/subjects.js?v=20260918-v4"></script>
-  <script src="js/data/demos.js?v=20260918-v4"></script>
-  <script src="js/data/full_demos.js?v=20260918-v4"></script>
-  <script src="js/data/prokudskoe_tasks.js?v=20260918-v4"></script>
-  <script src="js/data/guide.js?v=20260918-v4"></script>
-  <script src="js/data/kims.js?v=20260918-v4"></script>
-  <script src="js/data/umschool.js?v=20260918-v4"></script>
-  <script src="js/data/quizzes.js?v=20260918-v4"></script>
-  <script src="js/data/oge_topics.js?v=20260918-v4"></script>
-  <script src="js/calculator.js?v=20260918-v4"></script>
-  <script src="js/quiz.js?v=20260918-v4"></script>
-  <script src="js/app.js?v=20260918-v4"></script>
+  <script src="js/data/subjects.js?v=20260918-v5"></script>
+  <script src="js/data/demos.js?v=20260918-v5"></script>
+  <script src="js/data/full_demos.js?v=20260918-v5"></script>
+  <script src="js/data/prokudskoe_tasks.js?v=20260918-v5"></script>
+  <script src="js/data/guide.js?v=20260918-v5"></script>
+  <script src="js/data/kims.js?v=20260918-v5"></script>
+  <script src="js/data/umschool.js?v=20260918-v5"></script>
+  <script src="js/data/quizzes.js?v=20260918-v5"></script>
+  <script src="js/data/oge_topics.js?v=20260918-v5"></script>
+  <script src="js/calculator.js?v=20260918-v5"></script>
+  <script src="js/auth.js?v=20260918-v5"></script>
+  <script src="js/mistakes.js?v=20260918-v5"></script>
+  <script src="js/gamification.js?v=20260918-v5"></script>
+  <script src="js/quiz.js?v=20260918-v5"></script>
+  <script src="js/app.js?v=20260918-v5"></script>
 </body>
 </html>
