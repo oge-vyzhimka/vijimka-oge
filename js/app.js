@@ -473,9 +473,6 @@ const App = {
             <button class="btn-action" onclick="App.switchView('quiz')">
               🎯 Пройти тест
             </button>
-            <button class="btn-action" onclick="window.print()">
-              🖨️ Печать
-            </button>
           </div>
         </div>
       `;
@@ -554,7 +551,7 @@ const App = {
       `;
     }
 
-    // Карточки выжимок теории и формул
+    // Карточки выжимок теории и формул с переходом на глубокий разбор ФИПИ/Решу ОГЭ
     const cardsArea = document.getElementById("cheatsheet-cards-container");
     if (cardsArea) {
       cardsArea.innerHTML = `
@@ -569,8 +566,15 @@ const App = {
               </div>
               <div class="cheatsheet-body">
                 ${section.items.map(item => `
-                  <div class="formula-item">
-                    <div class="formula-title">${item.title}</div>
+                  <div class="formula-item clickable-task-card" 
+                       onclick="TaskDetails.openForSubjectItem('${subj.id}', '${item.title.replace(/'/g, "\\'")}')" 
+                       role="button" tabindex="0" 
+                       onkeydown="if(event.key==='Enter')TaskDetails.openForSubjectItem('${subj.id}', '${item.title.replace(/'/g, "\\'")}')"
+                       title="Нажмите, чтобы открыть подробный разбор задания из ФИПИ и Решу ОГЭ">
+                    <div class="formula-card-top">
+                      <div class="formula-title">${item.title}</div>
+                      <span class="formula-open-hint">Разбор ФИПИ / Решу ОГЭ →</span>
+                    </div>
                     <div class="formula-math">${item.formula.replace(/\n/g, '<br>')}</div>
                     ${item.note ? `<div class="formula-note">${item.note}</div>` : ''}
                   </div>
