@@ -13,11 +13,11 @@
   <meta name="mobile-web-app-capable" content="yes">
 
   <!-- Фавиконка для вкладки браузера (ОГЭ Выжималка) -->
-  <link rel="icon" type="image/x-icon" href="favicon.ico?v=20260919-v8">
-  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png?v=20260919-v8">
-  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png?v=20260919-v8">
-  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png?v=20260919-v8">
-  <link rel="shortcut icon" href="favicon.ico?v=20260919-v8">
+  <link rel="icon" type="image/x-icon" href="favicon.ico?v=20260919-v10">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png?v=20260919-v10">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png?v=20260919-v10">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png?v=20260919-v10">
+  <link rel="shortcut icon" href="favicon.ico?v=20260919-v10">
 
   <!-- Шрифты Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,7 +25,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   
   <!-- Основные стили -->
-  <link rel="stylesheet" href="css/styles.css?v=20260919-v8">
+  <link rel="stylesheet" href="css/styles.css?v=20260919-v10">
   <!-- Telegram WebApp SDK -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
@@ -37,8 +37,8 @@
   <div id="welcome-gate" class="welcome-gate-screen">
     <div class="welcome-gate-card">
       <div class="gate-header">
-        <div class="gate-logo-wrap" style="display: flex; justify-content: center; margin-bottom: 0.85rem;">
-          <img src="images/favicon.png?v=20260919-v8" alt="ОГЭ Выжималка" style="width: 76px; height: 76px; border-radius: 18px; box-shadow: 0 8px 24px rgba(14, 165, 233, 0.4); border: 2px solid rgba(56, 189, 248, 0.3);">
+        <div class="gate-spark-wrap" style="display: flex; justify-content: center; margin-bottom: 0.65rem;">
+          <span class="gate-spark-icon" style="font-size: 2.4rem; line-height: 1; filter: drop-shadow(0 2px 10px rgba(56, 189, 248, 0.4));">⚡</span>
         </div>
         <div class="gate-badge-row">
           <span class="gate-badge">🎓 ОГЭ 2026/2027</span>
@@ -59,22 +59,22 @@
 
         <div class="gate-form-group">
           <label class="gate-label" for="gate-input-password">Пароль:</label>
-          <input type="password" id="gate-input-password" class="gate-input" required placeholder="Введите пароль" autocomplete="current-password" value="123456">
+          <input type="password" id="gate-input-password" class="gate-input" required placeholder="Введите пароль" autocomplete="current-password" value="1234">
         </div>
 
-        <div id="gate-login-error" class="gate-error-msg" style="display: none;"></div>
+        <div id="gate-error-msg" class="gate-error-msg" style="display: none;"></div>
 
         <button type="submit" class="gate-submit-btn">
-          Войти в систему 🚀
+          <span>Войти в систему</span>
+          <span class="gate-btn-arrow">→</span>
         </button>
       </form>
 
-      <!-- РАЗДЕЛИТЕЛЬ И ВХОД ДЛЯ УЧИТЕЛЯ -->
-      <div class="gate-divider"><span>или доступ для преподавателей</span></div>
-
-      <div class="gate-teacher-section">
-        <button type="button" class="gate-teacher-toggle-btn" onclick="Auth.toggleTeacherPanel()" id="gate-teacher-toggle-btn">
-          👩‍🏫 Вход для учителя
+      <!-- ПЕРЕКЛЮЧАТЕЛЬ ДЛЯ УЧИТЕЛЯ -->
+      <div class="gate-teacher-toggle-wrap">
+        <button type="button" class="gate-teacher-toggle-btn" onclick="Auth.toggleTeacherGate()">
+          <span>🔑</span>
+          <span id="gate-teacher-toggle-text">Вход для учителя</span>
         </button>
 
         <div id="gate-teacher-panel" class="gate-teacher-panel" style="display: none;">
@@ -102,7 +102,7 @@
     <div class="header-container">
       <!-- Логотип и бренд -->
       <a href="#" class="nav-brand" onclick="App.goToHome(); return false;" title="ОГЭ Выжимка — Главная">
-        <img src="images/favicon-32x32.png?v=20260919-v8" alt="ОГЭ Выжималка" class="brand-logo-img">
+        <span class="brand-spark">⚡</span>
         <span class="brand-name">ОГЭ<strong>Выжимка</strong></span>
       </a>
 
@@ -589,48 +589,6 @@
   </footer>
 
   <!-- ========================================================================
-       Мобильная нижняя панель навигации (Native Mobile App Tab Bar)
-       ======================================================================== -->
-  <nav class="mobile-bottom-nav">
-    <button class="mobile-nav-btn active" data-view="home" onclick="App.goToHome()">
-      <span class="mobile-nav-icon">🏠</span>
-      <span class="mobile-nav-label">Главная</span>
-    </button>
-    <button class="mobile-nav-btn" data-view="cheatsheet" onclick="App.switchView('cheatsheet')">
-      <span class="mobile-nav-icon">📖</span>
-      <span class="mobile-nav-label">Выжимка</span>
-    </button>
-    <button class="mobile-nav-btn" data-view="demos" onclick="App.switchView('demos')">
-      <span class="mobile-nav-icon">📋</span>
-      <span class="mobile-nav-label">Пробники</span>
-    </button>
-    <button class="mobile-nav-btn" data-view="guide" onclick="App.switchView('guide')">
-      <span class="mobile-nav-icon">🚀</span>
-      <span class="mobile-nav-label">Гид ОГЭ</span>
-    </button>
-    <button class="mobile-nav-btn" data-view="quiz" onclick="App.switchView('quiz')">
-      <span class="mobile-nav-icon">🎯</span>
-      <span class="mobile-nav-label">Тренажёр</span>
-    </button>
-    <button class="mobile-nav-btn" data-view="calculator" onclick="App.switchView('calculator')">
-      <span class="mobile-nav-icon">🧮</span>
-      <span class="mobile-nav-label">Баллы</span>
-    </button>
-    <button class="mobile-nav-btn" data-view="tracker" onclick="App.switchView('tracker')">
-      <span class="mobile-nav-icon">📚</span>
-      <span class="mobile-nav-label">Все темы</span>
-    </button>
-    <button class="mobile-nav-btn" data-view="store" onclick="App.switchView('store')">
-      <span class="mobile-nav-icon">🛒</span>
-      <span class="mobile-nav-label">Купить КИМ</span>
-    </button>
-    <button class="mobile-nav-btn" data-view="school" onclick="App.switchView('school')">
-      <span class="mobile-nav-icon">🏫</span>
-      <span class="mobile-nav-label">Школа №6</span>
-    </button>
-  </nav>
-
-  <!-- ========================================================================
        Модальное окно: Глобальный поиск формул и определений
        ======================================================================== -->
   <div id="search-results-overlay" class="custom-modal-overlay search-overlay" onclick="if(event.target===this) this.classList.remove('open');" style="display: none;">
@@ -760,22 +718,22 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Подключение скриптов приложения -->
-  <script src="js/data/subjects.js?v=20260919-v7"></script>
-  <script src="js/data/demos.js?v=20260919-v7"></script>
-  <script src="js/data/full_demos.js?v=20260919-v7"></script>
-  <script src="js/data/prokudskoe_tasks.js?v=20260919-v7"></script>
-  <script src="js/data/guide.js?v=20260919-v7"></script>
-  <script src="js/data/kims.js?v=20260919-v7"></script>
-  <script src="js/data/umschool.js?v=20260919-v7"></script>
-  <script src="js/data/quizzes.js?v=20260919-v7"></script>
-  <script src="js/data/oge_topics.js?v=20260919-v7"></script>
-  <script src="js/task_details.js?v=20260919-v7"></script>
-  <script src="js/calculator.js?v=20260919-v7"></script>
-  <script src="js/auth.js?v=20260919-v7"></script>
-  <script src="js/mistakes.js?v=20260919-v7"></script>
-  <script src="js/gamification.js?v=20260919-v7"></script>
-  <script src="js/quiz.js?v=20260919-v7"></script>
-  <script src="js/libraries.js?v=20260919-v7"></script>
-  <script src="js/app.js?v=20260919-v7"></script>
+  <script src="js/data/subjects.js?v=20260919-v10"></script>
+  <script src="js/data/demos.js?v=20260919-v10"></script>
+  <script src="js/data/full_demos.js?v=20260919-v10"></script>
+  <script src="js/data/prokudskoe_tasks.js?v=20260919-v10"></script>
+  <script src="js/data/guide.js?v=20260919-v10"></script>
+  <script src="js/data/kims.js?v=20260919-v10"></script>
+  <script src="js/data/umschool.js?v=20260919-v10"></script>
+  <script src="js/data/quizzes.js?v=20260919-v10"></script>
+  <script src="js/data/oge_topics.js?v=20260919-v10"></script>
+  <script src="js/task_details.js?v=20260919-v10"></script>
+  <script src="js/calculator.js?v=20260919-v10"></script>
+  <script src="js/auth.js?v=20260919-v10"></script>
+  <script src="js/mistakes.js?v=20260919-v10"></script>
+  <script src="js/gamification.js?v=20260919-v10"></script>
+  <script src="js/quiz.js?v=20260919-v10"></script>
+  <script src="js/libraries.js?v=20260919-v10"></script>
+  <script src="js/app.js?v=20260919-v10"></script>
 </body>
 </html>
