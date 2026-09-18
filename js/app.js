@@ -153,21 +153,22 @@ const App = {
       return subj.category === this.currentCategory;
     });
 
-    container.innerHTML = subjects.map(subj => `
-      <div class="subject-card ${subj.id === this.currentSubject ? 'active' : ''}" 
-           style="--subject-accent: ${subj.accentColor};"
-           onclick="App.selectSubject('${subj.id}')">
-        <div class="subject-card-top">
-          <span class="subject-icon">${subj.icon}</span>
-          <span class="subject-badge">${this.getCategoryLabel(subj.category)}</span>
-        </div>
-        <div class="subject-title">${subj.title}</div>
-        <div class="subject-info-line">
-          <span>${subj.examInfo.questionsCount.split(' ')[0]} зад.</span>
-          <span>Макс: ${subj.examInfo.maxScore} б.</span>
-        </div>
-      </div>
-    `).join("");
+    container.innerHTML = subjects.map(subj => {
+      const isActive = (subj.id === this.currentSubject);
+      const qCount = subj.examInfo ? subj.examInfo.questionsCount.split(' ')[0] : '';
+      const maxScore = subj.examInfo ? subj.examInfo.maxScore : '';
+      return `
+        <button type="button" 
+             class="subject-chip subject-card ${isActive ? 'active' : ''}" 
+             style="--chip-accent: ${subj.accentColor};"
+             onclick="App.selectSubject('${subj.id}')"
+             title="${subj.title} — ${subj.examInfo ? subj.examInfo.questionsCount : ''}, макс. ${maxScore} б.">
+          <span class="chip-icon">${subj.icon}</span>
+          <span class="chip-title">${subj.title}</span>
+          <span class="chip-badge">${qCount} зад.</span>
+        </button>
+      `;
+    }).join("");
   },
 
   getCategoryLabel(category) {
@@ -207,14 +208,14 @@ const App = {
       Calculator.calculate();
     }
 
-    // Мгновенная плавная прокрутка прямо к началу информации о предмете
-    setTimeout(() => {
+    // Мягкая плавная прокрутка, только если пользователь уже проскроллил далеко вниз
+    if (window.scrollY > 220) {
       const banner = document.getElementById("cheatsheet-banner-container") || document.querySelector(".main-wrapper");
       if (banner) {
-        const topPos = banner.getBoundingClientRect().top + window.pageYOffset - 65;
+        const topPos = Math.max(0, banner.getBoundingClientRect().top + window.pageYOffset - 75);
         window.scrollTo({ top: topPos, behavior: "smooth" });
       }
-    }, 60);
+    }
   },
 
   /* --------------------------------------------------------------------------
@@ -273,39 +274,44 @@ const App = {
   },
 
   /* --------------------------------------------------------------------------
-     Переключение представлений (Выжимка, Тест, Калькулятор, Чек-лист, Школа, Магазин)
+     Переключение представлений (Linear / Vercel Navigation Bar & Dropdown)
      -------------------------------------------------------------------------- */
-  switchView(viewName, autoScroll = true) {
+  switchView(viewName, autoScroll = false) {
     this.currentView = viewName;
-    document.querySelectorAll(".view-tab-btn").forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.view === viewName);
+
+    // Синхронизация всех кнопок навигации и вкладок
+    document.querySelectorAll(".view-tab-btn, .nav-item-link, .nav-dropdown-item").forEach(btn => {
+      if (btn.dataset && btn.dataset.view) {
+        btn.classList.toggle("active", btn.dataset.view === viewName);
+      }
     });
 
+    // Индикатор родительской кнопки "Ещё", если активен раздел из выпадающего меню
+    const moreDropdownViews = ["demos", "tracker", "guide", "school", "store", "cabinet"];
+    const moreTrigger = document.querySelector(".nav-more-trigger");
+    if (moreTrigger) {
+      moreTrigger.classList.toggle("active", moreDropdownViews.includes(viewName));
+    }
+
+    // Закрываем выпадающее меню
+    this.closeMoreMenu();
+
+    // Мобильная нижняя навигация
     document.querySelectorAll(".mobile-nav-btn").forEach(btn => {
       btn.classList.toggle("active", btn.dataset.view === viewName);
     });
 
-    document.getElementById("view-cheatsheet").style.display = (viewName === "cheatsheet") ? "block" : "none";
-    const demosView = document.getElementById("view-demos");
-    if (demosView) demosView.style.display = (viewName === "demos") ? "block" : "none";
-    const guideView = document.getElementById("view-guide");
-    if (guideView) guideView.style.display = (viewName === "guide") ? "block" : "none";
-    document.getElementById("view-quiz").style.display = (viewName === "quiz") ? "block" : "none";
-    document.getElementById("view-calculator").style.display = (viewName === "calculator") ? "block" : "none";
-    document.getElementById("view-tracker").style.display = (viewName === "tracker") ? "block" : "none";
-    const storeView = document.getElementById("view-store");
-    if (storeView) storeView.style.display = (viewName === "store") ? "block" : "none";
-    const schoolView = document.getElementById("view-school");
-    if (schoolView) schoolView.style.display = (viewName === "school") ? "block" : "none";
-    const mistakesView = document.getElementById("view-mistakes");
-    if (mistakesView) mistakesView.style.display = (viewName === "mistakes") ? "block" : "none";
-    const cabinetView = document.getElementById("view-cabinet");
-    if (cabinetView) cabinetView.style.display = (viewName === "cabinet") ? "block" : "none";
+    // Переключение секций
+    const viewSections = ["cheatsheet", "demos", "guide", "quiz", "calculator", "tracker", "store", "school", "mistakes", "cabinet"];
+    viewSections.forEach(v => {
+      const el = document.getElementById(`view-${v}`);
+      if (el) el.style.display = (v === viewName) ? "block" : "none";
+    });
 
-    // Управляем видимостью промо-баннера: в разделах школы, гида, магазина, ошибок, кабинета и пробников скрываем его
-    const heroSection = document.querySelector(".hero-section");
-    if (heroSection) {
-      heroSection.style.display = (viewName === "school" || viewName === "guide" || viewName === "store" || viewName === "demos" || viewName === "mistakes" || viewName === "cabinet") ? "none" : "block";
+    // Управляем видимостью блока предметов: скрываем в школе, гиде, магазине, ошибках, кабинете
+    const subjectsNav = document.querySelector(".subjects-nav-section");
+    if (subjectsNav) {
+      subjectsNav.style.display = (viewName === "school" || viewName === "guide" || viewName === "store" || viewName === "mistakes" || viewName === "cabinet") ? "none" : "block";
     }
 
     // Достижение при посещении раздела школы №6
@@ -315,9 +321,27 @@ const App = {
 
     this.renderCurrentView();
 
-    // Автоматическая плавная прокрутка экрана вниз к выбранному разделу
-    if (autoScroll) {
+    // Плавная прокрутка, только если автоскролл явно запрошен и страница уже прокручена
+    if (autoScroll && window.scrollY > 200) {
       this.scrollToViewContent(viewName);
+    }
+  },
+
+  toggleMoreMenu(e) {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    const menu = document.getElementById("nav-more-dropdown");
+    if (menu) {
+      menu.classList.toggle("open");
+    }
+  },
+
+  closeMoreMenu() {
+    const menu = document.getElementById("nav-more-dropdown");
+    if (menu) {
+      menu.classList.remove("open");
     }
   },
 
@@ -2281,11 +2305,19 @@ const App = {
   },
 
   bindGlobalEvents() {
-    // Esc закрывает поиск
+    // Esc закрывает поиск и выпадающее меню
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         const overlay = document.getElementById("search-results-overlay");
         if (overlay) overlay.classList.remove("open");
+        this.closeMoreMenu();
+      }
+    });
+
+    // Закрытие выпадающего меню при клике вне него
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".nav-dropdown-wrapper")) {
+        this.closeMoreMenu();
       }
     });
   }
