@@ -22,6 +22,8 @@ const App = {
     this.initTheme();
     this.initTimer();
     this.renderHomeSubjects();
+    const navCapsule = document.getElementById("main-nav-capsule");
+    if (navCapsule) navCapsule.style.display = "none";
     this.renderSubjectCards();
 
     // Инициализация модулей аккаунтов, банка ошибок и геймификации
@@ -243,6 +245,8 @@ const App = {
       pill.classList.toggle("active", pill.dataset.category === category);
     });
     this.renderHomeSubjects();
+    const navCapsule = document.getElementById("main-nav-capsule");
+    if (navCapsule) navCapsule.style.display = "none";
     this.renderSubjectCards();
   },
 
@@ -271,6 +275,8 @@ const App = {
   goToHome(scroll = true) {
     this.switchView("home", false);
     this.renderHomeSubjects();
+    const navCapsule = document.getElementById("main-nav-capsule");
+    if (navCapsule) navCapsule.style.display = "none";
     if (scroll) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -358,6 +364,12 @@ const App = {
     // Закрываем выпадающее меню
     this.closeMoreMenu();
 
+    // Управление видимостью капсульного меню: скрываем на Главной (выбор предметов), показываем внутри предметов
+    const navCapsule = document.getElementById("main-nav-capsule");
+    if (navCapsule) {
+      navCapsule.style.display = (viewName === "home") ? "none" : "flex";
+    }
+
     // Мобильная нижняя навигация
     document.querySelectorAll(".mobile-nav-btn").forEach(btn => {
       btn.classList.toggle("active", btn.dataset.view === viewName);
@@ -416,6 +428,8 @@ const App = {
   renderCurrentView() {
     if (this.currentView === "home") {
       this.renderHomeSubjects();
+    const navCapsule = document.getElementById("main-nav-capsule");
+    if (navCapsule) navCapsule.style.display = "none";
     } else if (this.currentView === "cheatsheet") {
       this.renderCheatsheet();
     } else if (this.currentView === "demos") {
@@ -1256,7 +1270,7 @@ const App = {
 
     container.innerHTML = `
       <div class="mock-card-header">
-        <span class="quiz-step-badge">ОГЭ 2025/2026 • ${demo.icon} ${demo.subjectTitle}</span>
+        <span class="quiz-step-badge">ОГЭ 2026/2027 • ${demo.icon} ${demo.subjectTitle}</span>
         <h2 style="font-size: 1.35rem; font-weight: 800; margin: 0.5rem 0 0.25rem;">${demo.mockVariant.title}</h2>
         <p style="font-size: 0.85rem; color: var(--text-secondary);">
           Тренировочные типовые задания формата КИМ ОГЭ. Выполните задание самостоятельно, а затем нажмите кнопку «Показать ответ и решение» для проверки.
@@ -1329,7 +1343,7 @@ const App = {
 
     container.innerHTML = `
       <div class="kim-modal-header">
-        <div class="kim-modal-badge">📚 Официальные сборники КИМ ФИПИ 2025/2026</div>
+        <div class="kim-modal-badge">📚 Официальные сборники КИМ ФИПИ 2026/2027</div>
         <h2 style="font-size: 1.4rem; font-weight: 800; margin: 0.5rem 0 0.25rem;">
           ${kim.icon} ${kim.subjectTitle} — Печатные КИМы и цены
         </h2>
@@ -1422,7 +1436,7 @@ const App = {
 
     container.innerHTML = `
       <div class="umschool-card-header">
-        <div class="umschool-brand-badge">🟣 Онлайн-школа «Умскул» • ОГЭ 2025/2026</div>
+        <div class="umschool-brand-badge">🟣 Онлайн-школа «Умскул» • ОГЭ 2026/2027</div>
         <h2 style="font-size: 1.35rem; font-weight: 800; margin: 0.5rem 0 0.25rem;">
           ${um.variantTitle}
         </h2>
@@ -1989,7 +2003,7 @@ const App = {
     container.innerHTML = `
       <div class="store-hero-banner">
         <div class="store-badge-tag">🛒 Официальные печатные сборники ФИПИ • Цены и магазины</div>
-        <h2 class="store-hero-title">Где купить сборники КИМ ОГЭ 2025/2026</h2>
+        <h2 class="store-hero-title">Где купить сборники КИМ ОГЭ 2026/2027</h2>
         <p class="store-hero-subtitle">
           Путеводитель по покупке оригинальных сборников типовых вариантов ФИПИ: сравнение цен на маркетплейсах, главный оптово-розничный книжный склад в Новосибирске и пункты выдачи в селе Прокудское и р.п. Чик.
         </p>
@@ -2179,7 +2193,7 @@ const App = {
   },
 
   /* --------------------------------------------------------------------------
-     Раздел: Стратегия и методический гид ОГЭ 2025/2026
+     Раздел: Стратегия и методический гид ОГЭ 2026/2027
      -------------------------------------------------------------------------- */
   currentGuideTab: "plans",
 
@@ -2197,7 +2211,7 @@ const App = {
 
     container.innerHTML = `
       <div class="guide-hero-banner">
-        <div class="guide-hero-badge">🚀 Методический гид ОГЭ 2025/2026</div>
+        <div class="guide-hero-badge">🚀 Методический гид ОГЭ 2026/2027</div>
         <h2 class="guide-hero-title">Стратегия успешной сдачи экзаменов на 4 и 5</h2>
         <p class="guide-hero-desc">
           Полное руководство выпускника 9 класса: пошаговые планы подготовки, официальные правила бланков ФИПИ, поминутный тайминг на экзамене, разбор 15 фатальных ошибок и юридические правила апелляции.
@@ -2385,6 +2399,12 @@ const App = {
         const overlay = document.getElementById("search-results-overlay");
         if (overlay) overlay.classList.remove("open");
         this.closeMoreMenu();
+
+    // Управление видимостью капсульного меню: скрываем на Главной (выбор предметов), показываем внутри предметов
+    const navCapsule = document.getElementById("main-nav-capsule");
+    if (navCapsule) {
+      navCapsule.style.display = (viewName === "home") ? "none" : "flex";
+    }
       }
     });
 
@@ -2392,6 +2412,12 @@ const App = {
     document.addEventListener("click", (e) => {
       if (!e.target.closest(".nav-dropdown-wrapper")) {
         this.closeMoreMenu();
+
+    // Управление видимостью капсульного меню: скрываем на Главной (выбор предметов), показываем внутри предметов
+    const navCapsule = document.getElementById("main-nav-capsule");
+    if (navCapsule) {
+      navCapsule.style.display = (viewName === "home") ? "none" : "flex";
+    }
       }
     });
   }
