@@ -484,14 +484,11 @@ const App = {
             </div>
           </div>
           <div class="subject-banner-actions">
-            <button class="btn-action" onclick="App.switchView('demos')" title="Полная демоверсия ФИПИ, варианты Умскул и задачи села Прокудское">
+            <button class="btn-action" onclick="App.switchView('demos')" title="Полная демоверсия ФИПИ и задачи села Прокудское">
               📋 Пробники и демо-версии
             </button>
             <button class="btn-action btn-kim-action" onclick="App.openKimModal('${subj.id}')" title="Просмотр официальных сборников КИМ ФИПИ и ориентировочных цен">
               📚 КИМы и цены
-            </button>
-            <button class="btn-action btn-umschool-action" onclick="App.openUmschoolModal('${subj.id}')" title="Пробник ОГЭ от преподавателей Умскул">
-              🎓 Пробник Умскул
             </button>
             <button class="btn-action" onclick="App.switchView('quiz')">
               🎯 Пройти тест
@@ -543,16 +540,13 @@ const App = {
         <div class="demo-mock-banner">
           <div class="demo-mock-top">
             <div>
-              <span class="demo-mock-badge">📑 ФИПИ & 4ЕГЭ & УМСКУЛ & ПРОКУДСКОЕ</span>
+              <span class="demo-mock-badge">📑 ФИПИ & 4ЕГЭ & ПРОКУДСКОЕ</span>
               <h3 class="demo-mock-title">Демоверсии, тренировочные пробники и КИМы</h3>
               <p class="demo-mock-desc">${demoData.overview}</p>
             </div>
             <div class="demo-mock-actions">
               <button class="btn-action demo-action-btn" onclick="App.switchView('demos'); App.setDemosSubtab('fipi');" style="background: var(--accent-blue); color: white;">
                 📑 Полная демоверсия ФИПИ (${fullDemo ? fullDemo.totalTasks : 25} зад.)
-              </button>
-              <button class="btn-action btn-umschool-action" onclick="App.switchView('demos'); App.setDemosSubtab('umschool');">
-                🟣 Пробник Умскул
               </button>
               <button class="btn-action btn-prokudskoe-action" onclick="App.switchView('demos'); App.setDemosSubtab('prokudskoe');" style="background: #10b981; color: white; border-color: #10b981;">
                 📍 Задачи с. Прокудское
@@ -1585,13 +1579,10 @@ const App = {
           </div>
         </div>
 
-        <!-- Переключатель 3 подвкладок -->
+        <!-- Переключатель подвкладок -->
         <div class="demos-subtabs-nav">
           <button class="demos-subtab-btn ${this.currentDemosSubtab === 'fipi' ? 'active' : ''}" onclick="App.setDemosSubtab('fipi')">
             📑 Полная демоверсия ФИПИ (${totalTasksCount} зад.)
-          </button>
-          <button class="demos-subtab-btn subtab-umschool ${this.currentDemosSubtab === 'umschool' ? 'active' : ''}" onclick="App.setDemosSubtab('umschool')">
-            🟣 Вариант «Умскул» ${um ? `(${um.tasks.length} зад.)` : ''}
           </button>
           <button class="demos-subtab-btn subtab-prokudskoe ${this.currentDemosSubtab === 'prokudskoe' ? 'active' : ''}" onclick="App.setDemosSubtab('prokudskoe')">
             📍 Задачи с. Прокудское ${prokudskoe ? `(${prokudskoe.tasks.length} зад.)` : '✨'}
@@ -1601,8 +1592,6 @@ const App = {
 
     if (this.currentDemosSubtab === "fipi") {
       html += this.renderFipiDemoSubtab(fullDemo, subj);
-    } else if (this.currentDemosSubtab === "umschool") {
-      html += this.renderUmschoolDemoSubtab(um, subj);
     } else if (this.currentDemosSubtab === "prokudskoe") {
       html += this.renderProkudskoeDemoSubtab(prokudskoe, subj);
     }
