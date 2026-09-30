@@ -1379,9 +1379,55 @@ const App = {
      -------------------------------------------------------------------------- */
   historyMetodModalPage: 1,
   historyMetodSubtabPage: 1,
+  historyMetodFitMode: "screen",
 
-  openHistoryMetodModal(startPage = 1) {
-    this.historyMetodModalPage = Math.max(1, Math.min(20, startPage));
+  setHistoryMetodFit(mode) {
+    this.historyMetodFitMode = mode;
+    const stream = document.getElementById("history-metod-sheets-stream");
+    if (stream) {
+      stream.className = `history-metod-stream fit-${mode}`;
+      const imgs = stream.querySelectorAll(".metod-sheet-img");
+      imgs.forEach(img => {
+        if (mode === "screen") {
+          img.style.maxHeight = "85vh";
+          img.style.maxWidth = "100%";
+          img.style.width = "auto";
+        } else if (mode === "standard") {
+          img.style.maxHeight = "none";
+          img.style.maxWidth = "860px";
+          img.style.width = "100%";
+        } else if (mode === "full") {
+          img.style.maxHeight = "none";
+          img.style.maxWidth = "100%";
+          img.style.width = "100%";
+        }
+      });
+    }
+    const btns = document.querySelectorAll(".metod-fit-btn");
+    btns.forEach(b => {
+      const isActive = b.dataset.fit === mode;
+      b.style.background = isActive ? "#8b5cf6" : "var(--bg-tertiary)";
+      b.style.color = isActive ? "#ffffff" : "var(--text-secondary)";
+      b.style.borderColor = isActive ? "#8b5cf6" : "var(--border-color)";
+      b.style.fontWeight = isActive ? "700" : "500";
+    });
+  },
+
+  scrollToMetodSheet(num) {
+    const el = document.getElementById(`history-metod-sheet-${num}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  },
+
+  scrollToModalMetodSheet(num) {
+    const el = document.getElementById(`modal-metod-sheet-${num}`);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  },
+
+  openHistoryMetodModal() {
     const modal = document.getElementById("history-metod-modal");
     if (!modal) return;
     this.renderHistoryMetodModalContent();
@@ -1400,98 +1446,82 @@ const App = {
     }
   },
 
-  setHistoryMetodModalPage(pageNum) {
-    this.historyMetodModalPage = Math.max(1, Math.min(20, pageNum));
-    this.renderHistoryMetodModalContent();
-  },
-
   renderHistoryMetodModalContent() {
     const container = document.getElementById("history-metod-modal-content");
     if (!container) return;
-    const page = this.historyMetodModalPage;
     container.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.85rem; margin-bottom: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.85rem; margin-bottom: 0.85rem; flex-wrap: wrap;">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem;">
             <span style="font-size: 0.72rem; font-weight: 700; color: #a78bfa; background: rgba(139, 92, 246, 0.18); padding: 0.15rem 0.55rem; border-radius: 9999px;">ЕДСОО / ИСРО 2026/2027</span>
             <span style="font-size: 0.75rem; color: var(--text-muted);">🏛️ История</span>
-            <span style="font-size: 0.72rem; color: var(--accent-green); font-weight: 600;">✓ 100% цельный лист</span>
+            <span style="font-size: 0.72rem; color: var(--accent-green); font-weight: 600;">✓ Все 20 листов в ленте</span>
           </div>
-          <h2 style="font-size: 1.15rem; font-weight: 800; margin: 0; color: var(--text-primary);">Информационно-методическое письмо по Истории</h2>
-          <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">
-            Цельный аутентичный лист без изменений • Страница ${page} из 20
-          </div>
+          <h2 style="font-size: 1.15rem; font-weight: 800; margin: 0; color: var(--text-primary);">Информационно-методическое письмо по Истории (20 листов)</h2>
         </div>
-        <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
-          <a href="docs/istoriya_metod.pdf" download="istoriya_metod_2026_2027.pdf" class="btn-action" style="font-size: 0.82rem; padding: 0.45rem 0.85rem; background: var(--bg-tertiary);" title="Скачать оригинальный PDF файл">
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <a href="docs/istoriya_metod.pdf" download="istoriya_metod_2026_2027.pdf" class="btn-action" style="font-size: 0.82rem; padding: 0.45rem 0.85rem;" title="Скачать оригинальный PDF">
             📥 Скачать PDF
           </a>
         </div>
       </div>
 
-      <!-- Панель перелистывания -->
-      <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; background: var(--bg-secondary); padding: 0.6rem 0.9rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1rem; flex-wrap: wrap;">
-        <button class="btn-action" style="padding: 0.4rem 0.85rem; font-size: 0.84rem;" onclick="App.setHistoryMetodModalPage(${page - 1})" ${page <= 1 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
-          ◀ Предыдущий лист
-        </button>
-
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Лист:</span>
-          <select style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); padding: 0.35rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem; outline: none; cursor: pointer;" onchange="App.setHistoryMetodModalPage(parseInt(this.value, 10))">
-            ${Array.from({ length: 20 }, (_, i) => `<option value="${i + 1}" ${i + 1 === page ? 'selected' : ''}>Лист ${i + 1} из 20</option>`).join("")}
-          </select>
-        </div>
-
-        <button class="btn-action" style="padding: 0.4rem 0.85rem; font-size: 0.84rem; background: var(--accent-blue); color: white;" onclick="App.setHistoryMetodModalPage(${page + 1})" ${page >= 20 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
-          Следующий лист ▶
-        </button>
-      </div>
-
-      <!-- Сам лист документа (цельный аутентичный лист) -->
-      <div style="display: flex; justify-content: center; align-items: center; background: #262626; border-radius: var(--radius-md); padding: 1rem; overflow-y: auto; max-height: calc(85vh - 200px); box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);">
-        <img src="images/history_metod/page_${page}.png" alt="Лист ${page} методических материалов по истории" style="max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 4px 24px rgba(0,0,0,0.3); background: #fff;" loading="lazy">
-      </div>
-
-      <!-- Полоса быстрых номеров страниц (1..20) -->
-      <div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 0.85rem;">
+      <!-- Быстрый переход по номерам в модальном окне -->
+      <div style="display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; margin-bottom: 0.85rem; background: var(--bg-secondary); padding: 0.5rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+        <span style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); align-self: center; margin-right: 0.35rem;">Лист:</span>
         ${Array.from({ length: 20 }, (_, i) => `
-          <button onclick="App.setHistoryMetodModalPage(${i + 1})" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid ${i + 1 === page ? '#8b5cf6' : 'var(--border-color)'}; background: ${i + 1 === page ? '#8b5cf6' : 'var(--bg-tertiary)'}; color: ${i + 1 === page ? '#fff' : 'var(--text-secondary)'}; font-size: 0.8rem; font-weight: ${i + 1 === page ? '700' : '500'}; cursor: pointer;">
+          <button onclick="App.scrollToModalMetodSheet(${i + 1})" style="min-width: 30px; height: 28px; border-radius: 5px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.8rem; font-weight: 600; cursor: pointer;">
             ${i + 1}
           </button>
         `).join("")}
       </div>
+
+      <!-- Лента листов на весь экран -->
+      <div id="modal-metod-stream-container" style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center; max-height: calc(85vh - 140px); overflow-y: auto; padding: 0.5rem; background: #141414; border-radius: var(--radius-md);">
+        ${Array.from({ length: 20 }, (_, i) => {
+          const p = i + 1;
+          return `
+            <div id="modal-metod-sheet-${p}" style="width: 100%; max-width: 900px; display: flex; flex-direction: column; align-items: center; scroll-margin-top: 10px;">
+              <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; background: #262626; color: #a78bfa; font-size: 0.8rem; font-weight: 700; padding: 0.35rem 0.75rem; border-radius: 4px 4px 0 0;">
+                <span>📄 Лист ${p} из 20</span>
+                <a href="images/history_metod/page_${p}.png" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; text-decoration: none; font-size: 0.76rem;">В оригинальном размере ↗</a>
+              </div>
+              <img src="images/history_metod/page_${p}.png" alt="Лист ${p}" style="max-height: 85vh; max-width: 100%; width: auto; height: auto; object-fit: contain; background: #ffffff; border-radius: 0 0 4px 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);" loading="lazy" decoding="async">
+            </div>
+          `;
+        }).join("")}
+      </div>
     `;
   },
 
-  setHistoryMetodSubtabPage(pageNum) {
-    this.historyMetodSubtabPage = Math.max(1, Math.min(20, pageNum));
-    this.renderDemosView();
-    const el = document.getElementById("history-metod-viewer-container");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-  },
-
   renderHistoryMetodSubtab() {
-    const page = this.historyMetodSubtabPage || 1;
+    const fit = this.historyMetodFitMode || "screen";
+    const imgStyle = fit === "screen" 
+      ? "max-height: 85vh; max-width: 100%; width: auto; height: auto; display: block; object-fit: contain;"
+      : (fit === "standard"
+        ? "max-width: 860px; width: 100%; height: auto; display: block;"
+        : "max-width: 100%; width: 100%; height: auto; display: block;");
+
     return `
       <div id="history-metod-viewer-container" class="history-metod-subtab-card" style="margin-top: 1.5rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-md);">
+        
+        <!-- Верхний заголовок раздела методических материалов -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; border-bottom: 1px solid var(--border-color); padding-bottom: 1.25rem; margin-bottom: 1.25rem;">
           <div>
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; flex-wrap: wrap;">
               <span style="font-size: 0.75rem; font-weight: 700; color: #a78bfa; background: rgba(139, 92, 246, 0.16); padding: 0.2rem 0.6rem; border-radius: 9999px;">ЕДСОО / ИСРО 2026/2027</span>
               <span style="font-size: 0.8rem; color: var(--text-muted);">🏛️ История</span>
-              <span style="font-size: 0.75rem; color: var(--accent-green); background: rgba(16, 185, 129, 0.12); padding: 0.2rem 0.55rem; border-radius: 9999px; font-weight: 600;">✓ 100% цельные листы</span>
+              <span style="font-size: 0.75rem; color: var(--accent-green); background: rgba(16, 185, 129, 0.12); padding: 0.2rem 0.55rem; border-radius: 9999px; font-weight: 600;">✓ Все 20 листов без перелистывания</span>
             </div>
             <h2 style="font-size: 1.35rem; font-weight: 800; margin: 0 0 0.35rem; color: var(--text-primary);">
               Информационно-методическое письмо по предмету «История»
             </h2>
-            <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); max-width: 800px; line-height: 1.5;">
-              Официальные методические рекомендации Института стратегии развития образования. Документ представлен полностью в виде цельных оригинальных листов (20 страниц) без каких-либо сокращений или изменений.
+            <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); max-width: 850px; line-height: 1.5;">
+              Официальные методические рекомендации Института стратегии развития образования. Документ представлен полностью в виде цельных оригинальных листов (20 страниц) в единой ленте: листы помещаются в экран и прокручиваются целиком сверху вниз.
             </p>
           </div>
           <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-            <button class="btn-action" onclick="App.openHistoryMetodModal(${page})" style="background: #8b5cf6; color: white; font-weight: 600;" title="Открыть на весь экран">
+            <button class="btn-action" onclick="App.openHistoryMetodModal()" style="background: #8b5cf6; color: white; font-weight: 600;" title="Открыть на весь экран">
               🔍 Во весь экран
             </button>
             <a href="docs/istoriya_metod.pdf" download="istoriya_metod_2026_2027.pdf" class="btn-action" style="border: 1px solid var(--border-color); color: var(--text-primary);" title="Скачать оригинальный PDF">
@@ -1500,43 +1530,80 @@ const App = {
           </div>
         </div>
 
-        <!-- Навигационная панель перелистывания листов -->
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; background: var(--bg-secondary); padding: 0.75rem 1.15rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1.25rem; flex-wrap: wrap;">
-          <button class="btn-action" style="padding: 0.45rem 1rem; font-size: 0.86rem;" onclick="App.setHistoryMetodSubtabPage(${page - 1})" ${page <= 1 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
-            ◀ Предыдущий лист
-          </button>
-
-          <div style="display: flex; align-items: center; gap: 0.65rem;">
-            <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">Лист:</span>
-            <select style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); padding: 0.4rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.88rem; outline: none; cursor: pointer; font-weight: 600;" onchange="App.setHistoryMetodSubtabPage(parseInt(this.value, 10))">
-              ${Array.from({ length: 20 }, (_, i) => `<option value="${i + 1}" ${i + 1 === page ? 'selected' : ''}>Лист ${i + 1} из 20</option>`).join("")}
-            </select>
-            <span style="font-size: 0.85rem; color: var(--text-muted);">(из 20 страниц)</span>
-          </div>
-
-          <button class="btn-action" style="padding: 0.45rem 1rem; font-size: 0.86rem; background: var(--accent-blue); color: white;" onclick="App.setHistoryMetodSubtabPage(${page + 1})" ${page >= 20 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
-            Следующий лист ▶
-          </button>
-        </div>
-
-        <!-- Отображение цельного листа -->
-        <div style="display: flex; justify-content: center; align-items: center; background: #1e1e1e; border-radius: var(--radius-md); padding: 1.5rem 1rem; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
-          <img src="images/history_metod/page_${page}.png" alt="Официальный лист ${page} по истории" style="max-width: 100%; width: 850px; height: auto; border-radius: 4px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); background: #ffffff;" loading="lazy">
-        </div>
-
-        <!-- Полоса быстрого перехода по всем 20 страницам -->
-        <div style="margin-top: 1.25rem; text-align: center;">
-          <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
-            Быстрый переход к любому листу:
-          </div>
-          <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
-            ${Array.from({ length: 20 }, (_, i) => `
-              <button onclick="App.setHistoryMetodSubtabPage(${i + 1})" style="min-width: 36px; height: 36px; padding: 0 6px; border-radius: 8px; border: 1px solid ${i + 1 === page ? '#8b5cf6' : 'var(--border-color)'}; background: ${i + 1 === page ? '#8b5cf6' : 'var(--bg-tertiary)'}; color: ${i + 1 === page ? '#fff' : 'var(--text-secondary)'}; font-size: 0.85rem; font-weight: ${i + 1 === page ? '700' : '600'}; cursor: pointer; transition: all 0.15s;">
-                ${i + 1}
+        <!-- Панель управления масштабом и быстрым переходом -->
+        <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 1rem; margin-bottom: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem;">
+          
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">📐 Режим отображения:</span>
+              <button class="metod-fit-btn" data-fit="screen" onclick="App.setHistoryMetodFit('screen')" style="padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; border: 1px solid ${fit === 'screen' ? '#8b5cf6' : 'var(--border-color)'}; background: ${fit === 'screen' ? '#8b5cf6' : 'var(--bg-tertiary)'}; color: ${fit === 'screen' ? '#fff' : 'var(--text-secondary)'}; font-weight: ${fit === 'screen' ? '700' : '500'};">
+                📱 По высоте экрана (85vh)
               </button>
-            `).join("")}
+              <button class="metod-fit-btn" data-fit="standard" onclick="App.setHistoryMetodFit('standard')" style="padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; border: 1px solid ${fit === 'standard' ? '#8b5cf6' : 'var(--border-color)'}; background: ${fit === 'standard' ? '#8b5cf6' : 'var(--bg-tertiary)'}; color: ${fit === 'standard' ? '#fff' : 'var(--text-secondary)'}; font-weight: ${fit === 'standard' ? '700' : '500'};">
+                📖 Крупный лист (860px)
+              </button>
+              <button class="metod-fit-btn" data-fit="full" onclick="App.setHistoryMetodFit('full')" style="padding: 0.3rem 0.75rem; border-radius: 6px; font-size: 0.82rem; cursor: pointer; border: 1px solid ${fit === 'full' ? '#8b5cf6' : 'var(--border-color)'}; background: ${fit === 'full' ? '#8b5cf6' : 'var(--bg-tertiary)'}; color: ${fit === 'full' ? '#fff' : 'var(--text-secondary)'}; font-weight: ${fit === 'full' ? '700' : '500'};">
+                🖥️ 100% ширина
+              </button>
+            </div>
+            <div style="font-size: 0.82rem; color: var(--text-muted);">
+              20 оригинальных листов • непрерывная лента
+            </div>
+          </div>
+
+          <!-- Быстрый прыжок к любому листу (1..20) -->
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.65rem;">
+            <span style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary);">Быстрый переход:</span>
+            <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+              ${Array.from({ length: 20 }, (_, i) => `
+                <button onclick="App.scrollToMetodSheet(${i + 1})" title="Перейти к листу ${i + 1}" style="min-width: 32px; height: 30px; padding: 0 5px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-primary); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.15s;">
+                  ${i + 1}
+                </button>
+              `).join("")}
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Непрерывная лента всех 20 листов подряд -->
+        <div id="history-metod-sheets-stream" class="history-metod-stream fit-${fit}" style="display: flex; flex-direction: column; gap: 2rem; align-items: center;">
+          ${Array.from({ length: 20 }, (_, i) => {
+            const p = i + 1;
+            return `
+              <div id="history-metod-sheet-${p}" class="history-metod-sheet-card" style="width: 100%; display: flex; flex-direction: column; align-items: center; scroll-margin-top: 85px;">
+                <div style="width: 100%; max-width: 860px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-secondary); padding: 0.45rem 0.9rem; border-radius: var(--radius-sm) var(--radius-sm) 0 0; border: 1px solid var(--border-color); border-bottom: none; box-sizing: border-box;">
+                  <span style="font-size: 0.85rem; font-weight: 700; color: #a78bfa; display: flex; align-items: center; gap: 0.4rem;">
+                    📄 Лист ${p} из 20
+                  </span>
+                  <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <button onclick="App.scrollToMetodSheet(${Math.max(1, p - 1)})" ${p === 1 ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : 'style="cursor:pointer;"'} class="btn-action" style="padding: 0.2rem 0.55rem; font-size: 0.76rem;" title="К предыдущему листу">▲ Вверх</button>
+                    <button onclick="App.scrollToMetodSheet(${Math.min(20, p + 1)})" ${p === 20 ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : 'style="cursor:pointer;"'} class="btn-action" style="padding: 0.2rem 0.55rem; font-size: 0.76rem;" title="К следующему листу">▼ Вниз</button>
+                    <a href="images/history_metod/page_${p}.png" target="_blank" rel="noopener noreferrer" style="font-size: 0.78rem; color: var(--accent-blue); text-decoration: none; margin-left: 0.35rem;" title="Открыть лист в высоком разрешении в новой вкладке">
+                      В новой вкладке ↗
+                    </a>
+                  </div>
+                </div>
+                <div style="display: flex; justify-content: center; align-items: center; background: #1a1a1a; padding: 0.75rem; border-radius: 0 0 var(--radius-sm) var(--radius-sm); border: 1px solid var(--border-color); width: 100%; max-width: 860px; box-sizing: border-box; box-shadow: 0 6px 20px rgba(0,0,0,0.35);">
+                  <img class="metod-sheet-img" src="images/history_metod/page_${p}.png" alt="Официальный лист ${p} по истории" style="${imgStyle} border-radius: 3px; box-shadow: 0 2px 14px rgba(0,0,0,0.5); background: #ffffff;" loading="lazy" decoding="async">
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </div>
+
+        <!-- Нижняя панель быстрого перехода наверх -->
+        <div style="margin-top: 2rem; padding: 1rem; text-align: center; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <span style="font-size: 0.85rem; color: var(--text-secondary);">Конец документа (все 20 листов)</span>
+          <div style="display: flex; gap: 0.6rem;">
+            <button class="btn-action" onclick="App.scrollToMetodSheet(1)" style="padding: 0.45rem 1rem;">
+              ▲ Наверх к листу 1
+            </button>
+            <a href="docs/istoriya_metod.pdf" download="istoriya_metod_2026_2027.pdf" class="btn-action" style="background: #8b5cf6; color: white;">
+              📥 Скачать полный PDF
+            </a>
           </div>
         </div>
+
       </div>
     `;
   },
