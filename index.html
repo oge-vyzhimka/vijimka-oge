@@ -183,7 +183,7 @@
       <div class="status-left">
         <div class="last-update-indicator" id="last-update-badge" title="Последнее обновление материалов и базы заданий">
           <span class="update-pulse-dot"></span>
-          <span class="update-label">18.09 последнее изменение</span>
+          <span class="update-label">30.09 последнее изменение</span>
         </div>
         <span class="status-sep">•</span>
         <div class="status-countdown" title="Обратный отсчет до начала экзаменов ОГЭ">
@@ -654,6 +654,18 @@
 
 
   <!-- ========================================================================
+       Модальное окно: Методические материалы по Истории (ЕДСОО 2026/2027)
+       ======================================================================== -->
+  <div id="history-metod-modal" class="custom-modal-overlay" onclick="App.closeHistoryMetodModal(event)" style="display: none;">
+    <div class="custom-modal-card history-metod-modal-card" style="max-width: 920px; width: 96%; max-height: 94vh; padding: 1.25rem;">
+      <button class="modal-close-btn" onclick="App.closeHistoryMetodModal()">&times;</button>
+      <div id="history-metod-modal-content">
+        <!-- Генерируется из history_metod.js через App.openHistoryMetodModal -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
        Модальное окно: Личный кабинет / Авторизация Supabase (Фичи 3, 4, 5)
        ======================================================================== -->
   <div id="auth-modal" class="custom-modal-overlay" onclick="if(event.target===this) Auth.closeProfileModal();" style="display: none;">
@@ -707,21 +719,22 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <!-- Подключение скриптов приложения -->
-  <script src="js/data/subjects.js?v=20260919-v10"></script>
-  <script src="js/data/demos.js?v=20260919-v10"></script>
-  <script src="js/data/full_demos.js?v=20260919-v10"></script>
-  <script src="js/data/prokudskoe_tasks.js?v=20260919-v10"></script>
-  <script src="js/data/guide.js?v=20260919-v10"></script>
-  <script src="js/data/kims.js?v=20260919-v10"></script>
-  <script src="js/data/quizzes.js?v=20260919-v10"></script>
-  <script src="js/data/oge_topics.js?v=20260919-v10"></script>
-  <script src="js/task_details.js?v=20260919-v10"></script>
-  <script src="js/calculator.js?v=20260919-v10"></script>
-  <script src="js/auth.js?v=20260919-v10"></script>
-  <script src="js/mistakes.js?v=20260919-v10"></script>
-  <script src="js/gamification.js?v=20260919-v10"></script>
-  <script src="js/quiz.js?v=20260919-v10"></script>
-  <script src="js/libraries.js?v=20260919-v10"></script>
-  <script src="js/app.js?v=20260919-v10"></script>
+  <script src="js/data/subjects.js?v=20260930-v2"></script>
+  <script src="js/data/demos.js?v=20260930-v2"></script>
+  <script src="js/data/full_demos.js?v=20260930-v2"></script>
+  <script src="js/data/history_metod.js?v=20260930-v2"></script>
+  <script src="js/data/prokudskoe_tasks.js?v=20260930-v2"></script>
+  <script src="js/data/guide.js?v=20260930-v2"></script>
+  <script src="js/data/kims.js?v=20260930-v2"></script>
+  <script src="js/data/quizzes.js?v=20260930-v2"></script>
+  <script src="js/data/oge_topics.js?v=20260930-v2"></script>
+  <script src="js/task_details.js?v=20260930-v2"></script>
+  <script src="js/calculator.js?v=20260930-v2"></script>
+  <script src="js/auth.js?v=20260930-v2"></script>
+  <script src="js/mistakes.js?v=20260930-v2"></script>
+  <script src="js/gamification.js?v=20260930-v2"></script>
+  <script src="js/quiz.js?v=20260930-v2"></script>
+  <script src="js/libraries.js?v=20260930-v2"></script>
+  <script src="js/app.js?v=20260930-v2"></script>
 </body>
 </html>

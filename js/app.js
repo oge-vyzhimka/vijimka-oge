@@ -8,9 +8,10 @@ const App = {
   currentView: "home", // home | cheatsheet | demos | quiz | calculator | tracker | school | guide | store
   currentDemosSubtab: "fipi", // fipi | umschool | prokudskoe
   currentDemoPartFilter: "all", // all | part1 | part2
+  historyMetodSubtabPage: 1,
   allDemoSolutionsExpanded: false,
   theme: "dark",
-  lastUpdateDate: "18.09",
+  lastUpdateDate: "30.09",
   topicsSearchQuery: "",
   topicsPartFilter: "all", // all | part1 | part2
   topicsStatusFilter: "all", // all | pending | completed
@@ -398,18 +399,28 @@ const App = {
 
     // Рендерим контент соответствующего раздела
     if (viewName === "cheatsheet") this.renderCheatsheet();
-    else if (viewName === "demos") this.renderDemos();
+    else if (viewName === "demos") this.renderDemosView();
     else if (viewName === "guide") this.renderGuide();
-    else if (viewName === "quiz") this.renderQuiz();
-    else if (viewName === "calculator") this.renderCalculator();
+    else if (viewName === "quiz") {
+      if (typeof QuizEngine !== "undefined" && QuizEngine.start) QuizEngine.start(this.currentSubject);
+    }
+    else if (viewName === "calculator") {
+      if (typeof Calculator !== "undefined") {
+        if (Calculator.updateSubjectUI) Calculator.updateSubjectUI();
+        if (Calculator.calculate) Calculator.calculate();
+      }
+    }
     else if (viewName === "tracker") this.renderTracker();
-    else if (viewName === "store") this.renderStore();
-    else if (viewName === "school") this.renderSchool();
+    else if (viewName === "store") this.renderStoreView();
+    else if (viewName === "school") {
+      // school view
+    }
     else if (viewName === "mistakes") {
-      if (typeof MistakesBank !== "undefined") MistakesBank.render();
+      if (typeof MistakesBank !== "undefined" && MistakesBank.render) MistakesBank.render();
     }
     else if (viewName === "cabinet") {
-      if (typeof Gamification !== "undefined") Gamification.renderCabinet();
+      if (typeof CabinetView !== "undefined" && CabinetView.render) CabinetView.render();
+      else if (typeof Gamification !== "undefined" && Gamification.renderCabinet) Gamification.renderCabinet();
     }
 
     // Прокручиваем наверх страницы
@@ -484,6 +495,11 @@ const App = {
             </div>
           </div>
           <div class="subject-banner-actions">
+            ${subj.id === 'history' ? `
+              <button class="btn-action" onclick="App.openHistoryMetodModal(1)" style="background: #8b5cf6; color: white; font-weight: 700;" title="Официальные цельные листы методических материалов 2026/2027">
+                📑 Метод. материалы (20 листов)
+              </button>
+            ` : ''}
             <button class="btn-action" onclick="App.switchView('demos')" title="Полная демоверсия ФИПИ и задачи села Прокудское">
               📋 Пробники и демо-версии
             </button>
@@ -545,6 +561,11 @@ const App = {
               <p class="demo-mock-desc">${demoData.overview}</p>
             </div>
             <div class="demo-mock-actions">
+              ${this.currentSubject === 'history' ? `
+                <button class="btn-action" onclick="App.openHistoryMetodModal(1)" style="background: #8b5cf6; color: white; border-color: #8b5cf6; font-weight: 700;">
+                  📑 Метод. материалы (20 листов) ✨
+                </button>
+              ` : ''}
               <button class="btn-action demo-action-btn" onclick="App.switchView('demos'); App.setDemosSubtab('fipi');" style="background: var(--accent-blue); color: white;">
                 📑 Полная демоверсия ФИПИ (${fullDemo ? fullDemo.totalTasks : 25} зад.)
               </button>
@@ -562,6 +583,22 @@ const App = {
           ${demoData.fipiChanges ? `
             <div class="demo-changes-box">
               <strong>🔔 Спецификация 2026/2027:</strong> ${demoData.fipiChanges}
+            </div>
+          ` : ''}
+          ${this.currentSubject === 'history' ? `
+            <div style="margin-top: 1rem; padding: 0.9rem 1.15rem; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.35); border-radius: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+              <div>
+                <span style="font-size: 0.72rem; font-weight: 700; color: #a78bfa; text-transform: uppercase;">Официальный документ ЕДСОО 2026/2027</span>
+                <div style="font-weight: 700; font-size: 0.95rem; margin-top: 2px;">Информационно-методическое письмо по учебному предмету «История» (20 цельных листов)</div>
+              </div>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="btn-action" onclick="App.openHistoryMetodModal(1)" style="background: #8b5cf6; color: white; font-size: 0.82rem; padding: 0.45rem 0.9rem;">
+                  👁️ Открыть цельные листы
+                </button>
+                <a href="docs/istoriya_metod.pdf" download="istoriya_metod_2026_2027.pdf" class="btn-action" style="font-size: 0.82rem; padding: 0.45rem 0.85rem; border: 1px solid var(--border-color); color: var(--text-primary);">
+                  📥 Скачать PDF
+                </a>
+              </div>
             </div>
           ` : ''}
         </div>
@@ -1338,6 +1375,173 @@ const App = {
   },
 
   /* --------------------------------------------------------------------------
+     Официальные методические материалы по Истории (ЕДСОО 2026/2027)
+     -------------------------------------------------------------------------- */
+  historyMetodModalPage: 1,
+  historyMetodSubtabPage: 1,
+
+  openHistoryMetodModal(startPage = 1) {
+    this.historyMetodModalPage = Math.max(1, Math.min(20, startPage));
+    const modal = document.getElementById("history-metod-modal");
+    if (!modal) return;
+    this.renderHistoryMetodModalContent();
+    modal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  },
+
+  closeHistoryMetodModal(event) {
+    if (event && event.target.id !== "history-metod-modal" && !event.target.classList.contains("modal-close-btn")) {
+      return;
+    }
+    const modal = document.getElementById("history-metod-modal");
+    if (modal) {
+      modal.style.display = "none";
+      document.body.style.overflow = "auto";
+    }
+  },
+
+  setHistoryMetodModalPage(pageNum) {
+    this.historyMetodModalPage = Math.max(1, Math.min(20, pageNum));
+    this.renderHistoryMetodModalContent();
+  },
+
+  renderHistoryMetodModalContent() {
+    const container = document.getElementById("history-metod-modal-content");
+    if (!container) return;
+    const page = this.historyMetodModalPage;
+    container.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.85rem; margin-bottom: 1rem;">
+        <div>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+            <span style="font-size: 0.72rem; font-weight: 700; color: #a78bfa; background: rgba(139, 92, 246, 0.18); padding: 0.15rem 0.55rem; border-radius: 9999px;">ЕДСОО / ИСРО 2026/2027</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">🏛️ История</span>
+            <span style="font-size: 0.72rem; color: var(--accent-green); font-weight: 600;">✓ 100% цельный лист</span>
+          </div>
+          <h2 style="font-size: 1.15rem; font-weight: 800; margin: 0; color: var(--text-primary);">Информационно-методическое письмо по Истории</h2>
+          <div style="font-size: 0.82rem; color: var(--text-secondary); margin-top: 0.2rem;">
+            Цельный аутентичный лист без изменений • Страница ${page} из 20
+          </div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-shrink: 0;">
+          <a href="docs/istoriya_metod.pdf" download="istoriya_metod_2026_2027.pdf" class="btn-action" style="font-size: 0.82rem; padding: 0.45rem 0.85rem; background: var(--bg-tertiary);" title="Скачать оригинальный PDF файл">
+            📥 Скачать PDF
+          </a>
+        </div>
+      </div>
+
+      <!-- Панель перелистывания -->
+      <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; background: var(--bg-secondary); padding: 0.6rem 0.9rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1rem; flex-wrap: wrap;">
+        <button class="btn-action" style="padding: 0.4rem 0.85rem; font-size: 0.84rem;" onclick="App.setHistoryMetodModalPage(${page - 1})" ${page <= 1 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
+          ◀ Предыдущий лист
+        </button>
+
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-primary);">Лист:</span>
+          <select style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); padding: 0.35rem 0.6rem; border-radius: var(--radius-sm); font-size: 0.85rem; outline: none; cursor: pointer;" onchange="App.setHistoryMetodModalPage(parseInt(this.value, 10))">
+            ${Array.from({ length: 20 }, (_, i) => `<option value="${i + 1}" ${i + 1 === page ? 'selected' : ''}>Лист ${i + 1} из 20</option>`).join("")}
+          </select>
+        </div>
+
+        <button class="btn-action" style="padding: 0.4rem 0.85rem; font-size: 0.84rem; background: var(--accent-blue); color: white;" onclick="App.setHistoryMetodModalPage(${page + 1})" ${page >= 20 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
+          Следующий лист ▶
+        </button>
+      </div>
+
+      <!-- Сам лист документа (цельный аутентичный лист) -->
+      <div style="display: flex; justify-content: center; align-items: center; background: #262626; border-radius: var(--radius-md); padding: 1rem; overflow-y: auto; max-height: calc(85vh - 200px); box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);">
+        <img src="images/history_metod/page_${page}.png" alt="Лист ${page} методических материалов по истории" style="max-width: 100%; height: auto; border-radius: 4px; box-shadow: 0 4px 24px rgba(0,0,0,0.3); background: #fff;" loading="lazy">
+      </div>
+
+      <!-- Полоса быстрых номеров страниц (1..20) -->
+      <div style="display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; margin-top: 0.85rem;">
+        ${Array.from({ length: 20 }, (_, i) => `
+          <button onclick="App.setHistoryMetodModalPage(${i + 1})" style="width: 32px; height: 32px; border-radius: 6px; border: 1px solid ${i + 1 === page ? '#8b5cf6' : 'var(--border-color)'}; background: ${i + 1 === page ? '#8b5cf6' : 'var(--bg-tertiary)'}; color: ${i + 1 === page ? '#fff' : 'var(--text-secondary)'}; font-size: 0.8rem; font-weight: ${i + 1 === page ? '700' : '500'}; cursor: pointer;">
+            ${i + 1}
+          </button>
+        `).join("")}
+      </div>
+    `;
+  },
+
+  setHistoryMetodSubtabPage(pageNum) {
+    this.historyMetodSubtabPage = Math.max(1, Math.min(20, pageNum));
+    this.renderDemosView();
+    const el = document.getElementById("history-metod-viewer-container");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  },
+
+  renderHistoryMetodSubtab() {
+    const page = this.historyMetodSubtabPage || 1;
+    return `
+      <div id="history-metod-viewer-container" class="history-metod-subtab-card" style="margin-top: 1.5rem; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-md);">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; flex-wrap: wrap; border-bottom: 1px solid var(--border-color); padding-bottom: 1.25rem; margin-bottom: 1.25rem;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem;">
+              <span style="font-size: 0.75rem; font-weight: 700; color: #a78bfa; background: rgba(139, 92, 246, 0.16); padding: 0.2rem 0.6rem; border-radius: 9999px;">ЕДСОО / ИСРО 2026/2027</span>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">🏛️ История</span>
+              <span style="font-size: 0.75rem; color: var(--accent-green); background: rgba(16, 185, 129, 0.12); padding: 0.2rem 0.55rem; border-radius: 9999px; font-weight: 600;">✓ 100% цельные листы</span>
+            </div>
+            <h2 style="font-size: 1.35rem; font-weight: 800; margin: 0 0 0.35rem; color: var(--text-primary);">
+              Информационно-методическое письмо по предмету «История»
+            </h2>
+            <p style="margin: 0; font-size: 0.88rem; color: var(--text-secondary); max-width: 800px; line-height: 1.5;">
+              Официальные методические рекомендации Института стратегии развития образования. Документ представлен полностью в виде цельных оригинальных листов (20 страниц) без каких-либо сокращений или изменений.
+            </p>
+          </div>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+            <button class="btn-action" onclick="App.openHistoryMetodModal(${page})" style="background: #8b5cf6; color: white; font-weight: 600;" title="Открыть на весь экран">
+              🔍 Во весь экран
+            </button>
+            <a href="docs/istoriya_metod.pdf" download="istoriya_metod_2026_2027.pdf" class="btn-action" style="border: 1px solid var(--border-color); color: var(--text-primary);" title="Скачать оригинальный PDF">
+              📥 Скачать PDF (20 стр.)
+            </a>
+          </div>
+        </div>
+
+        <!-- Навигационная панель перелистывания листов -->
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; background: var(--bg-secondary); padding: 0.75rem 1.15rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 1.25rem; flex-wrap: wrap;">
+          <button class="btn-action" style="padding: 0.45rem 1rem; font-size: 0.86rem;" onclick="App.setHistoryMetodSubtabPage(${page - 1})" ${page <= 1 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
+            ◀ Предыдущий лист
+          </button>
+
+          <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <span style="font-size: 0.9rem; font-weight: 700; color: var(--text-primary);">Лист:</span>
+            <select style="background: var(--bg-card); color: var(--text-primary); border: 1px solid var(--border-color); padding: 0.4rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.88rem; outline: none; cursor: pointer; font-weight: 600;" onchange="App.setHistoryMetodSubtabPage(parseInt(this.value, 10))">
+              ${Array.from({ length: 20 }, (_, i) => `<option value="${i + 1}" ${i + 1 === page ? 'selected' : ''}>Лист ${i + 1} из 20</option>`).join("")}
+            </select>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">(из 20 страниц)</span>
+          </div>
+
+          <button class="btn-action" style="padding: 0.45rem 1rem; font-size: 0.86rem; background: var(--accent-blue); color: white;" onclick="App.setHistoryMetodSubtabPage(${page + 1})" ${page >= 20 ? 'disabled style="opacity: 0.4; cursor: not-allowed;"' : ''}>
+            Следующий лист ▶
+          </button>
+        </div>
+
+        <!-- Отображение цельного листа -->
+        <div style="display: flex; justify-content: center; align-items: center; background: #1e1e1e; border-radius: var(--radius-md); padding: 1.5rem 1rem; box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);">
+          <img src="images/history_metod/page_${page}.png" alt="Официальный лист ${page} по истории" style="max-width: 100%; width: 850px; height: auto; border-radius: 4px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); background: #ffffff;" loading="lazy">
+        </div>
+
+        <!-- Полоса быстрого перехода по всем 20 страницам -->
+        <div style="margin-top: 1.25rem; text-align: center;">
+          <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600;">
+            Быстрый переход к любому листу:
+          </div>
+          <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+            ${Array.from({ length: 20 }, (_, i) => `
+              <button onclick="App.setHistoryMetodSubtabPage(${i + 1})" style="min-width: 36px; height: 36px; padding: 0 6px; border-radius: 8px; border: 1px solid ${i + 1 === page ? '#8b5cf6' : 'var(--border-color)'}; background: ${i + 1 === page ? '#8b5cf6' : 'var(--bg-tertiary)'}; color: ${i + 1 === page ? '#fff' : 'var(--text-secondary)'}; font-size: 0.85rem; font-weight: ${i + 1 === page ? '700' : '600'}; cursor: pointer; transition: all 0.15s;">
+                ${i + 1}
+              </button>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+    `;
+  },
+
+  /* --------------------------------------------------------------------------
      Модальное окно: Просмотр сборников КИМ ФИПИ и ориентировочных цен
      -------------------------------------------------------------------------- */
   openKimModal(subjectId) {
@@ -1523,17 +1727,45 @@ const App = {
   /* --------------------------------------------------------------------------
      Раздел: Пробники и демо-версии (4ЕГЭ, ФИПИ, Умскул, с. Прокудское)
      -------------------------------------------------------------------------- */
+  renderDemos() {
+    this.renderDemosView();
+  },
+
+  renderStore() {
+    this.renderStoreView();
+  },
+
+  renderCalculator() {
+    if (typeof Calculator !== "undefined") {
+      if (Calculator.updateSubjectUI) Calculator.updateSubjectUI();
+      if (Calculator.calculate) Calculator.calculate();
+    }
+  },
+
+  renderQuiz() {
+    if (typeof QuizEngine !== "undefined" && QuizEngine.start) {
+      QuizEngine.start(this.currentSubject);
+    }
+  },
+
   renderDemosView() {
     const container = document.getElementById("demos-main-content");
     if (!container) return;
 
+    if (!this.currentSubject || (typeof SUBJECTS_DATA !== "undefined" && !SUBJECTS_DATA[this.currentSubject])) {
+      this.currentSubject = "math";
+    }
     const sId = this.currentSubject;
-    const subj = SUBJECTS_DATA[sId];
+    const subj = (typeof SUBJECTS_DATA !== "undefined") ? SUBJECTS_DATA[sId] : null;
     const fullDemo = (typeof FULL_DEMOS_DATA !== "undefined") ? FULL_DEMOS_DATA[sId] : null;
     const um = (typeof UMSCHOOL_DATA !== "undefined") ? UMSCHOOL_DATA[sId] : null;
     const prokudskoe = (typeof PROKUDSKOE_TASKS_DATA !== "undefined" && PROKUDSKOE_TASKS_DATA.subjects) ? PROKUDSKOE_TASKS_DATA.subjects[sId] : null;
 
     if (!subj) return;
+
+    if (this.currentDemosSubtab === "history_metod" && sId !== "history") {
+      this.currentDemosSubtab = "fipi";
+    }
 
     const totalTasksCount = fullDemo ? fullDemo.totalTasks : (subj.examInfo ? subj.examInfo.questionsCount : 25);
     const maxScoreVal = fullDemo ? fullDemo.maxScore : (subj.examInfo ? subj.examInfo.maxScore : 31);
@@ -1587,6 +1819,11 @@ const App = {
           <button class="demos-subtab-btn subtab-prokudskoe ${this.currentDemosSubtab === 'prokudskoe' ? 'active' : ''}" onclick="App.setDemosSubtab('prokudskoe')">
             📍 Задачи с. Прокудское ${prokudskoe ? `(${prokudskoe.tasks.length} зад.)` : '✨'}
           </button>
+          ${sId === 'history' ? `
+            <button class="demos-subtab-btn subtab-metod ${this.currentDemosSubtab === 'history_metod' ? 'active' : ''}" onclick="App.setDemosSubtab('history_metod')" style="border-color: #8b5cf6; color: #a78bfa;">
+              📚 Метод. материалы ЕДСОО (20 листов) ✨
+            </button>
+          ` : ''}
         </div>
     `;
 
@@ -1594,6 +1831,10 @@ const App = {
       html += this.renderFipiDemoSubtab(fullDemo, subj);
     } else if (this.currentDemosSubtab === "prokudskoe") {
       html += this.renderProkudskoeDemoSubtab(prokudskoe, subj);
+    } else if (this.currentDemosSubtab === "history_metod" && sId === 'history') {
+      html += this.renderHistoryMetodSubtab();
+    } else {
+      html += this.renderFipiDemoSubtab(fullDemo, subj);
     }
 
     html += `</div>`;
