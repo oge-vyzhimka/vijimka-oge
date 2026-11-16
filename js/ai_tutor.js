@@ -462,12 +462,12 @@
   // Format message text and markdown links
   function formatBotText(raw) {
     let clean = raw.replace(/\n/g, '<br>');
-    // Clean LaTeX artifacts like \( \) or \[ \]
     clean = clean.replace(/\\\(|\\\)/g, '').replace(/\\\[|\\\]/g, '');
-    // Replace [Text](#hash) with styled button
+    clean = clean.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
     clean = clean.replace(/\[([^\]]+)\]\((#[a-z0-9_\-]+)\)/gi, function(match, label, hash) {
       return `<a href="${hash}" class="ai-link-btn">👉 ${label}</a>`;
     });
+    clean = clean.replace(/href="https:\/\/oge-vyzhimka\.github\.io\/vijimka-oge\/#(math|russian|physics|social|history|informatics|chemistry|quiz|calculator)"/gi, 'href="#$1" class="ai-link-btn"');
     return clean;
   }
 
@@ -485,59 +485,66 @@
 
   // Real AI Query function
   async function queryAI(prompt) {
-    const systemPrompt = `Ты дружелюбный школьный ИИ-репетитор по ОГЭ для 9 класса на сайте «Выжимка ОГЭ» (Чикская СОШ № 6).
-Твоя задача — отвечать на ЛЮБЫЕ вопросы ученика: объяснять любые правила, теоремы, физические явления, исторические даты, термины по обществознанию и кодинг.
-Объясняй просто, понятно, кратко (2-4 предложения) и с жизненными примерами.
-ВАЖНОЕ ПРАВИЛО ПО НАВИГАЦИИ ПО НАШЕМУ САЙТУ:
-Если в вопросе речь идет о предмете (математика, русский, физика, химия, обществознание, история, информатика, тесты), ВСЕГДА добавь в конце ответа ссылку на наш сайт в формате:
-- Математика: [Открыть раздел «Математика»](#math)
-- Русский язык: [Открыть раздел «Русский язык»](#russian)
-- Обществознание: [Открыть раздел «Обществознание»](#social)
-- Информатика: [Открыть раздел «Информатика»](#informatics)
-- История: [Открыть раздел «История»](#history)
-- Физика: [Открыть раздел «Физика»](#physics)
-- Химия: [Открыть раздел «Химия»](#chemistry)
-- Тесты: [Открыть тесты](#quiz)
-- Калькулятор баллов: [Открыть калькулятор](#calculator)`;
-
-    // 1. Direct real AI call
-    try {
-      const res = await fetch('https://text.pollinations.ai/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: prompt }
-          ],
-          model: 'openai',
-          seed: Math.floor(Math.random() * 100000)
-        })
-      });
-      if (res.ok) {
-        const text = (await res.text()).trim();
-        if (text && text.length > 5) {
-          return text;
-        }
-      }
-    } catch (e) {
-      console.warn('Direct AI error, fallback to Supabase:', e);
-    }
-
-    // 2. Fallback to Supabase Cloud Function
+    // 1. Primary: Supabase Cloud Function with Education Engine & LLM
     try {
       const sRes = await fetch('https://rkzzfszozgleeujkxzlb.supabase.co/functions/v1/telegram-bot?ai_ask=1', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: prompt })
       });
-      const sData = await sRes.json();
-      if (sData && sData.ok && sData.answer) {
-        return sData.answer;
+      if (sRes.ok) {
+        const sData = await sRes.json();
+        if (sData && sData.ok && sData.answer) {
+          return sData.answer;
+        }
       }
-    } catch (_) {}
+    } catch (e) {
+      console.warn('Supabase AI endpoint error, trying browser Wikipedia engine:', e);
+    }
 
-    // 3. Fallback smart keywords
+    // 2. Backup: Wikipedia Knowledge Engine directly in Browser
+    try {
+      const clean = prompt.replace(/(что такое|кто такой|кто такая|как решить|как решать|объясни|расскажи о|расскажи про|формула|правило|теорема|закон|дай ссылку на|ссылка на)/gi, '').trim();
+      if (clean.length >= 2) {
+        const searchUrl = `https://ru.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(clean)}&limit=1&namespace=0&format=json&origin=*`;
+        const sRes = await fetch(searchUrl);
+        const sData = await sRes.json();
+        if (Array.isArray(sData) && sData.length > 1 && sData[1].length > 0) {
+          const pageTitle = sData[1][0];
+          const sumUrl = `https://ru.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(pageTitle)}`;
+          const sumRes = await fetch(sumUrl);
+          const sumData = await sumRes.json();
+          if (sumData && sumData.extract) {
+            let extract = sumData.extract;
+            const sentences = extract.split(/(?<=[.!?])\s+/);
+            if (sentences.length > 3) extract = sentences.slice(0, 3).join(' ');
+
+            let link = '\n\n[Перейти к материалам](#quiz)';
+            const combo = (prompt + ' ' + pageTitle + ' ' + extract).toLowerCase();
+            if (combo.match(/(матем|алгебр|геомет|уравнен|дискриминант|пифагор|синус|косинус|дробь|треугольн|квадрат|число)/)) {
+              link = '\n\n[Открыть раздел «Математика»](#math)';
+            } else if (combo.match(/(русск|орфограф|пунктуац|запят|причаст|деепричаст|сочинен|изложен|падеж|глагол)/)) {
+              link = '\n\n[Открыть раздел «Русский язык»](#russian)';
+            } else if (combo.match(/(физик|ом|ньютон|паскал|джоул|напряжен|ток|скорост|ускорен|сил|масс|энерги)/)) {
+              link = '\n\n[Открыть раздел «Физика»](#physics)';
+            } else if (combo.match(/(обществ|государств|прав|закон|конституц|экономик|политик|инфляц|бюджет)/)) {
+              link = '\n\n[Открыть раздел «Обществознание»](#social)';
+            } else if (combo.match(/(истор|войн|битв|цар|век|русь|революц|ленин|сталин|петр|княз)/)) {
+              link = '\n\n[Открыть раздел «История»](#history)';
+            } else if (combo.match(/(информ|байт|бит|паскал|питон|алгоритм|excel|граф|код)/)) {
+              link = '\n\n[Открыть раздел «Информатика»](#informatics)';
+            } else if (combo.match(/(хим|реакц|веществ|кислот|оксид|валентност|менделеев|молекул)/)) {
+              link = '\n\n[Открыть раздел «Химия»](#chemistry)';
+            }
+            return `💡 **${sumData.title}:**\n${extract}${link}`;
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('Wiki browser search error:', e);
+    }
+
+    // 3. Fallback smart subject rules
     const p = prompt.toLowerCase();
     if (p.includes('матем') || p.includes('алгебр') || p.includes('геомет')) {
       return 'В математике на ОГЭ главное — набрать не менее 2 баллов по геометрии! Все формулы и алгоритмы собраны у нас: [Открыть раздел «Математика»](#math)';
@@ -558,38 +565,16 @@
       return 'В истории учи хронологию по векам и сопоставление событий с правителями. Все даты: [Открыть раздел «История»](#history)';
     }
     if (p.includes('хим')) {
-      return 'По химии обязательно запомни степени окисления, формулы кислот и качественные реакции. Держи конспект: [Открыть раздел «Химия»](#chemistry)';
+      return 'В химии важно знать таблицу Менделеева, типы реакций и формулы солей и кислот. Разбор тем: [Открыть раздел «Химия»](#chemistry)';
     }
     if (p.includes('тест') || p.includes('тренаж')) {
-      return 'Закрепить свои знания можно в наших интерактивных тестах с мгновенной проверкой: [Открыть тесты](#quiz)';
+      return 'Интерактивные мини-тесты с моментальной проверкой ответов: [Открыть тесты](#quiz)';
     }
-    return 'Я всегда готов помочь с подготовкой к ОГЭ! Какой предмет тебя интересует? Выбирай: [Математика](#math), [Русский язык](#russian), [Обществознание](#social), [Информатика](#informatics), [История](#history), [Физика](#physics) или [Химия](#chemistry).';
+    if (p.includes('калькулятор') || p.includes('балл')) {
+      return 'Калькулятор баллов ОГЭ: [Открыть калькулятор](#calculator)';
+    }
+
+    return 'Я твой виртуальный репетитор по ОГЭ! Задай мне любой вопрос по школьной программе, и я помогу разобраться. Выбирай предмет: [Математика](#math), [Русский язык](#russian), [Физика](#physics), [Обществознание](#social), [История](#history), [Информатика](#informatics), [Химия](#chemistry) или [Тесты](#quiz).';
   }
 
-  async function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-
-    addMessage(text, true);
-    input.value = '';
-
-    // Typing indicator
-    const typing = document.createElement('div');
-    typing.className = 'ai-msg ai-msg-bot ai-typing-indicator';
-    typing.innerHTML = '<span class="ai-typing-dot"></span><span class="ai-typing-dot"></span><span class="ai-typing-dot"></span>';
-    msgList.appendChild(typing);
-    msgList.scrollTop = msgList.scrollHeight;
-
-    const answer = await queryAI(text);
-    typing.remove();
-    addMessage(answer);
-  }
-
-  sendBtn.addEventListener('click', sendMessage);
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      sendMessage();
-    }
-  });
-
-})();
+  
