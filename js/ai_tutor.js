@@ -461,6 +461,7 @@
 
   // Format message text and markdown links
   function formatBotText(raw) {
+    if (!raw) return '';
     let clean = raw.replace(/\n/g, '<br>');
     clean = clean.replace(/\\\(|\\\)/g, '').replace(/\\\[|\\\]/g, '');
     clean = clean.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
@@ -485,7 +486,7 @@
 
   // Real AI Query function
   async function queryAI(prompt) {
-    // 1. Primary: Supabase Cloud Function with Education Engine & LLM
+    // 1. Primary: Cloud Education Engine (Supabase in Frankfurt)
     try {
       const sRes = await fetch('https://rkzzfszozgleeujkxzlb.supabase.co/functions/v1/telegram-bot?ai_ask=1', {
         method: 'POST',
@@ -577,4 +578,30 @@
     return 'Я твой виртуальный репетитор по ОГЭ! Задай мне любой вопрос по школьной программе, и я помогу разобраться. Выбирай предмет: [Математика](#math), [Русский язык](#russian), [Физика](#physics), [Обществознание](#social), [История](#history), [Информатика](#informatics), [Химия](#chemistry) или [Тесты](#quiz).';
   }
 
-  
+  async function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    addMessage(text, true);
+    input.value = '';
+
+    // Typing indicator
+    const typing = document.createElement('div');
+    typing.className = 'ai-msg ai-msg-bot ai-typing-indicator';
+    typing.innerHTML = '<span class="ai-typing-dot"></span><span class="ai-typing-dot"></span><span class="ai-typing-dot"></span>';
+    msgList.appendChild(typing);
+    msgList.scrollTop = msgList.scrollHeight;
+
+    const answer = await queryAI(text);
+    typing.remove();
+    addMessage(answer);
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      sendMessage();
+    }
+  });
+
+})();
